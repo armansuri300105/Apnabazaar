@@ -1,0 +1,13 @@
+@media screen and (max-width: 1000px) {
+    .footer-grid{
+        grid-template-columns: 1fr 1fr;
+    }
+    .copyright{
+        flex-direction: column;
+    }
+}
+@media screen and (max-width: 760px) {
+    .footer-grid{
+        grid-template-columns: 1fr;
+    }
+}

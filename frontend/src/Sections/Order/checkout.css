@@ -1,0 +1,50 @@
+@media screen and (max-width: 1200px) {
+    .checkout-section{
+        width: 1000px;
+    }
+    .checkout-section-left{
+        width: 500px;
+    }
+    .orderdetail{
+        width: 400px;
+    }
+    .continue-btn{
+        width: 60%;
+    }
+    .back-btn{
+        width: 20%;
+    }
+}
+@media screen and (max-width: 1000px) {
+    .checkout-section{
+        flex-direction: column;
+    }
+    .checkout-section-left{
+        width: 90vw;
+    }
+    .orderdetail{
+        width: 90vw;
+    }
+    .order-section{
+        width: 600px;
+    }
+    .orders-page{
+        width: 600px;
+        margin-top: 180px;
+    }
+}
+@media screen and (max-width: 600px) {
+    .checkout-section{
+        width: 100vw;
+        padding-left: 20px;
+    }
+    .order-section{
+        width: 80vw;
+    }
+    .orderdetail-page{
+        width: 80vw;
+    }
+    .shipping-page, .orders-page{
+        width: 80vw;
+    }
+}

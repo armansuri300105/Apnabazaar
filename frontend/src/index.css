@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  /* font-family: "Acme", sans-serif; */
+  font-family: "Advent Pro", sans-serif;
+}

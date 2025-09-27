@@ -1,0 +1,54 @@
+@media screen and (max-width: 1200px) {
+    .hero{
+        flex-direction: column;
+    }
+    .feature-products{
+        width: 900px;
+    }
+}
+@media screen and (max-width: 900px) {
+    .home-hero{
+        padding-top: 200px;
+    }
+    .feature-products{
+        width: 90vw;
+    }
+}
+@media screen and (max-width: 600px) {
+    .home-buttons-div{
+        flex-direction: column;
+    }
+    .shopnow-btn, .vendor-btn{
+        width: 90vw;
+        justify-content: center;
+        gap: 10px;
+    }
+    .fruitimg-right, .fruitimg-left{
+        display: none;
+    }
+    .hero-section-text{
+        font-size: 30px;
+    }
+    .hero{
+        width: 100vw;
+    }
+    .hero-top-seciton{
+        margin: 20px;
+    }
+    .quality-btns{
+        width: 400px;
+    }
+}
+@media screen and (max-width: 600px) {
+    .hero-text{
+        width: 90vw;
+    }
+    .homeBotton-box{
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    .homeBotton-box > div{
+        width: auto;
+    }
+}

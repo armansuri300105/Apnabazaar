@@ -1,0 +1,80 @@
+@media screen and (max-width: 1300px) {
+    .about-story-img{
+        width: 400px;
+        height: 400px;
+    }
+    .team-section-box > div{
+        width: 180px;
+        height: 270px;
+    }
+}
+@media screen and (max-width: 1000px) {
+    .about-story-heading{
+        font-size: 30px;
+    }
+    .about-story-box{
+        flex-direction: column;
+    }
+    .about-story-box > div, .stats-section, .mission-section{
+        width: 650px;
+    }
+    .about-story-img{
+        width: 650px;
+        height: 650px;
+    }
+    .team-section-box{
+        width: 650px;
+        grid-template-columns: 1fr 1fr;
+    }
+    .team-section-box > div{
+        width: 280px;
+        height: 250px;
+    }
+    .team-section{
+        width: 650px;
+    }
+}
+@media screen and (max-width: 900px) {
+    .about-story-main{
+        margin-top: 200px;
+    }
+}
+@media screen and (max-width: 700px) {
+    .about-story-box > div, .mission-section{
+        width: 500px;
+    }
+    .about-story-img{
+        width: 500px;
+        height: 500px;
+    }
+    .stats-section{
+        grid-template-columns: 1fr 1fr;
+    }
+    .mission-section-box{
+        flex-direction: column;
+    }
+    .mission-section-box > div{
+        width: 500px;
+        height: auto;
+    }
+    .team-section-box{
+        width: 500px;
+        grid-template-columns: 1fr;
+    }
+    .team-section-box > div{
+        width: 500px;
+        height: auto;
+    }
+    .team-section{
+        width: 500px;
+    }
+}
+@media screen and (max-width: 550px) {
+    .about-story-box > div, .mission-section, .mission-section-box > div, .team-section-box, .team-section-box > div, .team-section{
+        width: 90vw;
+    }
+    .about-story-img{
+        width: 90vw;
+        height: 90vw;
+    }
+}
