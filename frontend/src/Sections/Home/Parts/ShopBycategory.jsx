@@ -17,7 +17,7 @@ export const ShopbyCategory = ({loadinguser}) =>{
                 Shop By Category
             </div>
             <div className="flex justify-center">
-                <div className="text-[14px] h-[21px] text-[#717182] text-center">
+                <div className="text-[20px] h-[21px] text-[#717182] text-center">
                     Browse our wide selection of local products organized by category
                 </div>
             </div>

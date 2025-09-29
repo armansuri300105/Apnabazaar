@@ -133,7 +133,7 @@ export default function Products() {
             </p>
           </div>
         </div>
-        {addProduct ? <AddProductForm setAddProduct={setAddProduct} /> : ``}
+        {addProduct ? <AddProductForm setAddProduct={setAddProduct} refetch={refetch} /> : ``}
 
         {selectedProducts.length > 0 && (
           <div className="mb-4">

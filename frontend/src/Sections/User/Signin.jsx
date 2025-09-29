@@ -10,16 +10,16 @@ import LoginError from "./loginError";
 import { CartProductContext } from "../../services/context";
 
 export default function SigninForm() {
-    const {setCheckAuth} = useContext(CartProductContext)
     const [eye1, setEye1] = useState(false);
     const [showbtn, setShowbtn] = useState(false);
     const [check, setCheck] = useState(false);
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
     const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+      email: "",
+      password: "",
+    });
+    const {refetch} = useContext(CartProductContext)
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,6 +65,7 @@ export default function SigninForm() {
       return;
     }
     const res = await sendData(formData);
+    refetch()
     if (res.data.success){
       navigate('/');
     }

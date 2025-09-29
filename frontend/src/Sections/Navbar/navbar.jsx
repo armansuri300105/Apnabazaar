@@ -40,13 +40,13 @@ export const NavBar = () =>{
                         <NavLink to="/"><div className="font-semibold"><img className="w-[150px]" src="/logo.png" alt="ApnaBazaar" /></div></NavLink>
                     </div>
                 </div>
-                <ul className={`options flex gap-8 justify-between cursor-pointer`}>
+                <ul className={`options flex gap-8 justify-between cursor-pointer text-[20px]`}>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/"><li>Home</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/categories"><li>Categories</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/about"><li>About</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/contact"><li>Contact</li></NavLink>
                 </ul>
-                <ul className={`mobile-options hidden flex-col items-center gap-[14px] justify-between cursor-pointer overflow-hidden duration-300 ease-linear tarnsition-all ${(menu) ? "h-[135px]" : "h-0"}`}>
+                <ul className={`mobile-options hidden flex-col items-center text-[20px] gap-[14px] justify-between cursor-pointer overflow-hidden duration-300 ease-linear tarnsition-all ${(menu) ? "h-[135px]" : "h-0"}`}>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/"><li>Home</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/categories"><li>Categories</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/about"><li>About</li></NavLink>

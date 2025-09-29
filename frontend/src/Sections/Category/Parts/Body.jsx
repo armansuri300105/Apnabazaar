@@ -58,7 +58,7 @@ export const CategoryBody = () => {
     <CategorySkeleton />
   ) : (
     <div className="category-grid flex gap-[20px]">
-      <div>
+      <div className="sticky top-[100px] h-screen overflow-y-auto">
         <div className="text-[14px] font-semibold mb-2">Categories</div>
         {categoriesWithCount.map((item, index) => (
           <div
@@ -68,7 +68,7 @@ export const CategoryBody = () => {
               category === item.name
                 ? "bg-black text-white"
                 : "bg-neutral-200 text-black"
-            } px-3 text-[12.25px] flex justify-between items-center w-[15vw] h-[41px] rounded-lg mb-2`}
+            } px-3 text-[16px] flex justify-between items-center w-[15vw] h-[41px] rounded-lg mb-2`}
           >
             {item.name}
             <div className="text-black h-5 w-5 rounded-lg bg-neutral-200 border-solid border-[1px] border-grey-100 flex items-center justify-center">
@@ -78,7 +78,8 @@ export const CategoryBody = () => {
         ))}
       </div>
 
-      <div>
+      {/* Products Section */}
+      <div className="flex-1">
         <div>{items !== 0 ? `Showing ${items} products` : ""}</div>
         <div className="flex gap-6 mt-2 flex-wrap relative">
           {products?.length === 0 ? (

@@ -26,7 +26,7 @@ export default function Vendors() {
   }
 
   const vendors = data?.vendors;
-  
+  console.log(vendors)
   // Toggle vendor details on mobile
   const toggleVendorDetails = (id) => {
     if (expandedVendor === id) {
@@ -136,7 +136,7 @@ export default function Vendors() {
                       {v?.vendor?.status}
                     </span>
                   </td>
-                  <td className="p-3">{v?.products}</td>
+                  <td className="p-3">{v?.vendor?.products?.length}</td>
                   <td className="p-3">
                     {v?.rating}{" "}
                     <span className="text-gray-400 text-sm">
@@ -144,7 +144,7 @@ export default function Vendors() {
                     </span>
                   </td>
                   <td className="p-3 font-semibold">
-                    ₹{v?.sales?.toFixed(2)}
+                    ₹{v?.vendor?.totalRevenue === 0 ? 0 : v?.vendor?.totalRevenue}
                   </td>
                   <td className="p-3">
                     <button onClick={() => {
@@ -212,7 +212,7 @@ export default function Vendors() {
                     </div>
                     <div>
                       <p className="text-gray-500">Products</p>
-                      <p className="font-medium">{v?.products}</p>
+                      <p className="font-medium">{v?.vendor?.products?.length}</p>
                     </div>
                     <div>
                       <p className="text-gray-500">Rating</p>
@@ -222,7 +222,7 @@ export default function Vendors() {
                     </div>
                     <div className="col-span-2">
                       <p className="text-gray-500">Sales</p>
-                      <p className="font-medium">₹{v?.sales?.toFixed(2)}</p>
+                      <p className="font-medium">₹{v?.vendor?.totalRevenue === 0 ? 0 : v?.vendor?.totalRevenue}</p>
                     </div>
                   </div>
                   <div className="mt-3">
