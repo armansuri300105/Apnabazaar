@@ -23,7 +23,7 @@ export const Hbody1 = () => {
               <div>Fresh Local Products</div>
               <div>Delivered to Your Door</div>
             </div>
-            <div className="hero-text text-[15.75px] mt-6 text-neutral-500 font-xl">
+            <div className="hero-text text-[20px] mt-6 text-neutral-500 font-xl">
               Discover the best local vendors in your area. From farm-fresh
               produce to artisanal crafts, support your community while getting
               quality products.

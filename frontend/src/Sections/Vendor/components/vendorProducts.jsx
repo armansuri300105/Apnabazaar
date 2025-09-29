@@ -77,10 +77,23 @@ export default function Products() {
 
   if (result.isConfirmed) {
     const res = await removeVendorProduct(id);
+    console.log(res?.data)
     if (res?.data?.success) {
-      Swal.fire("Deleted!", "Selected products have been deleted.", "success");
+      Swal.fire({
+        title: "Deleted!",
+        text: "Product has been deleted successfully.",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } else {
-      Swal.fire("Oops!", "Something went wrong.", "error");
+      Swal.fire({
+        title: "Oops!",
+        text: "Something went wrong.",
+        icon: "error",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   }
 };
@@ -132,7 +145,7 @@ export default function Products() {
             </p>
           </div>
         </div>
-        {addProduct ? <AddProductForm setAddProduct={setAddProduct} /> : ``}
+        {addProduct ? <AddProductForm setAddProduct={setAddProduct} refetch={refetch} /> : ``}
 
         {selectedProducts.length > 0 && (
           <div className="mb-4">

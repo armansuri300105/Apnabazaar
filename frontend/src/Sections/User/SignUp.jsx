@@ -9,7 +9,7 @@ import LoginError from "./loginError";
 import { CartProductContext } from "../../services/context";
 
 export default function SignupForm() {
-  const {setCheckAuth} = useContext(CartProductContext)
+  const {refetch} = useContext(CartProductContext)
     const [eye1, setEye1] = useState(false);
     const [eye2, setEye2] = useState(false);
     const [showbtn, setShowbtn] = useState(false);
@@ -96,6 +96,7 @@ export default function SignupForm() {
     try {
       if (authResult['code']){
         const res = await googleLogin(authResult['code']);
+        refetch()
         if (res?.data?.success){
           return navigate("/");
         }

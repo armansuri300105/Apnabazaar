@@ -5,6 +5,10 @@
     .category-select-btn{
         width: 70vw;
     }
+    .category-grid>div{
+        position: inherit;
+        height: fit-content;
+    }
 }
 @media screen and (max-width: 900px) {
     .category-section-start{

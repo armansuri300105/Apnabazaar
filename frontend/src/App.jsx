@@ -26,7 +26,7 @@ import VendorForm from "./Sections/Vendor/vendorForm";
 import { VendorDashboard } from "./Sections/Vendor/vendorDashboard";
 import TrackOrder from "./Sections/Order/trackOrder";
 
-const GOOGLE_CLIENT_ID = "174848792494-8na95j0m9qlsk9ooi5qagif0ls2cf5vj.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "316084868865-6cm9ag49f38mgqp25ttja2i61cbjbl6l.apps.googleusercontent.com";
 
 const GoogleAuthWrapper = ({ children }) => (
   <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
@@ -41,7 +41,7 @@ const App = () => {
   });
 
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["authcheck"],
     queryFn: authCheck,
     select: (res) => res?.data || null,
@@ -69,7 +69,8 @@ const App = () => {
         setCmenu,
         loadinguser: isLoading,
         dataForMl,
-        setDataForMl
+        setDataForMl,
+        refetch
       }}
     >
       {!isSignupPage && <NavBar />}

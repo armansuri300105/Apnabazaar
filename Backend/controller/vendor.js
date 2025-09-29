@@ -9,12 +9,14 @@ export const addVendorProduct = async (req, res) => {
     const { images, name, price, stock, description, category } = req.body;
 
     if (!name || !price || !description || !category || !images?.length) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All required fields must be filled" });
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be filled",
+      });
     }
 
-    await PRODUCT.create({
+    // Create product
+    const newProduct = await PRODUCT.create({
       name,
       description,
       price,
@@ -24,9 +26,17 @@ export const addVendorProduct = async (req, res) => {
       vendor: req?.user?._id,
     });
 
+    // Add product _id to vendor's profile
+    await USER.findByIdAndUpdate(
+      req.user._id,
+      { $push: { "vendor.products": newProduct._id } },
+      { new: true }
+    );
+
     return res.json({
       success: true,
       message: "Product added successfully",
+      product: newProduct,
     });
   } catch (err) {
     return res
@@ -65,7 +75,7 @@ export const getVendorProducts = async (req, res) => {
 export const getVendorOrders = async (req, res) => {
   try {
     // Step 1: First find all products that belong to this vendor
-    const vendorProducts = await PRODUCT.find({ vendor: req.user._id }).select('_id').lean();
+    const vendorProducts = await PRODUCT.find({ vendor: req.user._id}).select('_id').lean();
     const vendorProductIds = vendorProducts.map(product => product._id);
 
     if (vendorProductIds.length === 0) {
@@ -191,12 +201,5 @@ export const updateOrderStatus = async (req,res) => {
 
 export const removeProduct = async (req,res) => {
   const id = req.query.id
-  const vendorId = req?.user?._id
-  const product = await PRODUCT.findOne({vendor: vendorId, _id: id})
-  if (!product){
-      return res.status(400).json({success: false, message: "Product not found with this id"});
-  }
-  product.isActive = false
-  await product.save()
-  return res.json({success: true, message: "product successfully removed"});
+  
 }

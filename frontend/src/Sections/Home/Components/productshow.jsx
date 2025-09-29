@@ -32,7 +32,7 @@ export const ProductShow= ({product}) =>{
             <img className="object-cover w-[100%] h-[100%] transition-all group-hover:scale-[107%] duration-180 " src={product.images[0]} />
         </div>
         <div className="grid gap-[10px] mt-6 p-[14px]">
-            <div className="text-[14px]">{product.name} </div>
+            <div className="text-[20px] truncate">{product.name} </div>
             <div className="flex text-[12.25px]">
                 <FaStar className="text-md"/>
                 <div>

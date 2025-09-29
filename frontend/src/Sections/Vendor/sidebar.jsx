@@ -5,10 +5,10 @@ export default function Sidebar({setSelectedField, isOpen, setIsOpen}) {
     <>
       {/* 🔹 Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full z-40 w-64 bg-white p-6 space-y-4 transform transition-transform duration-300
+        className={`fixed top-0 left-0 h-full w-64 bg-white p-6 space-y-4 z-40 transform transition-transform duration-300
         ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <h2 className="text-xl font-bold hidden mt-[20px] min-[664px]:block">
+        <h2 className="text-xl font-bold hidden mt-[20px]">
           Vendor Panel
         </h2>
         <ul className="flex flex-col space-y-2">

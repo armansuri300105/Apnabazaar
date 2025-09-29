@@ -52,6 +52,7 @@ const userSchema = new mongoose.Schema(
         return this.authProvider === "local";
       },
       unique: true,
+      sparse: true,
       trim: true,
     },
     password: {
