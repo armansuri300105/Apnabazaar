@@ -49,7 +49,7 @@ const VendorOrders = () => {
     console.log(res);
   }
   return (
-    <div className="p-4 md:p-6 w-full">
+    <div className="p-4 md:p-6 w-full mt-[20px]">
         {isOpenDetail ? <OrderCard order={selectedOrder} setIsOpenDetail={setIsOpenDetail} onUpdateStatus={onUpdateStatus} /> : ""}
       {/* Header */}
       <h2 className="text-xl md:text-2xl font-bold mb-2">Orders Management</h2>

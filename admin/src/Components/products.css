@@ -1,0 +1,87 @@
+/* Mobile header - visible by default */
+.products-mobile-header {
+  display: flex;
+}
+
+/* Mobile cards - visible by default */
+.products-mobile-cards {
+  display: none;
+}
+
+/* FAB - visible by default */
+.products-fab {
+  display: block;
+}
+
+/* Mobile overlay - handled by React state */
+.products-mobile-overlay {
+  display: block;
+}
+
+
+/* Summary number text size on mobile */
+.products-summary-number {
+  font-size: 1.25rem; /* text-xl equivalent */
+}
+
+/* Content padding adjustment for mobile */
+.products-content {
+  padding: 1rem;
+}
+/* Ultra wide screens (1400px and up) */
+@media (max-width: 1400px) {
+  .products-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (max-width: 1200px) {
+  .products-content {
+    padding: 2rem;
+  }
+  .products-container {
+    max-width: 1200px;
+  }
+  .products-summary-grid{
+    grid-template-columns: 1fr 1fr;
+  }
+  .products-desktop-table table{
+    overflow: scroll;
+  }
+}
+
+/* Large devices (desktops, 1024px and up) */
+@media (max-width: 1024px) {
+  .products-mobile-cards {
+    display: block;
+  }
+  .products-desktop-table {
+    display: none;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (max-width: 768px) {
+  /* Content padding */
+  .products-content {
+    padding: 1.5rem;
+  }
+  
+  /* Summary grid - 4 columns */
+  .products-summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  
+  .products-summary-number {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .products-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

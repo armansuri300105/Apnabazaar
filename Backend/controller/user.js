@@ -78,28 +78,28 @@ export const verify = (req,res) => {
 }
 
 export const googleLogin = async (req,res) => {
-    try {
-        const {code} = req.query;
-        const googleres = await oauth2Client.getToken(code);
-        oauth2Client.setCredentials(googleres.tokens);
-        const userRes = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleres.tokens.access_token}`);
-        const {email, name, picture} = userRes.data;
-        let user = await USER.findOne({email});
-        if (!user){
-            const newUser = await USER.create({
-                email,
-                name,
-                authProvider: "google",
-                isVerified: true,
-            });
-            user = newUser;
-        }
-        const token = setuserandcookies(res, user);
-        res.send({success: true,user: {email,name,token}})
-    } catch (error) {
-        console.log("Error while authenticating user: ", error.message);
-        res.send({success: false, message: "Error while authenticating user: ", error: error.message});
+    const {code} = req.query;
+    const googleres = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(googleres.tokens);
+    const userRes = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleres.tokens.access_token}`);
+    const {email, name } = userRes.data;
+    let user = await USER.findOne({email});
+    if (!user){
+        const newUser = await USER.create({
+            email,
+            name,
+            authProvider: "google",
+            isVerified: true,
+        });
+        user = newUser;
     }
+    const token = setuserandcookies(res, user);
+    res.send({success: true,user: {email,name,token}})
+    // try {
+    // } catch (error) {
+    //     console.log("Error while authenticating user: ", error.message);
+    //     res.send({success: false, message: "Error while authenticating user: ", error: error.message});
+    // }
 }
 
 export const authCheck = async (req,res) => {

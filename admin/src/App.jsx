@@ -14,7 +14,7 @@ import { CartProductContext } from "./services/context";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "./services/protectedRoute";
 
-const GOOGLE_CLIENT_ID = "174848792494-8na95j0m9qlsk9ooi5qagif0ls2cf5vj.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "316084868865-6cm9ag49f38mgqp25ttja2i61cbjbl6l.apps.googleusercontent.com";
 
 const GoogleAuthWrapper = ({ children }) => (
   <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
@@ -75,7 +75,7 @@ export const App = () => {
     >
       <div className="flex min-h-screen">
         {!isSignupPage && checkAuth && (
-          <div className="hidden min-[664px]:block">
+          <div>
             <Sidebar />
           </div>
         )}

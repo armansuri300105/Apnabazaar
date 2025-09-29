@@ -38,7 +38,7 @@ export const addVendorProduct = async (req, res) => {
 // ✅ Get All Products of Logged-in Vendor
 export const getVendorProducts = async (req, res) => {
   try {
-    const products = await PRODUCT.find({ vendor: req?.user?._id }).lean();
+    const products = await PRODUCT.find({ vendor: req?.user?._id, isActive: true }).lean();
 
     if (!products || products.length === 0) {
       return res.json({ success: true, products: [] });
@@ -187,4 +187,16 @@ export const updateOrderStatus = async (req,res) => {
       message: "Internal server error",
     });
   }
+}
+
+export const removeProduct = async (req,res) => {
+  const id = req.query.id
+  const vendorId = req?.user?._id
+  const product = await PRODUCT.findOne({vendor: vendorId, _id: id})
+  if (!product){
+      return res.status(400).json({success: false, message: "Product not found with this id"});
+  }
+  product.isActive = false
+  await product.save()
+  return res.json({success: true, message: "product successfully removed"});
 }

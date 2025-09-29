@@ -41,7 +41,7 @@ const productSchema = new mongoose.Schema({
     },
     vendor: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+        ref: "User",
     },
     ratings: {
         average: {

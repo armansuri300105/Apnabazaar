@@ -36,7 +36,7 @@ const Dashboard = ({handleLogout}) => {
     const COLORS = ["#0088FE", "#FF8042", "#00C49F", "#FFBB28", "#AA66CC"];
   return (
     <>
-      <div className="p-6 space-y-6 transition-all duration-300 bg-gray-50 w-full">
+      <div className="p-6 space-y-6 transition-all mt-[20px] duration-300 bg-gray-50 w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <div className="flex flex-wrap gap-2">
