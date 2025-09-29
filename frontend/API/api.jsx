@@ -92,3 +92,7 @@ export const getVendorProducts = () => {
 export const updateOrderStatus = (data) => {
     return api.put('/api/vendor/updateorderstatus', data)
 }
+
+export const removeVendorProduct = (id) => {
+    return api.delete(`/api/vendor/deleteproduct?id=${id}`)
+}

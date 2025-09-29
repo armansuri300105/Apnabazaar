@@ -5,7 +5,7 @@ import { addproduct, removeproduct, updateproduct, checkAuth, getProducts, getAl
 const router = express.Router();
 
 router.post('/addProduct', checkAdmin, addproduct)
-router.post('/removeProduct', checkAdmin, removeproduct)
+router.delete('/removeProduct', checkAdmin, removeproduct)
 router.put('/updateProduct', checkAdmin, updateproduct)
 router.get('/getproduct', checkAdmin, getProducts)
 router.get('/authcheck', checkAuth)

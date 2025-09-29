@@ -4,8 +4,11 @@ import { getuser } from "../services/auth.js";
 import ORDER from "../models/order.js"
 import { sendVendorApprovalMail } from "../emails/sendMail.js";
 
+
 export const getProducts = async (req,res) => {
-    const products = await PRODUCT.find({isActive: true}).lean();
+    const products = await PRODUCT.find({ isActive: true })
+      .populate("vendor", "vendor.companyName") // only bring vendor's companyName
+      .lean();
     if (products.length===0) return res.json({products: []})
     const formattedProducts = products.map(p => ({
         productID: p._id,
@@ -29,7 +32,7 @@ export const addproduct = async (req,res) => {
     return res.json({success: true, message: "Product added successfully"});
 }
 export const removeproduct = async (req,res) => {
-    const id = req.body.id;
+    const id = req.query.id;
     const product = await PRODUCT.findOne({_id:id});
     if (!product){
         return res.status(400).json({success: false, message: "Product not found with this id"});

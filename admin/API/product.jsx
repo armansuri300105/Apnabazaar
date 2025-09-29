@@ -15,9 +15,7 @@ export const getproducts = () => {
 }
 
 export const removeproduct = (_id) => {
-    const data = {"id": _id};
-    console.log(data);
-    return api.post('/api/admin/removeProduct', data)
+    return api.delete(`/api/admin/removeProduct?id=${_id}`)
 }
 
 export const signup = (userData) => {
