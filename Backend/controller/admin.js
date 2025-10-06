@@ -17,9 +17,31 @@ export const getProducts = async (req,res) => {
     return res.json({success: true, message: `All Products`,items: products.length, products: formattedProducts})
 }
 
+export const editproduct = async (req,res) => {
+  const {id, images, name, price, stock, description, category} = req.body;
+
+  try {
+    const product = await PRODUCT.findById(id)
+    if (!product){
+      return res.status(404).json({success:false, message: "Product Not Found"})
+    }
+
+    product.name = name
+    product.price = price
+    product.stock = stock
+    product.description = description
+    product.category = category
+    product.images = images
+
+    await product.save()
+    return res.json({success: true, message: "Product Edited successfully"});
+  } catch (error) {
+    return res.status(500).json({success:false, message: error.message})
+  }
+}
+
 export const addproduct = async (req,res) => {
     const {images, name, price, stock, description, category} = req.body;
-    const user = req?.user
     await PRODUCT.create({
         name,
         description,

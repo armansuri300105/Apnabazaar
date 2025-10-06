@@ -45,6 +45,29 @@ export const addVendorProduct = async (req, res) => {
   }
 };
 
+export const editVendorProduct = async (req ,res) => {
+  const {id, images, name, price, stock, description, category} = req.body;
+
+  try {
+    const product = await PRODUCT.findById(id)
+    if (!product){
+      return res.status(404).json({success:false, message: "Product Not Found"})
+    }
+
+    product.name = name
+    product.price = price
+    product.stock = stock
+    product.description = description
+    product.category = category
+    product.images = images
+
+    await product.save()
+    return res.json({success: true, message: "Product Edited successfully"});
+  } catch (error) {
+    return res.status(500).json({success:false, message: error.message})
+  }
+}
+
 // ✅ Get All Products of Logged-in Vendor
 export const getVendorProducts = async (req, res) => {
   try {
@@ -200,6 +223,110 @@ export const updateOrderStatus = async (req,res) => {
 }
 
 export const removeProduct = async (req,res) => {
-  const id = req.query.id
-  
+  const id = req.query.id;
+  const product = await PRODUCT.findOne({_id:id});
+  if (!product){
+      return res.status(400).json({success: false, message: "Product not found with this id"});
+  }
+  product.isActive = false
+  await product.save()
+  return res.json({success: true, message: "product successfully removed"});
 }
+
+export const getVendorLast7DaysOrders = async (req, res) => {
+  try {
+    const vendorId = req.user._id; // current vendor
+
+    const result = await ORDER.aggregate([
+      // Only last 7 days
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          }
+        }
+      },
+      // Expand order items
+      { $unwind: "$items" },
+
+      // Join with product collection
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+      { $unwind: "$product" },
+
+      // Filter only the vendor's products
+      {
+        $match: {
+          "product.vendor": vendorId
+        }
+      },
+
+      // Group by day and count total orders
+      {
+        $group: {
+          _id: { $dateToString: { format: "%b %d", date: "$createdAt" } },
+          orders: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const formatted = result.map(r => ({
+      date: r._id,
+      orders: r.orders
+    }));
+
+    res.json({ success: true, data: formatted });
+  } catch (error) {
+    console.error("Error fetching vendor orders:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getVendorsOrdersByCategory = async (req, res) => {
+  try {
+    const vendorId = req?.user?._id;
+
+    const result = await ORDER.aggregate([
+      {
+        $match: { vendor: vendorId }
+      },
+      {
+        $unwind: "$items"
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+      {
+        $unwind: "$product"
+      },
+      {
+        $group: {
+          _id: "$product.category",
+          value: { $sum: "$items.quantity" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          name: "$_id",
+          value: 1
+        }
+      }
+    ]);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

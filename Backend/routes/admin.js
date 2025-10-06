@@ -1,10 +1,11 @@
 import express from "express"
 import { checkAdmin } from "../services/auth.js";
-import { addproduct, removeproduct, updateproduct, checkAuth, getProducts, getAllOrders, getAllUsers, getVendors, approveVendor, logout, getLast7DaysOrders, getSalesByVendors, getOrdersByCategory, getTotalDetail } from "../controller/admin.js";
+import { addproduct, editproduct, removeproduct, updateproduct, checkAuth, getProducts, getAllOrders, getAllUsers, getVendors, approveVendor, logout, getLast7DaysOrders, getSalesByVendors, getOrdersByCategory, getTotalDetail } from "../controller/admin.js";
 
 const router = express.Router();
 
 router.post('/addProduct', checkAdmin, addproduct)
+router.post('/editproduct', checkAdmin, editproduct)
 router.delete('/removeProduct', checkAdmin, removeproduct)
 router.put('/updateProduct', checkAdmin, updateproduct)
 router.get('/getproduct', checkAdmin, getProducts)

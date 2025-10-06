@@ -81,6 +81,10 @@ export const addVendorProduct = (product) => {
     return api.post('/api/vendor/addproduct', product)
 }
 
+export const editVendorProduct = (product) => {
+    return api.post('/api/vendor/editproduct', product)
+}
+
 export const getVendorOrders = () => {
     return api.get('/api/vendor/getorders')
 }
@@ -95,4 +99,12 @@ export const updateOrderStatus = (data) => {
 
 export const removeVendorProduct = (id) => {
     return api.delete(`/api/vendor/deleteproduct?id=${id}`)
+}
+
+export const getlast7daysorders = () => {
+    return api.get('/api/vendor/getlast7daysorders')
+}
+
+export const getordersbycategory = () => {
+    return api.get('/api/vendor/getordersbycategory')
 }

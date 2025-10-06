@@ -1,11 +1,26 @@
 import { useContext } from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from "recharts";
 import { CartProductContext } from "../../../services/context";
+import { useQuery } from "@tanstack/react-query";
+import { getlast7daysorders, getordersbycategory } from "../../../../API/api";
 
 const Dashboard = ({handleLogout}) => {
   const { user, loadinguser } = useContext(CartProductContext);
 
-  if (loadinguser){
+  const {data: ordersData} = useQuery({
+    queryKey: ["last7days"],
+    queryFn: getlast7daysorders,
+    select: (res) => res?.data?.data || []
+  })
+
+  const {data: salesCategory, isLoading: loading} = useQuery({
+    queryKey: ["salebycat"],
+    queryFn: getordersbycategory,
+    select: (res) => res?.data?.data || []
+  })
+
+  
+  if (loadinguser || loading){
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
@@ -15,25 +30,13 @@ const Dashboard = ({handleLogout}) => {
       </div>
     );
   }
-    const ordersData = [
-        { date: "Aug 20", orders: 12 },
-        { date: "Aug 21", orders: 15 },
-        { date: "Aug 22", orders: 8 },
-        { date: "Aug 23", orders: 10 },
-        { date: "Aug 24", orders: 18 },
-        { date: "Aug 25", orders: 20 },
-        { date: "Aug 26", orders: 16 },
-      ];
-    
-    const salesCategory = [
-        { name: "Produce", value: 35 },
-        { name: "Bakery", value: 25 },
-        { name: "Dairy", value: 20 },
-        { name: "Preserves", value: 10 },
-        { name: "Others", value: 10 },
-      ];
-    
-    const COLORS = ["#0088FE", "#FF8042", "#00C49F", "#FFBB28", "#AA66CC"];
+  
+  console.log(salesCategory)
+
+  const COLORS = Array.from(
+    { length: salesCategory.length },
+    () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")}`
+  );
   return (
     <>
       <div className="p-6 space-y-6 transition-all mt-[20px] duration-300 bg-gray-50 w-full">
