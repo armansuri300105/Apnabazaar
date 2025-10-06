@@ -57,3 +57,16 @@ export const getVendors = () => {
 export const approveVendor = (_id) => {
     return api.get(`/api/admin/approvevendor?id=${_id}`)
 }
+
+export const getLast7DaysOrders = () => {
+    return api.get('/api/admin/last7daysorders')
+}
+export const getOrdersByCategory = () => {
+    return api.get('/api/admin/salesbycategories')
+}
+export const getSalesByVendors = () => {
+    return api.get('/api/admin/salesbyvendors')
+}
+export const dashboardDetail = () => {
+    return api.get('/api/admin/dashboarddetail')
+}

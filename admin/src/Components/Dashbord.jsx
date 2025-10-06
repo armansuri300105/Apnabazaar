@@ -1,38 +1,48 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from "recharts";
 import { CartProductContext } from "../services/context";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../API/product";
+import { dashboardDetail, getLast7DaysOrders, getOrdersByCategory, getSalesByVendors, logout } from "../../API/product";
+import {useQuery} from "@tanstack/react-query"
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { setCheckAuth } = useContext(CartProductContext);
 
-  const ordersData = [
-    { date: "Aug 20", orders: 12 },
-    { date: "Aug 21", orders: 15 },
-    { date: "Aug 22", orders: 8 },
-    { date: "Aug 23", orders: 10 },
-    { date: "Aug 24", orders: 18 },
-    { date: "Aug 25", orders: 20 },
-    { date: "Aug 26", orders: 16 },
-  ];
+  const {data: last7days} = useQuery({
+    queryKey: ["last7days"],
+    queryFn: getLast7DaysOrders,
+    select: (res) => res?.data?.data || null
+  })
 
-  const salesCategory = [
-    { name: "Produce", value: 35 },
-    { name: "Bakery", value: 25 },
-    { name: "Dairy", value: 20 },
-    { name: "Preserves", value: 10 },
-    { name: "Others", value: 10 },
-  ];
+  const {data: sales} = useQuery({
+    queryKey: ["salesCategory"],
+    queryFn: getOrdersByCategory,
+    select: (res) => res?.data || null
+  })
+  
+  const {data: vendor} = useQuery({
+    queryKey: ["vendor"],
+    queryFn: getSalesByVendors,
+    select: (res) => res?.data || null
+  })
 
-  const vendorSales = [
-    { vendor: "Green Valley Farm", sales: 4500 },
-    { vendor: "Baker's Corner", sales: 3200 },
-    { vendor: "Sunny Side Farm", sales: 2800 },
-    { vendor: "Bee Happy Apiary", sales: 2300 },
-  ];
+  const {data: detail} = useQuery({
+    queryKey: ["detail"],
+    queryFn: dashboardDetail,
+    select: (res) => res?.data || null
+  })
 
+  console.log(detail)
+  let salesCategory = [];
+  if (sales?.success){
+    salesCategory = sales?.data
+  }
+
+  let vendorSales = [];
+  if (sales?.success){
+    vendorSales = vendor?.data
+  }
   const COLORS = ["#0088FE", "#FF8042", "#00C49F", "#FFBB28", "#AA66CC"];
 
   const handleLogout = async () => {
@@ -72,15 +82,15 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white shadow rounded-xl p-4">
           <h2 className="text-lg font-semibold">Total Orders</h2>
-          <p className="text-3xl font-bold mt-2">1,245</p>
+          <p className="text-3xl font-bold mt-2">{detail?.totalOrder}</p>
         </div>
         <div className="bg-white shadow rounded-xl p-4">
           <h2 className="text-lg font-semibold">Total Revenue</h2>
-          <p className="text-3xl font-bold mt-2">$12,340</p>
+          <p className="text-3xl font-bold mt-2">₹{detail?.totalRevenue?.toFixed(2)}</p>
         </div>
         <div className="bg-white shadow rounded-xl p-4">
           <h2 className="text-lg font-semibold">Active Vendors</h2>
-          <p className="text-3xl font-bold mt-2">45</p>
+          <p className="text-3xl font-bold mt-2">{detail?.totalVendors}</p>
         </div>
       </div>
 
@@ -88,7 +98,7 @@ export default function Dashboard() {
         <div className="bg-white shadow rounded-xl p-4">
           <h2 className="text-lg font-semibold mb-4">Orders Last 7 Days</h2>
           <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={ordersData}>
+            <LineChart data={last7days}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis />

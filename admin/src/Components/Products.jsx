@@ -177,7 +177,7 @@ export default function Products() {
                   />
                   <div className="flex-1">
                     <h3 className="font-medium text-sm">{p.name}</h3>
-                    <p className="text-xs text-gray-500">{p?.vendor?.vendor?.companyName}</p>
+                    <p className="text-xs text-gray-500">{p?.vendor?.vendor?.companyName ? p?.vendor?.vendor?.companyName : "Apnabazaar"}</p>
                     <span className="inline-block mt-1 px-2 py-1 bg-gray-100 rounded-full text-xs">
                       {p.category}
                     </span>
@@ -267,7 +267,7 @@ export default function Products() {
                     />
                     <div>
                       <p className="font-medium truncate w-48">{p.name}</p>
-                      <p className="text-xs text-gray-500">{p?.vendor?.vendor?.companyName}</p>
+                      <p className="text-xs text-gray-500">{p?.vendor?.vendor?.companyName ? p?.vendor?.vendor?.companyName : "Apnabazaar"}</p>
                     </div>
                   </td>
                   <td className="p-3">
@@ -275,7 +275,7 @@ export default function Products() {
                       {p.category}
                     </span>
                   </td>
-                  <td className="p-3">{p?.vendor?.vendor?.companyName}</td>
+                  <td className="p-3">{p?.vendor?.vendor?.companyName ? p?.vendor?.vendor?.companyName : "Apnabazaar"}</td>
                   <td className="p-3">
                     <span className="font-bold">₹{p.price}</span>
                     {p.oldPrice && (
