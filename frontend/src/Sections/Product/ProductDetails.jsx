@@ -123,7 +123,7 @@ const ProductDetails = () => {
             <span className="line-through text-gray-400">₹{product?.oldPrice}</span>
           </div>
 
-          <p className="text-gray-600">{product?.description}</p>
+          <p style={{ whiteSpace: "pre-line" }} className="text-gray-600">{product?.description}</p>
           <div className="p-3 bg-[#ececf0c0] rounded-md">
             <div className="flex items-center gap-[10px]">
               <HiOutlineTruck className="text-[20px]"/>

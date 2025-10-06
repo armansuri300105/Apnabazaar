@@ -15,6 +15,7 @@ export default function VendorDetailsModal({ vendor, isOpen, onClose }) {
             console.log(error.message)
         }
     }
+  console.log(vendor)
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 relative">
@@ -42,7 +43,7 @@ export default function VendorDetailsModal({ vendor, isOpen, onClose }) {
         <div className="grid grid-cols-4 gap-4 my-6 text-center">
           <div>
             <Package className="mx-auto text-blue-500" />
-            <p className="font-semibold">{vendor?.vendor?.productsCount}</p>
+            <p className="font-semibold">{vendor?.vendor?.products.length}</p>
             <p className="text-sm text-gray-500">Products</p>
           </div>
           <div>
