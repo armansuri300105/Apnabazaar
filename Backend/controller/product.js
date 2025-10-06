@@ -19,7 +19,7 @@ export const getallproducts = async (req,res) => {
 
 export const getproductsbyid = async (req, res) => {
     const {id} = req.query;
-    const product = await PRODUCT.findOne({_id: id}).select("-stock").lean();
+    const product = await PRODUCT.findOne({_id: id}).select("-stock").lean().populate("vendor");
     const formattedProduct = {
         productID: product._id,
         ...product

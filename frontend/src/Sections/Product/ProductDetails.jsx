@@ -11,7 +11,6 @@ import "./productDetail.css"
 import Detail from "./detail";
 import Vendor from "./vendor";
 import Reviews from "./reviews";
-import {useQuery} from "@tanstack/react-query"
 
 const ProductDetails = () => {
   const {user, cartItems, setCartItems, setCmenu} = useContext(CartProductContext)
@@ -85,6 +84,16 @@ const ProductDetails = () => {
   };
 
   if (isLoading) return (<p>Loading Products....</p>)
+  function renderBoldItalic(text) {
+    // Replace **bold** with <b>bold</b>
+    let html = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+    // Replace *italic* with <i>italic</i>
+    html = html.replace(/\*(.*?)\*/g, "<i>$1</i>");
+    // Preserve line breaks
+    html = html.replace(/\n/g, "<br/>");
+    return html;
+  }
+  console.log(product)
   return (
     <section className="product-detail w-screen flex flex-col items-center">
       <div className="product-detail-section w-[1200px] mt-[120px] mx-auto grid grid-cols-2 gap-10 p-6">
@@ -122,8 +131,10 @@ const ProductDetails = () => {
             <span className="text-2xl font-bold text-red-500">₹{product?.price}</span>
             <span className="line-through text-gray-400">₹{product?.oldPrice}</span>
           </div>
-
-          <p style={{ whiteSpace: "pre-line" }} className="text-gray-600">{product?.description}</p>
+          <div
+            style={{ whiteSpace: "pre-line" }}
+            dangerouslySetInnerHTML={{ __html: renderBoldItalic(product?.description || "") }}
+          />
           <div className="p-3 bg-[#ececf0c0] rounded-md">
             <div className="flex items-center gap-[10px]">
               <HiOutlineTruck className="text-[20px]"/>
@@ -161,7 +172,7 @@ const ProductDetails = () => {
             ))
           }
         </div>
-        {select===0 ? <Detail product={product}/> : select===1 ? <Vendor/> : <Reviews product={product}/>}
+        {select===0 ? <Detail product={product}/> : select===1 ? <Vendor vendor={product?.vendor?.vendor}/> : <Reviews product={product}/>}
         <div className="other-details w-[1200px] mt-[40px] relative">
           <h2 className="mb-[20px]">You Might Also Like</h2>
         </div>
