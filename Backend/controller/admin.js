@@ -132,3 +132,124 @@ export const logout = (req,res) => {
         res.status(500).json({ message: err.message , success: false});
     }
 }
+
+export const getLast7DaysOrders = async (req, res) => {
+  try {
+    const result = await ORDER.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%b %d", date: "$createdAt" } },
+          orders: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const formatted = result.map(r => ({
+      date: r._id,
+      orders: r.orders
+    }));
+
+    res.json({ success: true, data: formatted });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getOrdersByCategory = async (req, res) => {
+  try {
+    const result = await ORDER.aggregate([
+      { $unwind: "$items" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+      { $unwind: "$product" },
+      {
+        $group: {
+          _id: "$product.category",
+          value: { $sum: "$items.quantity" }
+        }
+      },
+      { $project: { _id: 0, name: "$_id", value: 1 } }
+    ]);
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getSalesByVendors = async (req, res) => {
+  try {
+    const result = await ORDER.aggregate([
+      { $unwind: "$items" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.product",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      { $unwind: "$product" },
+      {
+        $lookup: {
+          from: "users", // vendor info stored in user documents
+          localField: "product.vendor",
+          foreignField: "_id",
+          as: "vendor",
+        },
+      },
+      { $unwind: "$vendor" },
+
+      // Group by vendor and count unique orderIds
+      {
+        $group: {
+          _id: "$vendor.vendor.companyName",
+          orderIds: { $addToSet: "$_id" }, // store unique order ids
+        },
+      },
+
+      // Count number of orders
+      {
+        $project: {
+          _id: 0,
+          vendor: "$_id",
+          sales: { $size: "$orderIds" },
+        },
+      },
+      { $sort: { sales: -1 } },
+    ]);
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getTotalDetail = async (req,res) => {
+  try {
+    const orders = await ORDER.find({})
+    let totalRevenue = 0
+    orders.map((order) => (
+      totalRevenue += order.totalAmount
+    ))
+
+    const totalVendors = await USER.countDocuments({role: `vendor`})
+    res.status(200).json({success: true, totalOrder: orders.length, totalRevenue, totalVendors})
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}

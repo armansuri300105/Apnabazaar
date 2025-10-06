@@ -122,7 +122,7 @@ const AddProductForm = ({setAddProduct, refetch}) => {
     }
   };
 
-  const options = ["Groceries & Staples","Fruits & Vegetables","Dairy & Bakery","Snacks & Beverages","Personal Care","Home & Cleaning Essentials","Packaged Foods","Baby & Kids Care","Stationery & Household Items","Meat, Fish & Frozen Foods"]
+  const options = ["Groceries & Staples","Fruits & Vegetables","Dairy & Bakery","Snacks & Beverages","Personal Care","Home & Cleaning Essentials","Packaged Foods","Baby & Kids Care","Stationery & Household Items","Meat, Fish & Frozen Foods", "Dry Fruits"]
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6 mt-[30px] mb-[30px]">
       <h2 className="text-lg font-semibold mb-4">Add New Product</h2>
