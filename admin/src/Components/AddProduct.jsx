@@ -200,7 +200,7 @@ const AddProductForm = ({setAddProduct, refetch}) => {
         {/* Description */}
         <textarea
           name="description"
-          placeholder="Product Description"
+          placeholder="Product Description (use **bold** or *italic*)"
           value={product.description}
           onChange={handleChange}
           className="col-span-2 border rounded-md px-3 py-2 focus:outline-none focus:ring w-full"

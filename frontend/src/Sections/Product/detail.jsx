@@ -25,7 +25,7 @@ const Detail = ({product}) => {
             </div>
             <div className="product-other-detail-right w-[50%]">
               <h2 className="font-medium mb-[20px]">About this Product</h2>
-              <p className="text-[#717182]">{product?.description}</p>
+              <p style={{ whiteSpace: "pre-line" }} className="text-[#717182]">{product?.description}</p>
             </div>
         </div>
     </>
