@@ -11,6 +11,7 @@ import "./productDetail.css"
 import Detail from "./detail";
 import Vendor from "./vendor";
 import Reviews from "./reviews";
+import {useQuery} from "@tanstack/react-query"
 
 const ProductDetails = () => {
   const {user, cartItems, setCartItems, setCmenu} = useContext(CartProductContext)
@@ -93,7 +94,6 @@ const ProductDetails = () => {
     html = html.replace(/\n/g, "<br/>");
     return html;
   }
-  console.log(product)
   return (
     <section className="product-detail w-screen flex flex-col items-center">
       <div className="product-detail-section w-[1200px] mt-[120px] mx-auto grid grid-cols-2 gap-10 p-6">

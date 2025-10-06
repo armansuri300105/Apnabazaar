@@ -43,7 +43,11 @@ export default function Dashboard() {
   if (sales?.success){
     vendorSales = vendor?.data
   }
-  const COLORS = ["#0088FE", "#FF8042", "#00C49F", "#FFBB28", "#AA66CC"];
+  
+  const COLORS = Array.from(
+    { length: salesCategory.length },
+    () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")}`
+  );
 
   const handleLogout = async () => {
     try {
@@ -65,7 +69,7 @@ export default function Dashboard() {
       navigate("/signin");
     }
   };
-
+  console.log(salesCategory)
   return (
     <div className="p-6 space-y-6 transition-all duration-300">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

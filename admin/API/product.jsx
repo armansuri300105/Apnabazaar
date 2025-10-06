@@ -6,8 +6,10 @@ const api = axios.create({
 })
 
 export const addproduct = (data) => {
-    console.log(data);
     return api.post('/api/admin/addProduct', data)
+}
+export const editProduct = (data) => {
+    return api.post('/api/admin/editproduct', data)
 }
 
 export const getproducts = () => {

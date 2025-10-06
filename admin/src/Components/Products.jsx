@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Settings, LogOut, Plus, Eye, Edit, Trash, Menu, X, Cross } from "lucide-react";
+import { Bell, Settings, LogOut, Plus, Eye, Edit, Trash } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getproducts, removeproduct } from "../../API/product";
 import AddProductForm from "./AddProduct";
@@ -14,6 +14,17 @@ export default function Products() {
     queryFn: getproducts,
     select: (res) => res?.data || null
   })
+  const [product, setProduct] = useState({
+    name: "",
+    price: "",
+    vendor: "",
+    stock: "",
+    category: "",
+    description: "",
+    images: [],
+  });
+
+  const [mode, setMode] = useState("add")
 
   if (isLoading){
     return (
@@ -85,7 +96,21 @@ export default function Products() {
       }
     }
   };
-
+  const handleEdit = (product) => {
+    setMode("edit")
+    setAddProduct(true)
+    setProduct({
+      id: product?._id,
+      name: product?.name,
+      price: product?.price,
+      vendor: "",
+      stock: product?.stock,
+      category: product?.category,
+      description: product?.description,
+      images: product?.images,
+    })
+    console.log(product)
+  }
   return (
     <div className="products-container min-h-screen bg-gray-50">
       <div className="flex-1 w-full p-4 overflow-x-hidden products-content">
@@ -133,7 +158,7 @@ export default function Products() {
             </p>
           </div>
         </div>
-        {addProduct ? <AddProductForm setAddProduct={setAddProduct} refetch={refetch} /> : ``}
+        {addProduct ? <AddProductForm setAddProduct={setAddProduct} refetch={refetch} mode={mode} product = {product} setProduct = {setProduct} /> : ``}
 
         {selectedProducts.length > 0 && (
           <div className="mb-4">
@@ -210,7 +235,7 @@ export default function Products() {
                     <Eye className="w-4 h-4" />
                   </button>
                   <button className="p-2 hover:bg-gray-100 rounded">
-                    <Edit className="w-4 h-4" />
+                    <Edit onClick={() => handleEdit(p)} className="w-4 h-4" />
                   </button>
                   <button className="p-2 hover:bg-red-100 text-red-600 rounded">
                     <Trash onClick={() => handleRemoveItem(p._id)} className="w-4 h-4" />
@@ -302,7 +327,7 @@ export default function Products() {
                       <Eye className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded">
-                      <Edit className="w-4 h-4" />
+                      <Edit onClick={() => handleEdit(p)} className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-red-100 text-red-600 rounded">
                       <Trash onClick={() => handleRemoveItem(p._id)} className="w-4 h-4" />

@@ -14,7 +14,15 @@ export default function Products() {
     queryFn: getVendorProducts,
     select: (res) => res?.data || null
   })
-
+  const [product, setProduct] = useState({
+    name: "",
+    price: "",
+    stock: "",
+    category: "",
+    description: "",
+    images: [],
+  });
+  const [mode, setMode] = useState("add")
   if (isLoading){
     return (
       <div className="flex justify-center items-center h-screen">
@@ -65,38 +73,54 @@ export default function Products() {
   };
 
   const handleRemoveItem = async (id) => {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!",
-  });
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
 
-  if (result.isConfirmed) {
-    const res = await removeVendorProduct(id);
-    console.log(res?.data)
-    if (res?.data?.success) {
-      Swal.fire({
-        title: "Deleted!",
-        text: "Product has been deleted successfully.",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    } else {
-      Swal.fire({
-        title: "Oops!",
-        text: "Something went wrong.",
-        icon: "error",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+    if (result.isConfirmed) {
+      const res = await removeVendorProduct(id);
+      console.log(res?.data)
+      if (res?.data?.success) {
+        Swal.fire({
+          title: "Deleted!",
+          text: "Product has been deleted successfully.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          title: "Oops!",
+          text: "Something went wrong.",
+          icon: "error",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
     }
+  };
+
+  const handleEdit = (product) => {
+    setMode("edit")
+    setAddProduct(true)
+    setProduct({
+      id: product?._id,
+      name: product?.name,
+      price: product?.price,
+      vendor: "",
+      stock: product?.stock,
+      category: product?.category,
+      description: product?.description,
+      images: product?.images,
+    })
+    console.log(product)
   }
-};
 
   return (
     <div className="products-container min-h-screen bg-gray-50">
@@ -145,7 +169,7 @@ export default function Products() {
             </p>
           </div>
         </div>
-        {addProduct ? <AddProductForm setAddProduct={setAddProduct} refetch={refetch} /> : ``}
+        {addProduct ? <AddProductForm setAddProduct={setAddProduct} refetch={refetch} product = {product} setProduct={setProduct} mode={mode} /> : ``}
 
         {selectedProducts.length > 0 && (
           <div className="mb-4">
@@ -222,7 +246,7 @@ export default function Products() {
                     <Eye className="w-4 h-4" />
                   </button>
                   <button className="p-2 hover:bg-gray-100 rounded">
-                    <Edit className="w-4 h-4" />
+                    <Edit onClick={() => handleEdit(p)} className="w-4 h-4" />
                   </button>
                   <button className="p-2 hover:bg-red-100 text-red-600 rounded">
                     <Trash onClick={() => handleRemoveItem(p._id)} className="w-4 h-4" />
@@ -314,7 +338,7 @@ export default function Products() {
                       <Eye className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded">
-                      <Edit className="w-4 h-4" />
+                      <Edit onClick={() => handleEdit(p)} className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-red-100 text-red-600 rounded">
                       <Trash onClick={() => handleRemoveItem(p._id)} className="w-4 h-4" />
