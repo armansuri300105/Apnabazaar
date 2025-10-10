@@ -8,7 +8,7 @@ export const FeaturedLocalProducts = () => {
         queryFn: getProducts,
         select: (res) => res?.data?.products || []
     })
-
+    
     if (isLoading) return (<p>Loading Products....</p>)
     return (
         <div className="bg-white mb-[30px] relative flex flex-col items-center">
@@ -23,7 +23,7 @@ export const FeaturedLocalProducts = () => {
                 </div>
                 <div className="w-full mt-8 flex gap-4 flex-wrap justify-center">
                     {
-                        products && products.map((product, index) => {
+                        products && products.slice(0, 10).map((product, index) => {
                             return <ProductShow key={index} product={product} />
                         })
                     }

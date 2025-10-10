@@ -4,6 +4,7 @@ import axios from "axios"
 import bcrypt from "bcrypt"
 import {oauth2Client} from "../services/googleAuth.js"
 import { sendVendorApplicationMail, sendVerificationMail } from "../emails/sendMail.js";
+import PRODUCT from "../models/product.js";
 
 export const signup = async (req,res) => {
     const {name, email, phone, password} = req.body;
@@ -236,3 +237,109 @@ export const addVendor = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+export const interection = async (req,res) => {
+    try {
+        const data = req.body
+        console.log(data);
+        res.status(200).json({success: true, message: "Data saved Successfully"})
+    } catch (error) {
+        res.status(500).json({success: false, message: error.message})
+    }
+}
+
+export const addRatingReview = async (req,res) => {
+    try {
+        const reviewData = req.body
+        const ProductID = reviewData?.productID
+        const product = await PRODUCT.findOne({_id: ProductID})
+        if (!product){
+            return res.status(404).json({success: false, message: "Product not found"})
+        }
+
+        product.reviews = [...product.reviews, {
+            user: reviewData.user,
+            username: reviewData.name,
+            rating: reviewData.rating,
+            comment: reviewData.review,
+            createdAt: reviewData.date
+        }]
+        let avgrating = 0 
+        product.reviews.map((review) => (
+            avgrating += review.rating
+        ))
+        avgrating = avgrating/(product.ratings.count + 1)
+        product.ratings.count += 1
+        product.ratings.average = avgrating
+        await product.save()
+        return res.status(200).json({ success: true, message: "Review added successfully"})
+    } catch (error) {
+        res.status(500).json({success: false, message: error.message})
+    }
+}
+
+export const editReview = async (req, res) => {
+  try {
+    const data = req.body
+    const { productID, user, rating, review } = data
+
+    const product = await PRODUCT.findById(productID)
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" })
+    }
+
+    const reviewIndex = product.reviews.findIndex(r => r.user.toString() === user)
+
+    if (reviewIndex === -1) {
+      return res.status(404).json({ success: false, message: "Review not found for this user" })
+    }
+
+    product.reviews[reviewIndex].rating = rating
+    product.reviews[reviewIndex].comment = review
+    product.reviews[reviewIndex].createdAt = new Date()
+
+    await product.save()
+
+    return res.status(200).json({
+      success: true,
+      message: "Review updated successfully",
+      reviews: product.reviews
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message })
+  }
+}
+
+export const deleteReview = async (req, res) => {
+  try {
+    const { productID } = req.query
+    const userID = req?.user?._id
+    console.log(productID, userID)
+
+    const product = await PRODUCT.findById(productID)
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" })
+    }
+
+    // Filter out the user's review
+    const updatedReviews = product.reviews.filter(
+      (r) => r.user.toString() !== userID.toString()
+    )
+
+    // If no change, review not found
+    if (updatedReviews.length === product.reviews.length) {
+      return res.status(404).json({ success: false, message: "Review not found" })
+    }
+
+    product.reviews = updatedReviews
+    await product.save()
+
+    return res.status(200).json({
+      success: true,
+      message: "Review deleted successfully",
+      reviews: product.reviews
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message })
+  }
+}
