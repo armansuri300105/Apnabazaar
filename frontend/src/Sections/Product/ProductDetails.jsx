@@ -14,7 +14,7 @@ import Reviews from "./reviews";
 import {useQuery} from "@tanstack/react-query"
 
 const ProductDetails = () => {
-  const {user, cartItems, setCartItems, setCmenu} = useContext(CartProductContext)
+  const {user, cartItems, setCartItems, setCmenu, dataForMl, setDataForMl} = useContext(CartProductContext)
   const [wishlist, setWishlist] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [btn, setBtn] = useState("Add to Cart")
@@ -47,6 +47,75 @@ const ProductDetails = () => {
     product.length===0 ? setBtn("Add to Cart") : setBtn("Go to Cart")
   },[cartItems])
 
+  useEffect(() => {
+    return () => {
+      if (dataForMl?.currentView) {
+        const duration = Date.now() - dataForMl.currentView.startTime;
+
+        setDataForMl(prev => {
+          const updated = {
+            ...prev,
+            products: [
+              ...(prev.products || []),
+              {
+                product: {
+                  productID: prev.currentView.product.productID,
+                  category: prev.currentView.product.category,
+                  name: prev.currentView.product.name
+                },
+                time: Date.now(),
+                duration,
+                event: { type: "view", time: Date.now() },
+              },
+            ],
+            currentView: null,
+          };
+
+          localStorage.setItem("interaction", JSON.stringify(updated));
+          return updated;
+        });
+      }
+    };
+  }, [dataForMl?.currentView]);
+
+  const handleAddtoCart = () => {
+    if (btn === "Add to Cart") {
+      const exists = cartItems.some(item => item._id === product._id);
+      if (exists) return;
+
+      product.quantity = quantity;
+      setCartItems(prev => [...prev, product]);
+
+      setDataForMl(prev => {
+        const updated = {
+          ...prev,
+          products: [
+            ...(prev.products || []),
+            {
+              product: {
+                productID: prev.currentView.product.productID,
+                category: prev.currentView.product.category,
+                name: prev.currentView.product.name
+              },
+              time: Date.now(),
+              duration:
+                prev.currentView && prev.currentView.product.productID === product._id
+                  ? Date.now() - prev.currentView.startTime
+                  : 0,
+              event: { type: "add_to_cart", time: Date.now() },
+            },
+          ],
+        };
+
+        localStorage.setItem("interaction", JSON.stringify(updated));
+        return updated;
+      });
+    } else {
+      setCmenu(true);
+    }
+  };
+
+
   const handleWishlist = async () => {
     setWishlist(!wishlist);
     if (user?.wishlist?.includes(Productid)){
@@ -55,20 +124,6 @@ const ProductDetails = () => {
     } else {
       const res = await updateWishlist(Productid)
       console.log(res?.data)
-    }
-  }
-
-  const handleAddtoCart = () => {
-    if (btn==="Add to Cart"){
-      for (let i=0;i<cartItems.length;i++){
-          if (cartItems[i]._id===product._id){
-              return;
-          }
-      }
-      product["quantity"] = quantity;
-      setCartItems(prev => [...prev, product])
-    } else {
-        setCmenu(true)
     }
   }
 
@@ -120,10 +175,10 @@ const ProductDetails = () => {
           </div>
           <div className="flex items-center gap-2">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} size={18} className={i < Math.floor(product?.rating) ? "fill-yellow-500 text-yellow-500" : "text-gray-300"} />
+              <Star key={i} size={18} className={i < Math.floor(product?.ratings?.average) ? "fill-yellow-500 text-yellow-500" : "text-gray-300"} />
             ))}
             <span className="text-sm text-gray-500">
-              {product?.rating} ({product?.reviews} reviews)
+              {product?.ratings?.average} ({product?.reviews.length} reviews)
             </span>
           </div>
 

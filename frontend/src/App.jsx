@@ -16,7 +16,7 @@ import SignupForm from "./Sections/User/SignUp";
 import SigninForm from "./Sections/User/Signin";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useQuery } from "@tanstack/react-query";
-import { authCheck } from "../API/api";
+import { authCheck, userInteresctionData } from "../API/api";
 import Profile from "./Sections/User/Profile/profile";
 import Checkout from "./Sections/Order/checkout";
 import ProductDetails from "./Sections/Product/ProductDetails";
@@ -25,6 +25,7 @@ import Orders from "./Sections/Order/orders";
 import VendorForm from "./Sections/Vendor/vendorForm";
 import { VendorDashboard } from "./Sections/Vendor/vendorDashboard";
 import TrackOrder from "./Sections/Order/trackOrder";
+import { useEffect } from "react";
 
 const GOOGLE_CLIENT_ID = "316084868865-6cm9ag49f38mgqp25ttja2i61cbjbl6l.apps.googleusercontent.com";
 
@@ -46,8 +47,17 @@ const App = () => {
     queryFn: authCheck,
     select: (res) => res?.data || null,
   });
-
-  const [dataForMl, setDataForMl] = useState({user: data?.user});
+  const [dataForMl, setDataForMl] = useState(() => {
+    const saved = localStorage.getItem("interaction");
+    return saved ? JSON.parse(saved) : {};
+  });
+  
+  useEffect(() => {
+    setDataForMl(prev => ({
+      ...prev,
+      user: data?.user?._id,
+    }))
+  },[data])
 
   const checkAuth = !!data?.isAuthenticate;
 
@@ -55,6 +65,45 @@ const App = () => {
   const [cmenu, setCmenu] = useState(false);
   const location = useLocation();
   const isSignupPage = ["/signup", "/signin", "/checkout" ,"/vendor/dashboard"].includes(location.pathname);
+
+  useEffect(() => {
+    const sendInteractionData = async () => {
+      if (!dataForMl?.products?.length) return;
+
+      try {
+        const res = await userInteresctionData(dataForMl);
+        console.log("Interaction data sent:", res?.data);
+
+        setDataForMl({ products: [], currentView: null });
+        localStorage.removeItem("interaction");
+      } catch (err) {
+        console.error("Error sending interaction data:", err);
+      }
+    };
+
+    // 🔹 Send immediately if batch reaches 20
+    if (dataForMl?.products?.length >= 10) {
+      sendInteractionData();
+    }
+
+    // 🔹 Also send every 5 minutes
+    const interval = setInterval(sendInteractionData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [dataForMl]);
+
+
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (dataForMl?.products.length > 0) {
+        navigator.sendBeacon("http://localhost:3000/api/user/interaction", JSON.stringify(dataForMl));
+        setDataForMl({ products: [] });
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [dataForMl]);
+
 
   return (
     <CartProductContext.Provider

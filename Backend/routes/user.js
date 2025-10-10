@@ -1,5 +1,5 @@
 import express from "express"
-import { authCheck, deleteWishlist, googleLogin, login, signup, updateWishlist, verify, verifyEmail, logout, getWishlist, updateUser, addVendor } from "../controller/user.js";
+import { authCheck, deleteWishlist, googleLogin, login, signup, updateWishlist, verify, verifyEmail, logout, getWishlist, updateUser, addVendor, interection, addRatingReview, editReview, deleteReview } from "../controller/user.js";
 import { auth } from "../services/auth.js";
 
 const router = express.Router();
@@ -16,5 +16,9 @@ router.get('/wishlist/get',auth, getWishlist)
 router.put('/update',auth, updateUser);
 router.get('/logout', logout)
 router.post('/addvendor', auth, addVendor)
+router.post('/interection', auth, interection)
+router.post('/addratingreview', auth, addRatingReview)
+router.put('/editreview', auth, editReview)
+router.delete('/deletereview', auth, deleteReview)
 
 export default router

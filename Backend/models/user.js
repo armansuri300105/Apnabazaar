@@ -74,6 +74,13 @@ const userSchema = new mongoose.Schema(
     },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
+    interactions: [
+      {
+        productID: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        time: Date,
+        duration: Number
+      }
+    ],
     vendor: vendorSchema,
   },
   { timestamps: true }

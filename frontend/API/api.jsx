@@ -108,3 +108,19 @@ export const getlast7daysorders = () => {
 export const getordersbycategory = () => {
     return api.get('/api/vendor/getordersbycategory')
 }
+
+export const userInteresctionData = (data) => {
+    return api.post('/api/user/interection', data)
+}
+
+export const RatingAndReview = (data) => {
+    return api.post('/api/user/addratingreview', data)
+}
+
+export const editReview = (data) => {
+    return api.put('/api/user/editreview', data)
+}
+
+export const deleteReview = (id) => {
+    return api.delete(`/api/user/deletereview?productID=${id}`)
+}
