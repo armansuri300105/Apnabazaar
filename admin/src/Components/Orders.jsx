@@ -114,7 +114,7 @@ export default function Orders() {
           <option value="Cancelled">Cancelled</option>
         </select>
         <button className="flex items-center justify-center gap-1 border rounded-lg px-3 py-2 bg-white text-sm md:text-base">
-          <Filter className="w-4 h-4" /> More Filters
+          <Filter className="w-4 h-4" />
         </button>
       </div>
 

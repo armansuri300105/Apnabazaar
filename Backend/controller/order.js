@@ -108,6 +108,7 @@ export const verifyPayment =  async (req, res) => {
   for (const item of orderData.items) {
     const product = await PRODUCT.findById(item.productID);
     if (!product) return res.status(400).json({ message: `Product not found for ID ${item.ProductID}` });
+    product.stock -= 1;
     totalAmount += product.price * item.quantity;
   }
   totalAmount += totalAmount*2/100;

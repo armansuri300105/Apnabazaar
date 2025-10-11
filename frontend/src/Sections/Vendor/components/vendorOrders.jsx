@@ -45,8 +45,33 @@ const VendorOrders = () => {
     return matchesStatus && matchesSearch;
   });
   const onUpdateStatus = async (id, nextStatus) => {
-    const res = await updateOrderStatus({id, nextStatus})
-    console.log(res);
+    try {
+      const res = await updateOrderStatus({id, nextStatus})
+
+      if (res?.data?.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Order Status Updated",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: res?.data?.message || "Something went wrong!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message || "Server error",
+      });
+    }
   }
   return (
     <div className="p-4 md:p-6 w-full mt-[20px]">

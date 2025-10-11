@@ -298,6 +298,13 @@ export const editReview = async (req, res) => {
     product.reviews[reviewIndex].comment = review
     product.reviews[reviewIndex].createdAt = new Date()
 
+    let avgrating = 0 
+    product.reviews.map((review) => (
+        avgrating += review.rating
+    ))
+    avgrating = avgrating/(product.ratings.count + 1)
+    product.ratings.average = avgrating
+
     await product.save()
 
     return res.status(200).json({
@@ -332,6 +339,17 @@ export const deleteReview = async (req, res) => {
     }
 
     product.reviews = updatedReviews
+
+    await product.save()
+    
+    let avgrating = 0
+    product.reviews.map((review) => (
+        avgrating += review.rating
+    ))
+    avgrating = avgrating/(product.ratings.count + 1)
+    product.ratings.count -= 1
+    product.ratings.average = avgrating
+
     await product.save()
 
     return res.status(200).json({
