@@ -226,7 +226,7 @@ export default function Products() {
                   </div>
                   <div>
                     <p className="text-gray-500">Rating</p>
-                    <p>{p.rating} <span className="text-gray-400 text-xs">({p.reviews})</span></p>
+                    <p>{p.ratings?.average} <span className="text-gray-400 text-xs">({p.reviews.length})</span></p>
                   </div>
                 </div>
                 
@@ -319,8 +319,8 @@ export default function Products() {
                   </span>
                   </td>
                   <td className="p-3">
-                    {p.rating}{" "}
-                    <span className="text-gray-400 text-xs">({p.reviews})</span>
+                    {p.ratings?.average}{"⭐"}
+                    <span className="text-gray-400 text-xs">({p.reviews.length} reviews)</span>
                   </td>
                   <td className="p-3 flex gap-2">
                     <button className="p-2 hover:bg-gray-100 rounded">

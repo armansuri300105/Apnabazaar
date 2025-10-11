@@ -3,7 +3,7 @@ import { Edit, Star, Trash } from 'lucide-react'
 import { CartProductContext } from '../../services/context'
 import { deleteReview, editReview, RatingAndReview } from '../../../API/api'
 
-const Reviews = ({ product }) => {
+const Reviews = ({ product, refetch }) => {
   const {user, loadinguser} = useContext(CartProductContext)
   const [canComment, setCanComment] = useState(false);
   const [mode, setMode] = useState('add')
@@ -41,6 +41,8 @@ const Reviews = ({ product }) => {
       alert("There is an error to add rating")
     }
     setShowForm(false)
+    setMode('add')
+    refetch()
   }
 
   if (loadinguser){
@@ -62,6 +64,7 @@ const Reviews = ({ product }) => {
 
   const handleDeleteComment = async (id) => {
     await deleteReview(id);
+    refetch()
   }
   return (
     <div className="w-full p-5 border-2 rounded-xl flex flex-col gap-6">

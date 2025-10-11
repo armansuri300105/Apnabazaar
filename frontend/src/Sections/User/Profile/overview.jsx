@@ -13,7 +13,11 @@ const Overview = ({user}) => {
         select: (res) => (res?.data?.orders) || []
     })
     if (isLoading) return (<p>Loading....</p>)
-        
+    const min = (a,b) => {
+        return a>b ? b : a
+    }
+
+    console.log(orders)
   return (
     <>
         <div className="w-full">
@@ -24,10 +28,10 @@ const Overview = ({user}) => {
 
                 <div className="space-y-4">
                     {
-                        orders?.map((order, index) => (
+                        orders?.slice(0,min(5,orders.length)).map((order, index) => (
                             <div key={index} className="flex justify-between items-center p-4 bg-[#ececf0] rounded-lg">
                                 <div>
-                                    <p className="font-medium">{order?._id}</p>
+                                    <p className="font-medium">{order?.orderId}</p>
                                     <div className="text-sm flex gap-[7px]"><p className="text-gray-500">{dayjs(order?.createdAt).format("DD MMM YYYY, hh:mm A")}</p><p className="text-black italic">₹{order?.totalAmount}</p></div>
                                 </div>
                                 <span className="px-3 py-1 border text-sm rounded-md border-gray-500 bg-green-100 text-blue-600 font-medium">{order?.orderStatus}</span>

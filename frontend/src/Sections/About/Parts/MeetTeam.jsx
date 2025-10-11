@@ -1,9 +1,9 @@
 export const MeetTeam = () =>{
     const data = [
-        {image: "", role: "Full Stack", name: "ANIKET GUPTA", bio: "Expert in Nothing, Professional Yapper, Move on nahi ho raha"},
-        {image: "", role: "Full stack", name: "Md. ARSHAD MANSURI", bio: "Can't do Anything, Time Pass Merchant, Daal Baati Khani"},
-        {image: "", role: "Designer", name: "AWHAN RAY", bio: "Messy Hairstyle, I think I know you., Move on teammate"},
-        {image: "", role: "ML Developer", name: "Om Chiddarwar", bio: "1.5 metre life radius, Sleep Boi, Dual Degree (fucked)"},
+        {image: "", role: "Full Stack", name: "ANIKET GUPTA", bio: "Frontend Developer"},
+        {image: "", role: "Full stack", name: "Md. ARSHAD MANSURI", bio: "Backend and Frontend Developer"},
+        {image: "", role: "Designer", name: "AWHAN RAY", bio: "UI & UX Design"},
+        {image: "", role: "ML Developer", name: "Om Chiddarwar", bio: "ML Developer"},
     ]
     return (
     <div className="py-[56px] flex justify-center">

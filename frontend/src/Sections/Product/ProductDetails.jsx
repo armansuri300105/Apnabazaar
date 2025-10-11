@@ -24,7 +24,7 @@ const ProductDetails = () => {
   const Productid = param?.Productid
   const [selectedImage, setSelectedImage] = useState(null);
   
-  const {data: product, isLoading} = useQuery({
+  const {data: product, isLoading, refetch} = useQuery({
     queryKey : ["showproduct"],
     queryFn: () => getProductsById(Productid),
     select: (res) => (res?.data?.product) || [],
@@ -227,7 +227,7 @@ const ProductDetails = () => {
             ))
           }
         </div>
-        {select===0 ? <Detail product={product}/> : select===1 ? <Vendor vendor={product?.vendor?.vendor}/> : <Reviews product={product}/>}
+        {select===0 ? <Detail product={product}/> : select===1 ? <Vendor vendor={product?.vendor?.vendor}/> : <Reviews product={product} refetch={refetch}/>}
         <div className="other-details w-[1200px] mt-[40px] relative">
           <h2 className="mb-[20px]">You Might Also Like</h2>
         </div>

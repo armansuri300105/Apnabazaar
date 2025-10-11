@@ -60,7 +60,7 @@ export default function OrderCard({ order, onUpdateStatus, setIsOpenDetail }) {
             Current Status: <span className="text-blue-600">{status}</span>
           </p>
           <button
-          disabled={order.orderStatus === "Delivered" ? true : false}
+            disabled={order.orderStatus === "Delivered" ? true : false}
             onClick={handleStatusChange}
             className={`px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed`}
           >
