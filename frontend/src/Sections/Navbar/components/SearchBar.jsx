@@ -1,15 +1,12 @@
 import { Search } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
-import { userSearchMl } from "../../../../API/ml"
 
 export const SearchBar = () =>{
     const [search, setSearch] = useState("")
     const navigate = useNavigate()
     const handleSearch = async (e) => {
         e.preventDefault();
-        const res = await userSearchMl(search);
-        console.log(res);
         navigate(`/search/${search}`)
     }
     return(

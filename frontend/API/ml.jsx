@@ -9,5 +9,5 @@ export const userInteresctionDataMl = (data) => {
     return api.post(`/`, data)
 }
 export const userSearchMl = (name) => {
-    return api.post(`/recommend`, {item_name: name, user_id:0})
+    return api.post(`/recommend`, {item_name: name})
 }
