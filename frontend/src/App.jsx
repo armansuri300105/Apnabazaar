@@ -5,7 +5,6 @@ import { MeetTeam } from "./Sections/About/Parts/MeetTeam";
 import { CategoryBody } from "./Sections/Category/Parts/Body";
 import { Heading1 } from "./Sections/Category/Parts/Heading1";
 import { HomeBody } from "./Sections/Home/HomeBody";
-import { HomeBottom } from "./Sections/Home/Parts/homebottom";
 import { NavBar } from "./Sections/Navbar/navbar";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { CartProductContext } from "./services/context";
@@ -16,7 +15,7 @@ import SignupForm from "./Sections/User/SignUp";
 import SigninForm from "./Sections/User/Signin";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useQuery } from "@tanstack/react-query";
-import { authCheck, userInteresctionData } from "../API/api";
+import { authCheck } from "../API/api";
 import Profile from "./Sections/User/Profile/profile";
 import Checkout from "./Sections/Order/checkout";
 import ProductDetails from "./Sections/Product/ProductDetails";
@@ -26,6 +25,9 @@ import VendorForm from "./Sections/Vendor/vendorForm";
 import { VendorDashboard } from "./Sections/Vendor/vendorDashboard";
 import TrackOrder from "./Sections/Order/trackOrder";
 import { useEffect } from "react";
+import { userInteresctionDataMl } from "../API/ml";
+import { userInteresctionDataServer } from "../API/api";
+import Search from "./Sections/Product/search";
 
 const GOOGLE_CLIENT_ID = "316084868865-6cm9ag49f38mgqp25ttja2i61cbjbl6l.apps.googleusercontent.com";
 
@@ -71,7 +73,8 @@ const App = () => {
       if (!dataForMl?.products?.length) return;
 
       try {
-        const res = await userInteresctionData(dataForMl);
+        const res = await userInteresctionDataMl(dataForMl);
+        const res2 = await userInteresctionDataServer(dataForMl);
         console.log("Interaction data sent:", res?.data);
 
         setDataForMl({ products: [], currentView: null });
@@ -93,16 +96,17 @@ const App = () => {
 
 
 
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (dataForMl?.products.length > 0) {
-        navigator.sendBeacon("http://localhost:3000/api/user/interaction", JSON.stringify(dataForMl));
-        setDataForMl({ products: [] });
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [dataForMl]);
+  // useEffect(() => {
+  //   const handleBeforeUnload = () => {
+  //     if (dataForMl?.products.length > 0) {
+  //       navigator.sendBeacon("http://localhost:3000/api/user/interaction", JSON.stringify(dataForMl));
+  //       navigator.sendBeacon("https://recommendation-system-4-hysd.onrender.com/docs#/default/recommend_recommend_post", JSON.stringify(dataForMl));
+  //       setDataForMl({ products: [] });
+  //     }
+  //   };
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  // }, [dataForMl]);
 
 
   return (
@@ -156,6 +160,7 @@ const App = () => {
         <Route path="/vendor/form" element={<VendorForm/>} />
         <Route path="/vendor/dashboard" element={<VendorDashboard/>} />
         <Route path="/orders/:orderId" element={<TrackOrder/>} />
+        <Route path="/search/:text" element={<Search/>} />
       </Routes>
 
       {!isSignupPage && <FooterSection loadinguser={isLoading} />}

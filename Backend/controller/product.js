@@ -26,3 +26,43 @@ export const getproductsbyid = async (req, res) => {
     }
     res.json({success: true, product: formattedProduct})
 }
+
+export const searchProduct = async (req, res) => {
+  try {
+    const { name } = req.query;
+    let products = [];
+
+    if (name) {
+      const matchedProducts = await PRODUCT.find({
+        name: { $regex: name, $options: "i" },
+        isActive: true
+      }).lean();
+
+      if (matchedProducts.length > 0) {
+        const categories = [...new Set(matchedProducts.map(p => p.category))];
+        const categoryProducts = await PRODUCT.find({
+          category: { $in: categories },
+          isActive: true
+        }).lean();
+
+        const allProductsMap = new Map();
+        [...matchedProducts, ...categoryProducts].forEach(p => {
+          allProductsMap.set(p._id.toString(), p);
+        });
+
+        products = Array.from(allProductsMap.values());
+      }
+    } else {
+      products = await PRODUCT.find({ isActive: true }).lean();
+    }
+
+    const formattedProducts = products.map(product => ({
+      productID: product._id,
+      ...product
+    }));
+
+    res.status(200).json({ success: true, data: formattedProducts });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

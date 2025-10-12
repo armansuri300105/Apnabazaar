@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { SerachBar } from "./components/SearchBar"
+import { SearchBar } from "./components/SearchBar"
 import { NavLink } from 'react-router-dom'
 import { BsCart3 } from "react-icons/bs";
 import { IoMdClose } from "react-icons/io";
@@ -52,7 +52,7 @@ export const NavBar = () =>{
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/about"><li>About</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/contact"><li>Contact</li></NavLink>
                 </ul>
-                <SerachBar text={"Search Local Products..."}/>
+                <SearchBar/>
                 <div className="icons flex gap-[15px] items-center">
                     {checkAuth ? 
                         (<NavLink to="/profile"><div className="w-[40px] h-[40px] relative rounded-[50%] group">
@@ -73,4 +73,3 @@ export const NavBar = () =>{
             </nav>)}
         </div>
 )}
-
