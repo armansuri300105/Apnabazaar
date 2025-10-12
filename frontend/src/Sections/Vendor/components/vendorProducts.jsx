@@ -5,6 +5,7 @@ import { getVendorProducts, removeVendorProduct } from "../../../../API/api";
 import AddProductForm from "./AddProduct";
 import Swal from "sweetalert2";
 import "./product.css";
+import Loading from "../../Loading/loading";
 
 export default function Products() {
   const [addProduct, setAddProduct] = useState(false);
@@ -24,14 +25,7 @@ export default function Products() {
   });
   const [mode, setMode] = useState("add")
   if (isLoading){
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loading/>
   }
 
   const products = data.products;

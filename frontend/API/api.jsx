@@ -109,7 +109,7 @@ export const getordersbycategory = () => {
     return api.get('/api/vendor/getordersbycategory')
 }
 
-export const userInteresctionData = (data) => {
+export const userInteresctionDataServer = (data) => {
     return api.post('/api/user/interection', data)
 }
 
@@ -123,4 +123,8 @@ export const editReview = (data) => {
 
 export const deleteReview = (id) => {
     return api.delete(`/api/user/deletereview?productID=${id}`)
+}
+
+export const searchProduct = (name) => {
+    return api.get(`/api/product/search?name=${name}`)
 }

@@ -3,6 +3,7 @@ import { Search, Filter, CheckCircle, Clock, Package } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getVendorOrders, updateOrderStatus } from "../../../../API/api";
 import OrderCard from "./OrderDetail";
+import Loading from "../../Loading/loading"
 
 const VendorOrders = () => {
   const [statusFilter, setStatusFilter] = useState("All");
@@ -17,14 +18,7 @@ const VendorOrders = () => {
   })
 
   if (isLoading){
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loading/>
   }
 
   const orders = data.orders
