@@ -76,13 +76,12 @@ const userSchema = new mongoose.Schema(
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
     history: [
       {
-        user_id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
         productID: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         event: {
           type: {type: String},
-          timeStamp: Date
+          timeStamp: String
         },
-        time: Date,
+        time: String,
         duration: Number
       }
     ],

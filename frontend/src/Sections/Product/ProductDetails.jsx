@@ -12,6 +12,11 @@ import Detail from "./detail";
 import Vendor from "./vendor";
 import Reviews from "./reviews";
 import {useQuery} from "@tanstack/react-query"
+import ProductDetailSkeleton from "./productDetailSkeleton";
+import CartPopup from "./cartPopUp";
+import { userSearchMl } from "../../../API/ml";
+import { ProductShow } from "../Home/Components/productshow";
+import FavoritesSkeleton from "../User/Profile/Skeletons/favoritesSkeleton"
 
 const ProductDetails = () => {
   const {user, cartItems, setCartItems, setCmenu, dataForMl, setDataForMl} = useContext(CartProductContext)
@@ -23,12 +28,20 @@ const ProductDetails = () => {
   const param = useParams();
   const Productid = param?.Productid
   const [selectedImage, setSelectedImage] = useState(null);
+   const [popUp, setPopUp] = useState(false);
   
   const {data: product, isLoading, refetch} = useQuery({
-    queryKey : ["showproduct"],
+    queryKey : ["showproduct", Productid],
     queryFn: () => getProductsById(Productid),
     select: (res) => (res?.data?.product) || [],
     enabled: !!Productid,
+  })
+
+  const {data: mlprd, mlLoading} = useQuery({
+    queryKey: [`mlprd`, Productid],
+    queryFn: () => userSearchMl(product?.name),
+    select: (res) => res?.data,
+    enabled: !!product?.name
   })
 
   useEffect(() => {
@@ -36,6 +49,15 @@ const ProductDetails = () => {
       setSelectedImage(product.images[0]);
     }
   },[product])
+
+  useEffect(() => {
+      if (popUp) {
+        const timer = setTimeout(() => {
+        setPopUp(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+      }
+  }, [popUp]);
 
   useEffect(() => {
     const check = user?.wishlist?.includes(Productid)
@@ -63,9 +85,9 @@ const ProductDetails = () => {
                   category: prev.currentView.product.category,
                   name: prev.currentView.product.name
                 },
-                time: Date.now(),
+                time: new Date(Date.now()).toLocaleString(),
                 duration,
-                event: { type: "view", time: Date.now() },
+                event: { type: "view", time: new Date(Date.now()).toLocaleString() },
               },
             ],
             currentView: null,
@@ -97,12 +119,12 @@ const ProductDetails = () => {
                 category: prev.currentView.product.category,
                 name: prev.currentView.product.name
               },
-              time: Date.now(),
+              time: new Date(Date.now()).toLocaleString(),
               duration:
                 prev.currentView && prev.currentView.product.productID === product._id
                   ? Date.now() - prev.currentView.startTime
                   : 0,
-              event: { type: "add_to_cart", time: Date.now() },
+              event: { type: "add_to_cart", time: new Date(Date.now()).toLocaleString() },
             },
           ],
         };
@@ -115,7 +137,7 @@ const ProductDetails = () => {
     }
   };
 
-
+  console.log("ml products", mlprd)
   const handleWishlist = async () => {
     setWishlist(!wishlist);
     if (user?.wishlist?.includes(Productid)){
@@ -139,18 +161,21 @@ const ProductDetails = () => {
     }
   };
 
-  if (isLoading) return (<p>Loading Products....</p>)
+  if (isLoading || mlLoading){
+    return <ProductDetailSkeleton/>
+  }
   function renderBoldItalic(text) {
-    // Replace **bold** with <b>bold</b>
     let html = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-    // Replace *italic* with <i>italic</i>
     html = html.replace(/\*(.*?)\*/g, "<i>$1</i>");
-    // Preserve line breaks
     html = html.replace(/\n/g, "<br/>");
     return html;
   }
+
+  if (mlLoading){
+    return <FavoritesSkeleton/>
+  }
   return (
-    <section className="product-detail w-screen flex flex-col items-center">
+    <section className="product-detail flex flex-col items-center">
       <div className="product-detail-section w-[1200px] mt-[120px] mx-auto grid grid-cols-2 gap-10 p-6">
         <div onClick={() => navigate(-1)} className="cursor-pointer col-span-2 flex gap-[10px] items-center">
           <FaArrowLeft/>
@@ -184,7 +209,6 @@ const ProductDetails = () => {
 
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold text-red-500">₹{product?.price}</span>
-            <span className="line-through text-gray-400">₹{product?.oldPrice}</span>
           </div>
           <div
             style={{ whiteSpace: "pre-line" }}
@@ -209,11 +233,18 @@ const ProductDetails = () => {
                 <button className="border-[1px] rounded-md w-[30px] relative h-[30px] text-[20px]" onClick={() => setQuantity(quantity + 1)}><p className="absolute bottom-[2px] left-[25%]">+</p></button>
               </div>
             </div>
-            <button onClick={handleAddtoCart} className="bg-black text-white rounded-md text-[14px] w-[350px] h-[30px]">
+            <button onClick={(e) => {
+                                      if (btn === "Add to Cart") {
+                                        handleAddtoCart(e);
+                                        setPopUp(true);
+                                      } else {
+                                        handleAddtoCart(e);
+                                      }
+                                    }}
+              className="bg-black text-white rounded-md text-[14px] w-[350px] h-[30px]">
               {btn}
             </button>
           </div>
-
           <div className="text-sm text-gray-500 mt-2">
             Total: ₹{(product?.price * quantity).toFixed(2)}
           </div>
@@ -227,11 +258,25 @@ const ProductDetails = () => {
             ))
           }
         </div>
-        {select===0 ? <Detail product={product}/> : select===1 ? <Vendor vendor={product?.vendor?.vendor}/> : <Reviews product={product} refetch={refetch}/>}
-        <div className="other-details w-[1200px] mt-[40px] relative">
-          <h2 className="mb-[20px]">You Might Also Like</h2>
+        {select===0 ? <Detail product={product}/> :
+         select===1 ? <Vendor vendor={product?.vendor?.vendor}/> : 
+         <Reviews product={product} refetch={refetch}/>}
+        <div className="feature-products w-[1200px]">
+            <div className="flex justify-start">
+                <div className="text-[24px] text-black text-center mt-[30px]">
+                    You Might Also Like
+                </div>
+            </div>
+            <div className="w-full mt-8 flex gap-4 flex-wrap justify-start">
+                {
+                    (mlprd?.recommendations && mlprd?.recommendations.slice(0, 10).map((product, index) => {
+                        return <ProductShow key={index} product={product} />
+                    }))
+                }
+            </div>
         </div>
       </div>
+      <CartPopup show={popUp} message="Product added to cart!" />
     </section>
   );
 };

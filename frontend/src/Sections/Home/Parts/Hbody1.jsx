@@ -11,6 +11,12 @@ import { CartProductContext } from "../../../services/context";
 export const Hbody1 = () => {
   const {user, loadinguser} = useContext(CartProductContext)
 
+  const handleScroll = () => {
+    const productsSection = document.getElementById("feature-products");
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: "smooth" });
+    }
+  }
   return (
     <div className="home-hero bg-[#f8f8f9] flex justify-center pt-[130px]">
       <div className="hero w-[80vw] flex justify-center gap-[30px] items-center">
@@ -29,7 +35,7 @@ export const Hbody1 = () => {
               quality products.
             </div>
             <div className="home-buttons-div flex gap-4 mt-5">
-              <div className="shopnow-btn h-[35px] w-[114px] bg-black text-white font-semibold flex justify-between px-3 items-center rounded-lg text-[12.25px]">
+              <div onClick={handleScroll} className="shopnow-btn h-[35px] w-[114px] bg-black text-white font-semibold flex justify-between px-3 items-center rounded-lg text-[12.25px]">
                 Shop Now
                 <FaArrowRight/>
               </div>

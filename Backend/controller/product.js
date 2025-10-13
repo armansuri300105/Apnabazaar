@@ -8,21 +8,27 @@ export const getproduct = async (req, res) => {
 }
 
 export const getallproducts = async (req,res) => {
-    const products = await PRODUCT.find({isActive: true}).select("-stock").lean();
+    const products = await PRODUCT.find({isActive: true}).lean();
     if (products.length==0) return res.json({message: `Products not found`})
-    const formattedProducts = products.map(p => ({
-        productID: p._id,
-        ...p
-    }));
+    const formattedProducts = products.map(p => {
+        const {stock, ...rest} = p;
+        return {
+          productID: p._id,
+          inStock: stock>0,
+          ...rest
+        }
+    });
     return res.json({success: true, message: `All Products`,items: products.length, products: formattedProducts})
 }
 
 export const getproductsbyid = async (req, res) => {
     const {id} = req.query;
-    const product = await PRODUCT.findOne({_id: id}).select("-stock").lean().populate("vendor");
+    const product = await PRODUCT.findOne({_id: id}).lean().populate("vendor");
+    const {stock, ...rest} = product
     const formattedProduct = {
         productID: product._id,
-        ...product
+        inStock: stock > 0,
+        ...rest
     }
     res.json({success: true, product: formattedProduct})
 }
@@ -58,6 +64,7 @@ export const searchProduct = async (req, res) => {
 
     const formattedProducts = products.map(product => ({
       productID: product._id,
+      inStock: product.stock > 0,
       ...product
     }));
 

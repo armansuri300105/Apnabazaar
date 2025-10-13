@@ -52,6 +52,7 @@ const Cart = ({setCmenu}) => {
                 </div>
                 <IoMdClose onClick={handleMenuClose} className="cursor-pointer text-xl"/>
             </div>
+            <div className={`${cartItems.length!==0 ? "overflow-y-scroll" : ""} h-[calc(100vh_-_330px)]`}>
             {
                 cartItems.length!==0 ? (
                     <div className="flex flex-col gap-[20px] mt-[50px]">
@@ -62,7 +63,7 @@ const Cart = ({setCmenu}) => {
                         }
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-[10px] items-center justify-center h-[90vh]">
+                    <div className="flex flex-col gap-[10px] items-center justify-center h-[80vh]">
                         <div className="w-[50px] h-[50px] rounded-[50%] flex justify-center items-center bg-[#ececf0]">
                             <FiShoppingBag className="text-xl text-[#717182]"/>
                         </div>
@@ -72,8 +73,9 @@ const Cart = ({setCmenu}) => {
                     </div>
                 )
             }
+            </div>
             {cartItems.length===0 ? "" : <div className="w-[100%] flex flex-col gap-[20px] absolute bottom-[20px] justify-center">
-                <div className="flex flex-col gap-[7px] w-[85%] border-t-2 border-[#ececf0] border-b-2 py-[7px]">
+                <div className="flex h-[100px] flex-col gap-[7px] w-[85%] border-t-2 border-[#ececf0] border-b-2 py-[7px]">
                     <div className="flex justify-between items-center">
                         <p>Subtotal</p>
                         <p>₹{priceDetail?.subtototal}</p>

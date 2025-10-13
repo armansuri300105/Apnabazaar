@@ -3,7 +3,6 @@ import { Stats } from "./Sections/About/Parts/stats";
 import { Story } from "./Sections/About/Parts/Story";
 import { MeetTeam } from "./Sections/About/Parts/MeetTeam";
 import { CategoryBody } from "./Sections/Category/Parts/Body";
-import { Heading1 } from "./Sections/Category/Parts/Heading1";
 import { HomeBody } from "./Sections/Home/HomeBody";
 import { NavBar } from "./Sections/Navbar/navbar";
 import { Routes, Route, useLocation } from "react-router-dom";
@@ -73,40 +72,36 @@ const App = () => {
       if (!dataForMl?.products?.length) return;
 
       try {
-        const res = await userInteresctionDataMl(dataForMl);
-        const res2 = await userInteresctionDataServer(dataForMl);
+        const res = await userInteresctionDataServer(dataForMl);
         console.log("Interaction data sent:", res?.data);
 
-        setDataForMl({ products: [], currentView: null });
+        setDataForMl({user: data?.user?._id, products: [], currentView: null });
         localStorage.removeItem("interaction");
       } catch (err) {
         console.error("Error sending interaction data:", err);
       }
     };
 
-    // 🔹 Send immediately if batch reaches 20
     if (dataForMl?.products?.length >= 10) {
       sendInteractionData();
     }
 
-    // 🔹 Also send every 5 minutes
     const interval = setInterval(sendInteractionData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [dataForMl]);
 
 
 
-  // useEffect(() => {
-  //   const handleBeforeUnload = () => {
-  //     if (dataForMl?.products.length > 0) {
-  //       navigator.sendBeacon("http://localhost:3000/api/user/interaction", JSON.stringify(dataForMl));
-  //       navigator.sendBeacon("https://recommendation-system-4-hysd.onrender.com/docs#/default/recommend_recommend_post", JSON.stringify(dataForMl));
-  //       setDataForMl({ products: [] });
-  //     }
-  //   };
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-  //   return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  // }, [dataForMl]);
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (dataForMl?.products?.length > 0) {
+        navigator.sendBeacon("http://localhost:3000/api/user/interaction", JSON.stringify(dataForMl));
+        setDataForMl({user: data?.user?._id, products: [], currentView: null });
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [dataForMl]);
 
 
   return (
@@ -171,10 +166,7 @@ const App = () => {
 function CategoryPage() {
   return (
     <div className="flex justify-center">
-      <div className="category-section-top w-[70vw] grid grid-cols-1 gap-[40px] mb-[50px]">
-        <Heading1 />
-        <CategoryBody />
-      </div>
+      <CategoryBody/>
     </div>
   );
 }

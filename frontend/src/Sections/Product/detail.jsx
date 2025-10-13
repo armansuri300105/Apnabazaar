@@ -9,6 +9,7 @@ const Detail = ({product}) => {
     html = html.replace(/\n/g, "<br/>");
     return html;
   }
+  console.log(product)
   return (
     <>
         <div className="product-other-detail w-full p-[20px] border-2 rounded-xl flex gap-[30px]">
@@ -25,7 +26,7 @@ const Detail = ({product}) => {
                   </div>
                   <div className="flex justify-between">
                     <p className="text-[#717182]">Availability:</p>
-                    <p>{product?.stock > 0 ? "In Stock" : "Out Of Stock"}</p>
+                    <p>{product?.inStock ? "In Stock" : "Out Of Stock"}</p>
                   </div>
                   <div className="flex justify-between">
                     <p className="text-[#717182]">Vendor:</p>

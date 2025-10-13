@@ -19,7 +19,7 @@ const Orders = ({user}) => {
     })
   return isLoading ? <OrdersSkeleton/> : (
     <section className="flex flex-col items-center">
-        <div className="orders-page relative w-[1200px] mt-[120px] mb-[100px]">
+        <div className="orders-page relative w-[1190px] mt-[120px] mb-[100px]">
             <div className="w-full mb-[20px]">
                 <div className="px-2">
                     <h2 className="text-2xl font-semibold">Order History</h2>
@@ -28,11 +28,7 @@ const Orders = ({user}) => {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2 bg-white border rounded-2xl shadow-sm p-2 m-2">
-                    <div className="flex items-center flex-1 bg-gray-100 rounded-md px-3 py-2">
-                        <Search className=" h-4 text-gray-400 mr-2" />
-                        <input type="text" placeholder="Search orders..." className="bg-transparent focus:outline-none w-full text-sm" />
-                    </div>
+                <div className="orders-section-filters flex items-center gap-2 bg-white border rounded-2xl shadow-sm p-2 m-2">
                     <div className="relative">
                         <select onChange={(e) => setFilter(e.target.value)} className="bg-gray-100 text-sm w-[100px] rounded-md px-4 appearance-none py-2 focus:outline-none">
                             <option value={"All"}>All Orders</option>
@@ -81,7 +77,7 @@ const Orders = ({user}) => {
                             </div>
                         </div>
 
-                        <div className="flex gap-[10px]">
+                        <div className="flex gap-[10px] flex-wrap">
                             {
                                 order?.items?.map((item, index) => {
                                     return <img key={index} src={item?.product?.images[0]} alt="item" className="w-14 h-14 rounded-md object-cover" />
@@ -89,7 +85,7 @@ const Orders = ({user}) => {
                             }
                         </div>
 
-                        <div className="flex justify-between">
+                        <div className="orders-detail-section-2 flex justify-between">
                             <p className="text-sm text-gray-600">
                                 {order?.items?.length} item{order?.items?.length > 1 ? "s" : ""}{" "}
                                 <span className="mx-1">•</span> Expected {new Date(new Date(order?.createdAt).getTime() + 3 * 24 * 60 * 60 * 1000).toDateString()}

@@ -116,7 +116,7 @@ export const authCheck = async (req,res) => {
         const email = decodeUser?.email
         const user = await USER.findOne({email});
         if (!user){
-            return res.send({ isAuthenticate: false, message: "UnAutharized Access" })
+            return res.send({isAuthenticate: false, message: "UnAutharized Access"})
         }
         return res.send({ isAuthenticate: true, message: "Authenticate user", user, role: user.role })
     } catch (error) {
@@ -239,9 +239,28 @@ export const addVendor = async (req, res) => {
 };
 
 export const interection = async (req,res) => {
+    const data = req.body
+    console.log("Data",data)
     try {
-        const data = req.body
-        console.log(data);
+        const user = await USER.findById(data?.user)
+        if (!user){
+            return res.status(404).json({success: false, message: "User Not Found"})
+        }
+        const userHistory = data?.products.map(product => {
+            return {
+                productID: product?.product?.productID,
+                event: {
+                    type: product?.event?.type,
+                    timeStamp: product?.event?.time
+                },
+                time: product?.time,
+                duration: product?.duration
+            }
+        })
+        console.log("user History",userHistory)
+        user.history = [...user.history, ...userHistory]
+
+        await user.save()
         res.status(200).json({success: true, message: "Data saved Successfully"})
     } catch (error) {
         res.status(500).json({success: false, message: error.message})

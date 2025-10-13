@@ -11,7 +11,7 @@ export const FeaturedLocalProducts = () => {
     
     if (isLoading) return (<p>Loading Products....</p>)
     return (
-        <div className="bg-white mb-[30px] relative flex flex-col items-center">
+        <div  id="feature-products" className="bg-white mb-[30px] relative flex flex-col items-center">
             <div className="feature-products w-[1200px]">
                 <div className="flex justify-center text-[26.5px] mt-[10px] mb-[14px] font-[500]">
                     Featured Local Products

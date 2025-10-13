@@ -5,6 +5,9 @@
     .feature-products{
         width: 900px;
     }
+    .product-cart-component{
+        width: calc(900px / 3 - 20px);
+    }
 }
 @media screen and (max-width: 900px) {
     .home-hero{
@@ -12,6 +15,9 @@
     }
     .feature-products{
         width: 90vw;
+    }
+    .product-cart-component{
+        width: calc(90vw / 2 - 20px);
     }
 }
 @media screen and (max-width: 600px) {
@@ -38,6 +44,15 @@
     .quality-btns{
         width: 400px;
     }
+    .product-cart-component{
+        width: 80vw;
+    }
+    .product-cart-component>div{
+        width: calc(80vw - 1px);
+    }
+    .product-cart-component>div img{
+        object-fit: contain;
+    }
 }
 @media screen and (max-width: 600px) {
     .hero-text{
@@ -50,5 +65,14 @@
     }
     .homeBotton-box > div{
         width: auto;
+    }
+}
+
+@media screen and (max-width: 325px) {
+    .product-cart-component>div img{
+        object-fit: cover;
+    }
+    .product-card-component-rating{
+        display: block;
     }
 }

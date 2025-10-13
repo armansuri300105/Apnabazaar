@@ -14,6 +14,9 @@
     .back-btn{
         width: 20%;
     }
+    .orders-page{
+        width: 900px;
+    }
 }
 @media screen and (max-width: 1000px) {
     .checkout-section{
@@ -46,5 +49,20 @@
     }
     .shipping-page, .orders-page{
         width: 80vw;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .orders-detail-section-2{
+        flex-direction: column;
+    }
+    .orders-section-filters{
+        flex-direction: column;
+    }
+    .orders-section-filters div{
+        width: 100%;
+    }
+    .orders-section-filters div select{
+        width: 100%;
     }
 }

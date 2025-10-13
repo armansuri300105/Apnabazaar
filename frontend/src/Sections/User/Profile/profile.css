@@ -40,4 +40,8 @@
     .profile-section-heading>div p{
         font-size: 15px;
     }
+    .profile-overview-orders{
+        flex-direction: column;
+        gap: 10px;
+    }
 }

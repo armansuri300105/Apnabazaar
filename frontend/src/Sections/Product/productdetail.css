@@ -13,6 +13,9 @@
     .product-detail-section>div, .product-detail-section-left, .other-details{
         width: 80vw;
     }
+    .search-result-section{
+        margin-top: 200px;
+    }
 }
 @media screen and (max-width: 600px) {
     .product-detail-section>div, .product-detail-section-left, .other-details{
@@ -31,5 +34,12 @@
     }
     .product-detail-section-btns>button{
         width: 90vw;
+    }
+    .search-product-recommendation{
+        justify-content: center;
+    }
+    .search-result-section-filter{
+        flex-direction: column;
+        gap: 10px;
     }
 }
