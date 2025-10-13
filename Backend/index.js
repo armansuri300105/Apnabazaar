@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use(cookieParser())
 
 app.use(cors({
-    origin: ["https://apnabzaar.netlify.app", "https://apnabazaaradmin.netlify.app"],
+    origin: ["https://apnabzaar.netlify.app", "https://apnabazaaradmin.netlify.app", "http://localhost:5173", "http://localhost:5174"],
     credentials: true
 }));
 

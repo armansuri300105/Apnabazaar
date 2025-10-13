@@ -9,22 +9,21 @@ export const setuserandcookies = (res, user) => {
     const token = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '7d'})
     console.log(user?.role)
     if (user?.role === "customer" || user?.role === "vendor"){
-        res.cookie("token", token ,{
+        res.cookie("token", token, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
-            maxAge: 7*24*60*60*1000
-        })
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
     }
     if (user?.role === "Admin"){
-        res.cookie("admin_token", token ,{
+        res.cookie("admin_token", token, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
-            maxAge: 7*24*60*60*1000
-        })
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
     }
-
     return token
 }
 

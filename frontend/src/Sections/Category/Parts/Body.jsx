@@ -1,5 +1,5 @@
 import { ProductShow } from "../../Home/Components/productshow";
-import { useState, useMemo, useContext } from "react";
+import { useState, useMemo, useContext, useEffect } from "react";
 import "./category.css";
 import { getProducts } from "../../../../API/api";
 import { useQuery } from "@tanstack/react-query";
@@ -8,16 +8,32 @@ import { CartProductContext } from "../../../services/context";
 
 export const CategoryBody = () => {
   const { loadinguser } = useContext(CartProductContext);
+  const [selected, setSelected] = useState('name');
   const [category, setCategory] = useState("All Products");
   const [items, setItems] = useState("");
 
-  const { data, isError, error } = useQuery({
+  const { data, isError, error, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
     select: (res) => res?.data?.products || [],
   });
 
-  // ✅ Build category list dynamically from products
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 600;
+
+    if (isMobile) {
+      const productsSection = document.getElementById("products-section");
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [category, selected]);
+
   const categories = useMemo(() => {
     if (!data) return ["All Products"];
     const uniqueCategories = [
@@ -26,7 +42,7 @@ export const CategoryBody = () => {
     return ["All Products", ...uniqueCategories];
   }, [data]);
 
-  const products = useMemo(() => {
+  let products = useMemo(() => {
     if (!data) return [];
     if (category === "All Products") return data;
     return data.filter(
@@ -54,43 +70,84 @@ export const CategoryBody = () => {
 
   if (isError) return <p>Error: {error.message}</p>;
 
+  if (selected === 'name') {
+    products = [...products].sort((a, b) =>
+      a.name.localeCompare(b.name) // A-Z
+    );
+  } else if (selected === 'date') {
+    products = [...products].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt) // Newest first
+    );
+  } else if (selected === 'rating') {
+    products = [...products].sort(
+      (a, b) => b.ratings?.average - a.ratings?.average // High → low
+    );
+  } else if (selected === 'price') {
+    products = [...products].sort((a, b) => a.price - b.price); // Low → high
+  }
+
+  if (isLoading){
+    return <CategorySkeleton/>
+  }
+
   return loadinguser ? (
     <CategorySkeleton />
   ) : (
-    <div className="category-grid flex gap-[20px]">
-      <div className="sticky top-[100px] h-screen overflow-y-auto">
-        <div className="text-[14px] font-semibold mb-2">Categories</div>
-        {categoriesWithCount.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => setCategory(item.name)}
-            className={`category-select-btn ${
-              category === item.name
-                ? "bg-black text-white"
-                : "bg-neutral-200 text-black"
-            } px-3 text-[16px] flex justify-between items-center w-[15vw] h-[41px] rounded-lg mb-2`}
-          >
-            {item.name}
-            <div className="text-black h-5 w-5 rounded-lg bg-neutral-200 border-solid border-[1px] border-grey-100 flex items-center justify-center">
-              {item.quantity}
-            </div>
+    <div className="category-section-top w-[90vw] grid grid-cols-1 gap-[40px] mb-[50px]">
+      <div className="category-section-start mt-[100px] w-[90vw] flex justify-between items-end justify-self-start relative">
+          <div>
+              <div className="text-[31.5px] font-semibold pt-4">Categories</div>
+              <div className="text-[14px] text-[#717182] py-3">Browse our complete selection of local products organized by category</div>
           </div>
-        ))}
+          <div className="category-section-items flex items-center gap-4 justify-start">
+              <div className="flex gap-[10px] items-center">
+                  <select className="outline-none border-solid border-[1px] h-9 px-2 flex justify-center rounded-md border-grey-100" value={selected} onChange={e => setSelected(e.target.value)}>
+                      <option value="name">Sort by Name</option>
+                      <option value="date">Sort by Date</option>
+                      <option value="priority">Sort by Priority</option>
+                      <option value="price">Sort by Price</option>
+                  </select>
+              </div>
+          </div>
       </div>
+      <div className="category-grid flex gap-[20px]">
+        <div className="sticky top-[100px] h-screen overflow-y-auto">
+          <div className="text-[14px] font-semibold mb-2">Categories</div>
+          {categoriesWithCount.map((item, index) => (
+            <div
+              id={index===categoriesWithCount.length-1 ? "products-section" : ""}
+              key={index}
+              onClick={() => setCategory(item.name)}
+              className={`category-select-btn ${
+                category === item.name
+                  ? "bg-black text-white"
+                  : "bg-neutral-200 text-black"
+              }
+              ${index===categoriesWithCount.length-1 ? "mb-[100px]" : ""} 
+              px-3 text-[16px] flex justify-between items-center w-[250px] h-[41px] rounded-lg mb-2`}
+            >
+              {item.name}
+              <div className="text-black h-5 w-5 rounded-lg bg-neutral-200 border-solid border-[1px] border-grey-100 flex items-center justify-center">
+                {item.quantity}
+              </div>
+            </div>
+          ))}
+        </div>
 
-      {/* Products Section */}
-      <div className="flex-1">
-        <div>{items !== 0 ? `Showing ${items} products` : ""}</div>
-        <div className="flex gap-6 mt-2 flex-wrap relative">
-          {products?.length === 0 ? (
-            <p className="w-[100%] h-[100%] text-center text-2xl font-bold">
-              Product Not Available
-            </p>
-          ) : (
-            products?.map((product, index) => (
-              <ProductShow key={index} product={product} />
-            ))
-          )}
+        {/* Products Section */}
+        <div className="flex-1">
+          <div>{items !== 0 ? `Showing ${items} products` : ""}</div>
+          <div className="category-product-section flex gap-6 mt-2 flex-wrap relative">
+            {products?.length === 0 ? (
+              <p className="w-[100%] h-[100%] text-center text-2xl font-bold">
+                Product Not Available
+              </p>
+            ) : (
+              products?.map((product, index) => (
+                <ProductShow key={index} product={product} />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

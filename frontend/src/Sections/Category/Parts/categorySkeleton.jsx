@@ -1,6 +1,6 @@
 const CategorySkeleton = () => {
   return (
-    <div className="flex gap-[20px]">
+    <div className="flex gap-[20px] mt-[150px] ml-[50px]">
       {/* Left category skeleton */}
       <div>
         <div className="w-28 h-4 bg-gray-300 rounded mb-2 animate-pulse"></div>

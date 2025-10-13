@@ -7,7 +7,9 @@ export const SearchBar = () =>{
     const navigate = useNavigate()
     const handleSearch = async (e) => {
         e.preventDefault();
-        navigate(`/search/${search}`)
+        if (search){
+            navigate(`/search/${search}`)
+        }
     }
     return(
         <form onSubmit={handleSearch} className={`search-bar relative h-[31.5px] bg-[#f3f3f5] flex items-center gap-3 rounded-lg w-[30vw]`}>

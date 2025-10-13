@@ -3,6 +3,7 @@ import { getOrders } from "../../../../API/api";
 import dayjs from "dayjs"
 import { useNavigate } from "react-router-dom";
 import {useQuery} from "@tanstack/react-query"
+import "./profile.css"
 
 const Overview = ({user}) => {
     const navigate = useNavigate()
@@ -29,7 +30,7 @@ const Overview = ({user}) => {
                 <div className="space-y-4">
                     {
                         orders?.slice(0,min(5,orders.length)).map((order, index) => (
-                            <div key={index} className="flex justify-between items-center p-4 bg-[#ececf0] rounded-lg">
+                            <div key={index} className="profile-overview-orders flex justify-between items-center p-4 bg-[#ececf0] rounded-lg">
                                 <div>
                                     <p className="font-medium">{order?.orderId}</p>
                                     <div className="text-sm flex gap-[7px]"><p className="text-gray-500">{dayjs(order?.createdAt).format("DD MMM YYYY, hh:mm A")}</p><p className="text-black italic">₹{order?.totalAmount}</p></div>
