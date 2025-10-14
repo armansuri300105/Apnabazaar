@@ -73,6 +73,7 @@ export const CreateOrder =  async (req, res) => {
             { new: true }
           );
         }
+        await sendOrderConfirmation(OrderData?.user?.email, OrderData.user?.name, newOrderData?.orderId, finalItems, newOrderData?.totalAmount)
         return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder._id });
     }
     const orderId = generateOrderId()
