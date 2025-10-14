@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Bell, Settings, LogOut, Plus, Eye, Edit, Trash } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { getproducts, removeproduct } from "../../API/product";
+import { getproducts, getVendors, removeproduct } from "../../API/product";
 import AddProductForm from "./AddProduct";
 import Swal from "sweetalert2";
 import "./Products.css";
@@ -9,10 +9,17 @@ import "./Products.css";
 export default function Products() {
   const [addProduct, setAddProduct] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selected, setSelected] = useState("All")
   const {data, isLoading, refetch} = useQuery({
     queryKey: ["product"],
     queryFn: getproducts,
     select: (res) => res?.data || null
+  })
+
+  const {data:vendors} = useQuery({
+    queryKey: ["vendors"],
+    queryFn: getVendors,
+    select: (res) => res?.data?.vendors || null
   })
   const [product, setProduct] = useState({
     name: "",
@@ -109,8 +116,17 @@ export default function Products() {
       description: product?.description,
       images: product?.images,
     })
-    console.log(product)
   }
+
+  const filteredProducts = products.filter(p => {
+    if (selected === "All") return true;
+
+    if (selected === "Apnabazaar") {
+      return !p?.vendor?.vendor?.companyName; // products without vendor name
+    }
+
+    return p?.vendor?.vendor?.companyName === selected;
+  });
   return (
     <div className="products-container min-h-screen bg-gray-50">
       <div className="flex-1 w-full p-4 overflow-x-hidden products-content">
@@ -170,7 +186,19 @@ export default function Products() {
             </button>
           </div>
         )}
-
+        <div className="category-section-items flex items-center gap-4 justify-start mb-[20px]">
+            <div className="flex gap-[10px] items-center">
+                <select className="outline-none border-solid border-[1px] h-9 px-2 flex justify-center rounded-md border-grey-100" value={selected} onChange={e => setSelected(e.target.value)}>
+                  <option value="All">All</option>
+                  <option value="Apnabazaar">Apnabazaar</option>
+                    {
+                      vendors && vendors?.map((v, index) => {
+                        return <option key={index} value={v?.vendor?.companyName}>{v?.vendor?.companyName}</option>
+                      })
+                    }
+                </select>
+            </div>
+        </div>
         {/* Mobile Product Cards for Small Screens */}
         <div className="products-mobile-cards mb-6">
           <div className="p-3">
@@ -185,7 +213,7 @@ export default function Products() {
             />
           </div>
           <div className="flex flex-col gap-[15px]">
-            {products.map((p, index) => (
+            {filteredProducts.map((p, index) => (
               <div key={index} className="bg-white rounded-lg shadow p-4">
                 <div className="flex items-start gap-3 mb-3">
                   <div className="p-3">
@@ -272,7 +300,7 @@ export default function Products() {
               </tr>
             </thead>
             <tbody>
-              {products.map((p, index) => (
+              {filteredProducts.map((p, index) => (
                 <tr
                   key={index}
                   className="border-t hover:bg-gray-50 text-sm"

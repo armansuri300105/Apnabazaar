@@ -154,9 +154,12 @@ export const deleteWishlist = async (req,res) => {
 export const logout = (req,res) => {
     try{
         res.clearCookie("token", {
+            // httpOnly: true,
+            // secure: false,
+            // sameSite: "lax",
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: true,
+            sameSite: "none",
         });
         res.status(200).json({ message: "Logout successful" , success: true});
     } catch (err) {

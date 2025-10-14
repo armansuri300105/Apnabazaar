@@ -12,9 +12,10 @@ import Addresses from "./addresses";
 import OrderPage from "./orderPage";
 import {useQuery} from "@tanstack/react-query"
 import CheckoutSkeleton from "./Skeletons/checkoutSkeleton"
+import Loading from "../Loading/loading"
 
 const Checkout = () => {
-    const {cartItems , user, setCartItems} = useContext(CartProductContext)
+    const {cartItems , user, setCartItems, setCmenu} = useContext(CartProductContext)
     const [priceDetail, setPriceDetail] = useState({subtotal: "", platform_fees: "", delivery: "", total: ""});
     const [count, setCount] = useState(1);
     const [selected, setSelected] = useState(0);
@@ -71,6 +72,7 @@ const Checkout = () => {
 
     const handleCreateOrder = async (e) => {
         e.preventDefault();
+        setCmenu(false)
         setLoading(true);
         if (cartItems?.length<=0){
             alert("Cart Should Not be Empty")
@@ -173,6 +175,10 @@ const Checkout = () => {
             console.error("Payment error:", err);
         }
     };
+
+    if (loading){
+        return <Loading/>
+    }
   return isLoading ? <CheckoutSkeleton/> : (
     <>
       <section className="min-h-screen flex justify-center bg-[#f3f3f5]">
