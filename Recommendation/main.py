@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import datetime
 from decimal import Decimal
-
+from fastapi.middleware.cors import CORSMiddleware
 
 from recommendation import (
     hybrid_recommendation_system,
