@@ -4,7 +4,7 @@ import AddressSkeleton from "./Skeletons/addressSkeleton";
 
 const AddressCard = ({ address, onEdit }) => {
   return (
-    <div className="relative border rounded-2xl p-4 min-w-[280px] shadow-sm hover:shadow-md transition">
+    <div className="relative border rounded-2xl p-4 min-w-[250px] shadow-sm hover:shadow-md transition">
       <div className="flex justify-between items-start">
         <h3 className="font-medium">{address.label}</h3>
         <button
@@ -55,9 +55,6 @@ export const SavedAddresses = ({user, loadinguser}) => {
           <h2 className="font-semibold text-lg">Saved Addresses</h2>
           <p className="text-gray-500 text-sm">Manage your delivery addresses</p>
         </div>
-        <button className="bg-black text-white px-4 py-2 rounded-lg">
-          + Add Address
-        </button>
       </div>
 
       <div className="flex gap-6">

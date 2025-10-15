@@ -15,7 +15,7 @@ import CheckoutSkeleton from "./Skeletons/checkoutSkeleton"
 import Loading from "../Loading/loading"
 
 const Checkout = () => {
-    const {cartItems , user, setCartItems, setCmenu} = useContext(CartProductContext)
+    const {cartItems , user, setCartItems, setCmenu, dataForMl, setDataForMl} = useContext(CartProductContext)
     const [priceDetail, setPriceDetail] = useState({subtotal: "", platform_fees: "", delivery: "", total: ""});
     const [count, setCount] = useState(1);
     const [selected, setSelected] = useState(0);
@@ -146,7 +146,30 @@ const Checkout = () => {
                     if (verifyData.success) {
                         setCartItems([]);
                         setLoading(false)
-                        console.log(verifyData)
+                        // setDataForMl(prev => {
+                        //     const updated = {
+                        //     ...prev,
+                        //     products: [
+                        //         ...(prev.products || []),
+                        //         {
+                        //         product: {
+                        //             productID: prev.currentView.product.productID,
+                        //             category: prev.currentView.product.category,
+                        //             name: prev.currentView.product.name
+                        //         },
+                        //         time: new Date(Date.now()).toLocaleString(),
+                        //         duration:
+                        //             prev.currentView && prev.currentView.product.productID === product._id
+                        //             ? Date.now() - prev.currentView.startTime
+                        //             : 0,
+                        //         event: { type: "purchase", time: new Date(Date.now()).toLocaleString() },
+                        //         },
+                        //     ],
+                        //     };
+                        //     localStorage.setItem("interaction", JSON.stringify(updated));
+                        //     return updated;
+                        // });
+
                         setOrderId(verifyData.orderid)
                         localStorage.removeItem("Cart");
                         setOrderStatus(true)

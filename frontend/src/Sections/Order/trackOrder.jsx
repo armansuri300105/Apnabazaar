@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Clock, Truck, CheckCircle, Package } from "lucide-react";
 import { getOrderById } from "../../../API/api";
 import { useNavigate, useParams } from "react-router-dom";
+import "./checkout.css"
 
 export default function TrackOrder() {
     const {orderId} = useParams();
@@ -82,10 +83,9 @@ export default function TrackOrder() {
         {/* Order Progress */}
         <div className="bg-white shadow rounded-2xl p-6">
           <h3 className="font-medium text-gray-700 mb-4">Order Progress</h3>
-          <div className="flex items-center justify-between">
+          <div className="track-order-details flex items-center justify-between">
           {/* Processing */}
-          <div
-            className={`flex flex-col items-center text-center ${
+          <div className={`flex flex-col items-center text-center ${
               ["Processing", "Shipped", "Delivered"].includes(order?.orderStatus)
                 ? "text-black"
                 : "text-gray-400"
@@ -97,7 +97,7 @@ export default function TrackOrder() {
             </div>
           </div>
 
-          <div className="flex-1 border-t border-gray-300 mx-2"></div>
+          <div className="track-order-bars flex-1 border-t border-gray-300 mx-2"></div>
 
           {/* Shipped */}
           <div
@@ -113,7 +113,7 @@ export default function TrackOrder() {
             </div>
           </div>
 
-          <div className="flex-1 border-t border-gray-300 mx-2"></div>
+          <div className="track-order-bars flex-1 border-t border-gray-300 mx-2"></div>
 
           {/* Delivered */}
           <div

@@ -42,7 +42,7 @@ export const Hbody1 = () => {
 
               {user?.role==="vendor" && user?.vendor?.status==="Active" ? <NavLink to="/vendor/dashboard"><div className="cursor-pointer vendor-btn h-[35px] w-[141px] border-blur border-[1px] border-grey bg-white text-black font-semibold flex justify-center items-center rounded-lg text-[12.25px]">
                 Vendor Dashboard
-              </div></NavLink> :<NavLink to="/vendor/form"><div className="cursor-pointer vendor-btn h-[35px] w-[141px] border-blur border-[1px] border-grey bg-white text-black font-semibold flex justify-center items-center rounded-lg text-[12.25px]">
+              </div></NavLink> : <NavLink to="/vendor/form"><div className="cursor-pointer vendor-btn h-[35px] w-[141px] border-blur border-[1px] border-grey bg-white text-black font-semibold flex justify-center items-center rounded-lg text-[12.25px]">
                 Become a Vendor
               </div></NavLink>}
             </div>

@@ -32,6 +32,7 @@ const Profile = () => {
       navigate(`/signup`)
     }
   },[user])
+  
   return loadinguser ? <ProfileSkeleton/> : (
     <section className="min-h-screen bg-gray-50 flex justify-center">
       <div className="profile-section w-[1200px] p-6 mt-[120px]">

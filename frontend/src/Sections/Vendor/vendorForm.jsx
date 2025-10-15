@@ -1,9 +1,12 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { addVendor } from "../../../API/api";
 import { CartProductContext } from "../../services/context";
+import { useNavigate } from "react-router-dom";
+import Loading from "../Loading/loading";
 
 export default function VendorForm() {
     const {user, loadinguser} = useContext(CartProductContext)
+    const navigate = useNavigate()
 
   const [vendor, setVendor] = useState({
     address: "",
@@ -22,6 +25,16 @@ export default function VendorForm() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  if (loadinguser){
+    return <Loading/>
+  }
+
+  useEffect(() => {
+    if (!loadinguser && !user){
+      navigate(`/signup`)
+    }
+  },[user])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
