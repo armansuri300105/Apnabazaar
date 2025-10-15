@@ -1,6 +1,7 @@
 import { FaFacebookF, FaTwitter, FaInstagram } from 'react-icons/fa';
 import "./footer.css"
 import FooterSkeleton from './footerSkeleton';
+import {NavLink} from "react-router-dom"
 
 export const FooterSection = ({loadinguser}) => {
   return loadinguser ? <FooterSkeleton/> : (
@@ -8,7 +9,7 @@ export const FooterSection = ({loadinguser}) => {
       <footer className="bg-gray-50 border-t border-gray-200 px-6">
         <div className="footer-grid max-w-7xl mx-auto grid grid-cols-4 gap-12 p-[50px]">
           <div>
-            <div className="font-semibold mb-[25px]"><img className="w-[150px]" src="/logo.png" alt="ApnaBazaar" /></div>
+            <NavLink to="/"><div className="font-semibold mb-[25px]"><img className="w-[150px]" src="/logo.png" alt="ApnaBazaar" /></div></NavLink>
             <p className="text-[12px] text-gray-600 mb-4">
               Connecting communities with fresh, local products from trusted vendors. Support your neighborhood while enjoying quality goods.
             </p>

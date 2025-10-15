@@ -1,6 +1,7 @@
 import { ProductShow } from "../Components/productshow"
 import { getProducts } from "../../../../API/api";
 import { useQuery } from "@tanstack/react-query"
+import FavoritesSkeleton from "../../User/Profile/Skeletons/favoritesSkeleton";
 
 export const FeaturedLocalProducts = () => {
     const { data: products, isLoading } = useQuery({
@@ -9,7 +10,9 @@ export const FeaturedLocalProducts = () => {
         select: (res) => res?.data?.products || []
     })
     
-    if (isLoading) return (<p>Loading Products....</p>)
+    if (isLoading){
+        return <FavoritesSkeleton/>
+    }
     return (
         <div  id="feature-products" className="bg-white mb-[30px] relative flex flex-col items-center">
             <div className="feature-products w-[1200px]">

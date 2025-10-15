@@ -25,6 +25,7 @@ export const CreateOrder =  async (req, res) => {
     for (const item of items) {
       const product = await PRODUCT.findById(item.productID);
       if (!product) return res.status(400).json({ message: `Product not found for ID ${item.productID}` });
+      product.stock -= 1;
       totalAmount += product.price * item.quantity;
     }
     let delivery = totalAmount >= 499 ? 0 : 40;
@@ -40,8 +41,8 @@ export const CreateOrder =  async (req, res) => {
         }));
         OrderData = {
           ...OrderData,
-          paymentStatus: 'pending',
-          orderStatus: 'processing',
+          paymentStatus: 'Pending',
+          orderStatus: 'Processing',
           totalAmount,
         }
         const newOrderData = {
@@ -73,7 +74,7 @@ export const CreateOrder =  async (req, res) => {
             { new: true }
           );
         }
-        await sendOrderConfirmation(OrderData?.user?.email, OrderData.user?.name, newOrderData?.orderId, finalItems, newOrderData?.totalAmount)
+        await sendOrderConfirmation(OrderData?.user?.email, OrderData.user?.name, newOrderData?.orderId, OrderData?.items, newOrderData?.totalAmount)
         return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder._id });
     }
     const orderId = generateOrderId()
@@ -109,7 +110,6 @@ export const verifyPayment =  async (req, res) => {
   for (const item of orderData.items) {
     const product = await PRODUCT.findById(item.productID);
     if (!product) return res.status(400).json({ message: `Product not found for ID ${item.ProductID}` });
-    product.stock -= 1;
     totalAmount += product.price * item.quantity;
   }
   totalAmount += totalAmount*2/100;

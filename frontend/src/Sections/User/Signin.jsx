@@ -6,6 +6,7 @@ import {NavLink, useNavigate} from "react-router-dom"
 import { googleLogin, signin } from "../../../API/api";
 import {useGoogleLogin} from "@react-oauth/google"
 import LoginError from "./loginError";
+import Loading from "../Loading/loading"
 
 import { CartProductContext } from "../../services/context";
 
@@ -14,6 +15,7 @@ export default function SigninForm() {
     const [showbtn, setShowbtn] = useState(false);
     const [check, setCheck] = useState(false);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false)
     const [errorMessage, setErrorMessage] = useState("");
     const [formData, setFormData] = useState({
       email: "",
@@ -53,6 +55,7 @@ export default function SigninForm() {
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (!isValidEmail(formData.email)){
       setCheck(true);
       setTimeout(() => {
@@ -67,6 +70,7 @@ export default function SigninForm() {
     const res = await sendData(formData);
     refetch()
     if (res.data.success){
+      setLoading(false)
       navigate('/');
     }
     setFormData({
@@ -92,6 +96,10 @@ export default function SigninForm() {
     onError: responseGoogle,
     flow: "auth-code"
   })
+
+  if (loading){
+    return <Loading/>
+  }
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="w-full max-w-md p-8 rounded-lg">

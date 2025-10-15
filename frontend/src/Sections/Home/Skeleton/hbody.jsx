@@ -1,3 +1,5 @@
+import "../home.css"
+
 const HeroSkeleton = () => {
   return (
     <div className="hero-top-seciton animate-pulse">
@@ -41,11 +43,11 @@ const HeroSkeleton = () => {
       {/* Right Side Image & Stats */}
       <div className="mt-10 flex items-center justify-center gap-6">
         {/* Left Stat */}
-        <div className="h-[76px] w-[105px] bg-gray-300 rounded-2xl"></div>
+        <div className="hero-side-images-skeleton h-[76px] w-[105px] bg-gray-300 rounded-2xl"></div>
         {/* Hero Image */}
-        <div className="h-[399px] w-[532px] bg-gray-200 rounded-xl"></div>
+        <div className="hero-section-image-skeleton h-[399px] w-[532px] bg-gray-200 rounded-xl"></div>
         {/* Right Stat */}
-        <div className="h-[76px] w-[126px] bg-gray-300 rounded-2xl"></div>
+        <div className="hero-side-images-skeleton h-[76px] w-[126px] bg-gray-300 rounded-2xl"></div>
       </div>
     </div>
   );

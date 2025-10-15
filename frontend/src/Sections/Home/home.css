@@ -19,6 +19,12 @@
     .product-cart-component{
         width: calc(90vw / 2 - 20px);
     }
+    .hero-side-images-skeleton{
+        display: none;
+    }
+    .hero-section-image-skeleton{
+        width: 90vw;
+    }
 }
 @media screen and (max-width: 600px) {
     .home-buttons-div{

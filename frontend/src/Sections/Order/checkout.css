@@ -66,3 +66,17 @@
         width: 100%;
     }
 }
+
+@media screen and (max-width: 500px) {
+    .track-order-details{
+        flex-direction: column;
+        gap: 10px;
+        align-items: start;
+    }
+    .track-order-bars{
+        width: 1px;
+        height: 100px;
+        background-color: #9ca3af;
+        flex: 0 0 auto;
+    }
+}
