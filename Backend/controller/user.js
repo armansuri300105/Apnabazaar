@@ -28,10 +28,11 @@ export const signup = async (req,res) => {
         verificationTokenExpiry,
         authProvider: "local"
     })
+    console.log("sending..")
     await sendVerificationMail(email, verificationToken);
-    return res.json({success: false, message: "user registered successfully", user: {name, email, phone}, token});
+    return res.json({success: true, message: "user registered successfully", user: {name, email, phone}, token});
   } catch (error) {
-    return res.status(500).json({success: true, message: error.message})
+    return res.status(500).json({success: false, message: error.message})
   }
 }
 
