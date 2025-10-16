@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { addproduct, editProduct } from "../../API/product";
 import Swal from "sweetalert2";
-import "./product.css"
+import "./products.css"
 
 const CLOUDINARY_UPLOAD_PRESET = "ecommerce";
 const CLOUDINARY_CLOUD_NAME = "do9m8kc0b";
