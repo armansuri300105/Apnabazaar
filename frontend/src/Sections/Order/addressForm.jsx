@@ -34,6 +34,8 @@ const AddressForm = ({ addressForm, setAddressForm, setCount, count }) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
+
+    console.log(count)
   return (
     <>
         <div className={` ${count!==1 ? "cursor-not-allowed" : ""} checkout-section-left bg-white w-[600px] relative rounded-md border-2`}>

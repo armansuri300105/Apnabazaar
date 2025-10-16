@@ -146,29 +146,6 @@ const Checkout = () => {
                     if (verifyData.success) {
                         setCartItems([]);
                         setLoading(false)
-                        // setDataForMl(prev => {
-                        //     const updated = {
-                        //     ...prev,
-                        //     products: [
-                        //         ...(prev.products || []),
-                        //         {
-                        //         product: {
-                        //             productID: prev.currentView.product.productID,
-                        //             category: prev.currentView.product.category,
-                        //             name: prev.currentView.product.name
-                        //         },
-                        //         time: new Date(Date.now()).toLocaleString(),
-                        //         duration:
-                        //             prev.currentView && prev.currentView.product.productID === product._id
-                        //             ? Date.now() - prev.currentView.startTime
-                        //             : 0,
-                        //         event: { type: "purchase", time: new Date(Date.now()).toLocaleString() },
-                        //         },
-                        //     ],
-                        //     };
-                        //     localStorage.setItem("interaction", JSON.stringify(updated));
-                        //     return updated;
-                        // });
 
                         setOrderId(verifyData.orderid)
                         localStorage.removeItem("Cart");
@@ -228,7 +205,7 @@ const Checkout = () => {
                         )
                     )}
                 </div>
-                {user?.addresses?.length > 0 ? 
+                {user?.addresses?.length > 0 ?
                     <Addresses user={user} addNew={addNew} setaddNew={setaddNew} addressForm={addressForm} setAddressForm={setAddressForm} setCount={setCount} count={count}/> :
                     <AddressForm addressForm={addressForm} setAddressForm={setAddressForm} setCount={setCount} count={count}/>
                 }
