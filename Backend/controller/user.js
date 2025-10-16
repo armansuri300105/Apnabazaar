@@ -5,6 +5,7 @@ import bcrypt from "bcrypt"
 import {oauth2Client} from "../services/googleAuth.js"
 import { sendVendorApplicationMail, sendVerificationMail } from "../emails/sendMail.js";
 import PRODUCT from "../models/product.js";
+import ORDER from "../models/order.js"
 
 export const signup = async (req,res) => {
     const {name, email, phone, password} = req.body;
@@ -271,30 +272,29 @@ export const interection = async (req,res) => {
 }
 
 export const addRatingReview = async (req,res) => {
-    try {
-        const reviewData = req.body
-        const ProductID = reviewData?.productID
-        const product = await PRODUCT.findOne({_id: ProductID})
-        if (!product){
-            return res.status(404).json({success: false, message: "Product not found"})
-        }
-
-        product.reviews = [...product.reviews, {
-            user: reviewData.user,
-            username: reviewData.name,
-            rating: reviewData.rating,
-            comment: reviewData.review,
-            createdAt: reviewData.date
-        }]
-        let avgrating = 0 
-        product.reviews.map((review) => (
-            avgrating += review.rating
-        ))
-        avgrating = avgrating/(product.ratings.count + 1)
-        product.ratings.count += 1
-        product.ratings.average = avgrating
-        await product.save()
-        return res.status(200).json({ success: true, message: "Review added successfully"})
+  try {
+      const reviewData = req.body
+      const ProductID = reviewData?.productID
+      const product = await PRODUCT.findOne({_id: ProductID})
+      if (!product){
+          return res.status(404).json({success: false, message: "Product not found"})
+      }
+      product.reviews = [...product.reviews, {
+          user: reviewData.user,
+          username: reviewData.name,
+          rating: reviewData.rating,
+          comment: reviewData.review,
+          createdAt: reviewData.date
+      }]
+      let avgrating = 0 
+      product.reviews.map((review) => (
+          avgrating += review.rating
+      ))
+      avgrating = avgrating/(product.ratings.count + 1)
+      product.ratings.count += 1
+      product.ratings.average = avgrating
+      await product.save()
+      return res.status(200).json({ success: true, message: "Review added successfully"})
     } catch (error) {
         res.status(500).json({success: false, message: error.message})
     }
@@ -383,3 +383,126 @@ export const deleteReview = async (req, res) => {
     res.status(500).json({ success: false, message: error.message })
   }
 }
+
+export const chat = async (req, res) => {
+  const user_id = req?.user?._id;
+  try {
+    const { input } = req.body;
+
+    if (!input) {
+      return res.status(400).json({ success: false, message: "Input is required" });
+    }
+
+    const lowerInput = input.toLowerCase();
+    const user = await USER.findById(user_id).populate("orders");
+
+    switch (lowerInput) {
+      case "order related":
+        return res.json({
+          success: true,
+          message: "Please choose an option related to your orders:",
+          options: ["Recent Order", "All Orders", "Track Order", "Back"],
+        });
+
+      case "product related":
+        return res.json({
+          success: true,
+          message: "Need help with products? Select an option below:",
+          options: ["Request Product", "Back"],
+        });
+
+      case "others":
+        return res.json({
+          success: true,
+          message: "You can chat with our AI assistant for general help 💬",
+          options: ["Chat with AI Assistant", "Back"],
+        });
+
+      case "recent order": {
+        if (!user || user.orders.length === 0)
+          return res.json({
+            success: true,
+            message: "You have no recent orders 😔",
+            options: ["Back"],
+          });
+
+        const recentOrder = user.orders[user.orders.length - 1];
+        return res.json({
+          success: true,
+          message: `🛍️ Your most recent order (${recentOrder.orderId}) is currently *${recentOrder.orderStatus}* 🚚`,
+          options: ["Track Order", "Back"],
+        });
+      }
+
+      case "all orders": {
+        if (!user)
+          return res.json({
+            success: true,
+            message: "User not found. Please log in again.",
+            options: ["Back"],
+          });
+
+        const totalOrder = user.orders?.length || 0;
+        return res.json({
+          success: true,
+          message: `You have ${totalOrder} total orders. Would you like to track your latest one?`,
+          options: ["Track Order", "Back"],
+        });
+      }
+
+      case "track order": {
+        if (!user || user.orders.length === 0)
+          return res.json({
+            success: true,
+            message: "No orders found to track 😅",
+            options: ["Back"],
+          });
+
+        const latestOrder = await ORDER.findById(user.orders[user.orders.length - 1]);
+
+        if (!latestOrder)
+          return res.json({
+            success: true,
+            message: "Sorry, we couldn't find your latest order details.",
+            options: ["Back"],
+          });
+
+        return res.json({
+          success: true,
+          message: `📦 *Order Details*\n\nOrder ID: ${latestOrder.orderId}\nStatus: ${latestOrder.orderStatus}\nEstimated Delivery: ${new Date(latestOrder.createdAt).toDateString()}`,
+          options: ["Back"],
+        });
+      }
+
+      case "request product":
+        return res.json({
+          success: true,
+          message: "Please share the product name or details you want us to add 🛒",
+          options: ["Back"],
+        });
+
+      case "chat with ai assistant":
+        return res.json({
+          success: true,
+          message: "Hi there! 👋 I’m your AI assistant. How can I help you today?",
+          options: ["Back"],
+        });
+
+      case "back":
+        return res.json({
+          success: true,
+          message: "Welcome back! How can we assist you today?",
+          options: ["Order Related", "Product Related", "Others"],
+        });
+
+      default:
+        return res.json({
+          success: true,
+          message: "Sorry, I didn’t quite get that. Please select a valid option:",
+          options: ["Order Related", "Product Related", "Others"],
+        });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

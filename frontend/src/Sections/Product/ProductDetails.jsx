@@ -263,17 +263,17 @@ const ProductDetails = () => {
          <Reviews product={product} refetch={refetch}/>}
         <div className="feature-products w-[1200px]">
             <div className="flex justify-start">
-                <div className="text-[24px] text-black text-center mt-[30px]">
+                <div className="font-medium text-[24px] text-black text-center mt-[30px] mb-[30px]">
                     You Might Also Like
                 </div>
             </div>
-            <div className="w-full mt-8 flex gap-4 flex-wrap justify-start">
+            {!mlprd?.recommendations ? <FavoritesSkeleton/> : <div className="w-full flex gap-4 flex-wrap justify-start">
                 {
                     (mlprd?.recommendations && mlprd?.recommendations.slice(0, 10).map((product, index) => {
                         return <ProductShow key={index} product={product} />
                     }))
                 }
-            </div>
+            </div>}
         </div>
       </div>
       <CartPopup show={popUp} message="Product added to cart!" />

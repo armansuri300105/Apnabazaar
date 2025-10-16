@@ -16,12 +16,6 @@ export const Story = ()=>{
                     each other. We're building a platform where local producers can reach more customers while shoppers
                     discover the best their community has to offer
                 </div>
-                <div className="h-[35px] w-[149px] text-[12.25px] font-semibold text-white bg-black rounded-lg flex items-center justify-center gap-2">
-                    Join our Mission
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                    </svg>
-                </div>
             </div>
             <img className="about-story-img w-[500px] h-[500px] rounded-xl"  src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=600&fit=crop"/>
         </div>

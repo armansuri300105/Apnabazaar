@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getVendorOrders, updateOrderStatus } from "../../../../API/api";
 import OrderCard from "./OrderDetail";
 import Loading from "../../Loading/loading"
+import Swal from "sweetalert2";
 
 const VendorOrders = () => {
   const [statusFilter, setStatusFilter] = useState("All");
@@ -11,7 +12,7 @@ const VendorOrders = () => {
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const {data, isLoading} = useQuery({
+  const {data, isLoading, refetch} = useQuery({
     queryKey: [`orders`],
     queryFn: getVendorOrders,
     select: (res) => res?.data || null
@@ -69,7 +70,7 @@ const VendorOrders = () => {
   }
   return (
     <div className="p-4 md:p-6 w-full mt-[20px]">
-        {isOpenDetail ? <OrderCard order={selectedOrder} setIsOpenDetail={setIsOpenDetail} onUpdateStatus={onUpdateStatus} /> : ""}
+        {isOpenDetail ? <OrderCard refetch={refetch} order={selectedOrder} setIsOpenDetail={setIsOpenDetail} onUpdateStatus={onUpdateStatus} /> : ""}
       {/* Header */}
       <h2 className="text-xl md:text-2xl font-bold mb-2">Orders Management</h2>
       <p className="text-gray-500 mb-6 text-sm md:text-base">

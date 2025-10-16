@@ -1,22 +1,22 @@
 import { IoMdClose } from "react-icons/io";
 import { useState } from "react";
+import Loading from "../../Loading/loading"
 
-export default function OrderCard({ order, onUpdateStatus, setIsOpenDetail }) {
+export default function OrderCard({ order, refetch, onUpdateStatus, setIsOpenDetail }) {
   const [status, setStatus] = useState(order.orderStatus);
-
-  const handleStatusChange = () => {
+  const [loading, setLoading] = useState(false);
+  const handleStatusChange = async () => {
+    setLoading(true);
     let nextStatus =
       status === "Processing"
         ? "Shipped"
         : status === "Shipped"
         ? "Delivered"
         : "Delivered";
-    const res = onUpdateStatus(order._id, nextStatus);
-    if (res?.data?.success){
-        setStatus(nextStatus);
-    }
+    await onUpdateStatus(order._id, nextStatus);
+    setStatus(nextStatus);
+    setLoading(false)
   };
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white relative w-[600px] rounded-2xl shadow-lg p-6 overflow-y-auto max-h-[90vh]">
@@ -62,9 +62,9 @@ export default function OrderCard({ order, onUpdateStatus, setIsOpenDetail }) {
           <button
             disabled={order.orderStatus === "Delivered" ? true : false}
             onClick={handleStatusChange}
-            className={`px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed`}
+            className={`px-4 py-2 rounded-xl text-white disabled:bg-blue-300 disabled:cursor-not-allowed ${loading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"}`}
           >
-            {status === "Processing"
+            {loading ? "Updating..." : status === "Processing"
               ? "Mark as Shipped"
               : status === "Shipped"
               ? "Mark as Delivered"

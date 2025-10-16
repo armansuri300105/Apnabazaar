@@ -46,7 +46,7 @@ export const NavBar = () =>{
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/about"><li>About</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/contact"><li>Contact</li></NavLink>
                 </ul>
-                <ul className={`mobile-options hidden flex-col items-center text-[20px] gap-[14px] justify-between cursor-pointer overflow-hidden duration-300 ease-linear tarnsition-all ${(menu) ? "h-[135px]" : "h-0"}`}>
+                <ul className={`mobile-options hidden flex-col items-center text-[20px] gap-[14px] justify-between cursor-pointer overflow-hidden duration-300 ease-linear tarnsition-all ${(menu) ? "h-[155px]" : "h-0"}`}>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/"><li>Home</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/categories"><li>Categories</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/about"><li>About</li></NavLink>
@@ -67,7 +67,7 @@ export const NavBar = () =>{
                         <BsCart3 className="cart-icon text-2xl cursor-pointer"/>
                         {cartItems.length!==0 ? <div className="w-[20px] h-[20px] rounded-[50%] bg-red-700 flex justify-center items-center p-[3px] absolute top-[-9px] right-[-9px]"><p className="text-white text-[11px]">{items}</p></div> : ""}
                     </div>
-                    <Icon onClick={() => setMenu(!menu)} className="menu-icon hidden text-2xl font-medium"/>
+                    <Icon onClick={() => setMenu(!menu)} className="menu-icon cursor-pointer hidden text-2xl font-medium"/>
                 </div>
                 <div className={`absolute top-0 right-0 duration-300 ease-linear transition-transform ${cmenu ? "translate-x-0" : "translate-x-[100%]"}`}><Cart cmenu={cmenu} setCmenu={setCmenu}/></div>
             </nav>)}
