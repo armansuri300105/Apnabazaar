@@ -2,6 +2,8 @@ import { FaFacebookF, FaTwitter, FaInstagram } from 'react-icons/fa';
 import "./footer.css"
 import FooterSkeleton from './footerSkeleton';
 import {NavLink} from "react-router-dom"
+import { MessageCircle } from 'lucide-react';
+import ChatBot from '../chatbot/chatbot';
 
 export const FooterSection = ({loadinguser}) => {
   return loadinguser ? <FooterSkeleton/> : (
@@ -77,6 +79,7 @@ export const FooterSection = ({loadinguser}) => {
             <a href="#">Cookie Policy</a>
           </div>
         </div>
+        {<ChatBot/>}
       </footer>
     </>
   )

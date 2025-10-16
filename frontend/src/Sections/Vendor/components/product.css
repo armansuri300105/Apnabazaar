@@ -84,4 +84,8 @@
   .products-summary-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .addproduct-form{
+    display: flex;
+    flex-direction: column;
+  }
 }
