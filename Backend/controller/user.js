@@ -8,6 +8,7 @@ import PRODUCT from "../models/product.js";
 import ORDER from "../models/order.js"
 
 export const signup = async (req,res) => {
+  try {
     const {name, email, phone, password} = req.body;
     const user = await USER.findOne({email});
     if (user){
@@ -16,7 +17,7 @@ export const signup = async (req,res) => {
     const saltround = 11;
     const hashedpass = await bcrypt.hash(password, saltround);
     const verificationToken =  Math.floor(100000 + Math.random() * 900000)
-    const verificationTokenExpiry = Date.now() + 15*60*60*1000 // 15 min
+    const verificationTokenExpiry = Date.now() + 15*60*60*1000
     const token = setuserandcookies(res, {name, email})
     await USER.create({
         name,
@@ -28,7 +29,10 @@ export const signup = async (req,res) => {
         authProvider: "local"
     })
     await sendVerificationMail(email, verificationToken);
-    return res.json({success: true, message: "user registered successfully", user: {name, email, phone}, token});
+    return res.json({success: false, message: "user registered successfully", user: {name, email, phone}, token});
+  } catch (error) {
+    return res.status(500).json({success: true, message: error.message})
+  }
 }
 
 export const login = async (req,res) => {
@@ -41,7 +45,7 @@ export const login = async (req,res) => {
         }
 
         const UserPassword = user.password;
-        const isMatch = await bcrypt.compare(password, UserPassword);
+        const isMatch = bcrypt.compare(password, UserPassword);
         if (!isMatch){
             return res.json({success: false, message: "incorrect possword"});
         } else {

@@ -174,7 +174,7 @@ export default function SignupForm() {
                 <input type={eye1 ? "text" : "password"} name="password" placeholder="Create a strong password" value={formData.password} onChange={handleChange} className=" outline-none bg-[#f3f3f5] w-full pl-10 pr-3 h-[30px] border rounded-md text-sm"/>
                 <Icon1 onClick={() => setEye1(!eye1)} className="absolute cursor-pointer right-3 top-[8px] text-gray-600"/>
                 <p className="text-xs text-gray-500 mt-1">
-                Must be at least 8 characters with numbers and letters
+                  Must be at least 8 characters with numbers and letters
                 </p> 
             </div>
           </div>
