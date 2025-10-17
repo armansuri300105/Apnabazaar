@@ -207,25 +207,40 @@ export const getWishlist = async (req,res) => {
     }
 }
 
-export const updateUser = async (req,res) => {
-    const formData = req.body;
-    const data = {
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        phone: formData.phone
-    }
-    try {
-        const updatedUser = await USER.findByIdAndUpdate(
-            req.user._id,
-            {$set : data},
-            {new: true, runValidators: true}
-        )
+export const updateUser = async (req, res) => {
+  const formData = req.body;
 
-        res.status(200).json({ success: true, message: "User updated successfully", user: updatedUser });
-    } catch (error) {
-        res.status(500).json({ message: err.message , success: false});
+  try {
+    const user = await USER.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
-}
+
+    const emailChanged = formData.email && formData.email !== user.email;
+
+    const data = {
+      name: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email,
+      phone: formData.phone,
+    };
+
+    if (emailChanged) {
+      data.isVerified = false;
+    }
+
+    const updatedUser = await USER.findByIdAndUpdate(
+      req.user._id,
+      { $set: data },
+      { new: true, runValidators: true }
+    );
+
+    res
+      .status(200)
+      .json({ success: true, message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export const addVendor = async (req, res) => {
   try {

@@ -10,7 +10,6 @@ const addressSchema = new mongoose.Schema(
     zipcode: { type: String },
     phone: { type: String },
   },
-  { _id: false }
 );
 
 const vendorSchema = new mongoose.Schema({
