@@ -131,6 +131,55 @@ export const sendOrderConfirmation = (to, name, orderId, items, total) => {
   return sendMail({ to, subject: "Order Confirmation", html });
 };
 
+export const sendOrderToVendor = (to, vendorName, orderId, items, shippingAddress, buyerName) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 40px; text-align: center;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <img 
+          src="https://res.cloudinary.com/do9m8kc0b/image/upload/v1760161496/esftuk6irpikvltmbevx.png" 
+          alt="ApnaBazaar" 
+          style="width: 140px; margin-bottom: 25px;"
+        />
+
+        <h2 style="color: #4a90e2;">🛒 New Order Received!</h2>
+        <p style="color: #333; font-size: 16px;">Hi <b>${vendorName}</b>, you’ve received a new order <b>#${orderId}</b>.</p>
+        <p style="color: #666; font-size: 14px;">Please prepare the following items for shipment:</p>
+
+        ${items.map(item => `
+          <div style="display: flex; align-items: center; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin: 15px 0; text-align: left;">
+            <img src="${item?.images?.[0] || ''}" alt="${item.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px; margin-right: 15px;" />
+            <div style="flex: 1;">
+              <p style="margin: 0; font-weight: bold; font-size: 14px; color: #333;">${item.name}</p>
+              <p style="margin: 5px 0 0 0; color: #555; font-size: 13px;">Quantity: ${item.quantity}</p>
+              <p style="margin: 2px 0 0 0; color: #4a90e2; font-size: 13px;">Price: ₹${item.price}</p>
+            </div>
+          </div>
+        `).join("")}
+
+        <h3 style="color: #4a90e2; margin-top: 30px;">📦 Shipping Details</h3>
+        <div style="text-align: left; font-size: 14px; color: #444; margin: 10px 0 20px 0;">
+          <p><b>Customer:</b> ${buyerName}</p>
+          <p><b>Name:</b> ${shippingAddress?.name}</p>
+          <p><b>Email:</b> ${shippingAddress?.email}</p>
+          <p><b>Phone:</b> ${shippingAddress?.phone}</p>
+          <p><b>Address:</b> ${shippingAddress?.street}, ${shippingAddress?.city}, ${shippingAddress?.state} - ${shippingAddress?.zipcode}</p>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 20px;">
+          Please process and dispatch the order at your earliest convenience.<br/>
+          Thank you for partnering with <b>ApnaBazaar</b> 💛
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendMail({
+    to,
+    subject: `New Order #${orderId} - Please Process`,
+    html
+  });
+};
+
 // ✅ Order Status Update
 export const sendOrderStatusMail = (to, name, orderId, status) => {
   const html = `
