@@ -136,16 +136,12 @@ const ProductDetails = () => {
       setCmenu(true);
     }
   };
-
-  console.log("ml products", mlprd)
   const handleWishlist = async () => {
     setWishlist(!wishlist);
     if (user?.wishlist?.includes(Productid)){
       const res = await deleteWishlist(Productid)
-      console.log(res?.data)
     } else {
       const res = await updateWishlist(Productid)
-      console.log(res?.data)
     }
   }
 

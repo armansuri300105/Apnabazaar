@@ -30,8 +30,6 @@ const Search = () => {
     if (data?.success){
         products = data?.data;
     }
-    console.log(data)
-    console.log("ml products", mlprd)
 
     if (selected=== 'filter'){
         products = products

@@ -28,11 +28,34 @@ export const signup = async (req,res) => {
         verificationTokenExpiry,
         authProvider: "local"
     })
-    console.log("sending..")
     await sendVerificationMail(email, verificationToken);
     return res.json({success: true, message: "user registered successfully", user: {name, email, phone}, token});
   } catch (error) {
     return res.status(500).json({success: false, message: error.message})
+  }
+}
+
+export const sendVerification = async (req,res) => {
+  try {
+    const user_id = req?.user?._id
+    const user = await USER.findById(user_id);
+    if (!user){
+        return res.status(404).json({success:false, message: "User Not Found"})
+    }
+    if (user.isVerified){
+      return res.json({success: false, message: "Already verified"})
+    }
+    const verificationToken =  Math.floor(100000 + Math.random() * 900000)
+    const verificationTokenExpiry = Date.now() + 15*60*60*1000
+    user.verificationToken = verificationToken
+    user.verificationTokenExpiry = verificationTokenExpiry
+    const email = user?.email
+    await user.save()
+    await sendVerificationMail(email, verificationToken);
+
+    res.status(200).json({success: true, message: `Verification code send to ${email}`})
+  } catch (error) {
+    
   }
 }
 
@@ -46,7 +69,7 @@ export const login = async (req,res) => {
         }
 
         const UserPassword = user.password;
-        const isMatch = bcrypt.compare(password, UserPassword);
+        const isMatch = await bcrypt.compare(password, UserPassword);
         if (!isMatch){
             return res.json({success: false, message: "incorrect possword"});
         } else {
@@ -62,10 +85,10 @@ export const verifyEmail = async (req,res) => {
     const {Token} = req.query
     const user = await USER.findOne({verificationToken: Token});
     if (!user){
-        return res.json({ success: false, message: "Invalid or expired verification link" })
+        return res.status(404).json({ success: false, message: "Invalid or expired verification link" })
     }
     if (user?.verificationTokenExpiry < Date.now()){
-        return res.json({ success: false, message: "Verification link has expired" });
+        return res.status(401).json({ success: false, message: "Verification link has expired" });
     }
 
     await USER.updateOne(
@@ -73,7 +96,7 @@ export const verifyEmail = async (req,res) => {
         { $set: { isVerified: true }, $unset: { verificationToken: "", verificationTokenExpiry: "" } }
     );
 
-    return res.json({ success: true, message: "User verified successfully" });
+    return res.status(200).json({ success: true, message: "User verified successfully" });
 }
 
 export const verify = (req,res) => {
@@ -85,28 +108,28 @@ export const verify = (req,res) => {
 }
 
 export const googleLogin = async (req,res) => {
-    const {code} = req.query;
-    const googleres = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(googleres.tokens);
-    const userRes = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleres.tokens.access_token}`);
-    const {email, name } = userRes.data;
-    let user = await USER.findOne({email});
-    if (!user){
-        const newUser = await USER.create({
-            email,
-            name,
-            authProvider: "google",
-            isVerified: true,
-        });
-        user = newUser;
+    try {
+      const {code} = req.query;
+      const googleres = await oauth2Client.getToken(code);
+      oauth2Client.setCredentials(googleres.tokens);
+      const userRes = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleres.tokens.access_token}`);
+      const {email, name } = userRes.data;
+      let user = await USER.findOne({email});
+      if (!user){
+          const newUser = await USER.create({
+              email,
+              name,
+              authProvider: "google",
+              isVerified: true,
+          });
+          user = newUser;
+      }
+      const token = setuserandcookies(res, user);
+      res.send({success: true,user: {email,name,token}})
+    } catch (error) {
+        console.log("Error while authenticating user: ", error.message);
+        res.send({success: false, message: "Error while authenticating user: ", error: error.message});
     }
-    const token = setuserandcookies(res, user);
-    res.send({success: true,user: {email,name,token}})
-    // try {
-    // } catch (error) {
-    //     console.log("Error while authenticating user: ", error.message);
-    //     res.send({success: false, message: "Error while authenticating user: ", error: error.message});
-    // }
 }
 
 export const authCheck = async (req,res) => {
@@ -131,7 +154,6 @@ export const authCheck = async (req,res) => {
 }
 
 export const updateWishlist = async (req,res) => {
-    console.log(req.user)
     try {
         const user = await USER.findByIdAndUpdate(
             req.user._id,
@@ -175,7 +197,10 @@ export const logout = (req,res) => {
 
 export const getWishlist = async (req,res) => {
     try {
-        const data = await USER.findById(req.user._id).populate("wishlist")
+        const data = await USER.findById(req.user._id).populate({
+        path: "wishlist",
+        match: { isActive: true },
+      })
         return res.status(200).json({success: true, data})
     } catch (error) {
         res.status(500).json({ message: err.message , success: false});
@@ -249,7 +274,6 @@ export const addVendor = async (req, res) => {
 
 export const interection = async (req,res) => {
     const data = req.body
-    console.log("Data",data)
     try {
         const user = await USER.findById(data?.user)
         if (!user){
@@ -266,7 +290,6 @@ export const interection = async (req,res) => {
                 duration: product?.duration
             }
         })
-        console.log("user History",userHistory)
         user.history = [...user.history, ...userHistory]
 
         await user.save()
@@ -348,7 +371,6 @@ export const deleteReview = async (req, res) => {
   try {
     const { productID } = req.query
     const userID = req?.user?._id
-    console.log(productID, userID)
 
     const product = await PRODUCT.findById(productID)
     if (!product) {

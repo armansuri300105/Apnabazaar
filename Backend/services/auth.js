@@ -7,7 +7,6 @@ export const setuserandcookies = (res, user) => {
         email: user.email
     }
     const token = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '7d'})
-    console.log(user?.role)
     if (user?.role === "customer" || user?.role === "vendor"){
         res.cookie("token", token, {
             httpOnly: true,

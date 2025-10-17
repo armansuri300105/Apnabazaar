@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, MessageCircle } from "lucide-react";
 import { sendInputToBot } from "../../../API/api";
+import { send } from "../../../API/chat";
 
 const ChatBot = () => {
   const [open, setOpen] = useState(false);
@@ -27,6 +28,7 @@ const ChatBot = () => {
 
     try {
       const res = await sendInputToBot(userInput);
+      // const res2 = await send(userInput);
       const botMessage = res?.data?.message || "Sorry, I didn’t understand that 😅";
       const botOptions = res?.data?.options || [];
 

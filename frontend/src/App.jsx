@@ -24,9 +24,11 @@ import VendorForm from "./Sections/Vendor/vendorForm";
 import { VendorDashboard } from "./Sections/Vendor/vendorDashboard";
 import TrackOrder from "./Sections/Order/trackOrder";
 import { useEffect } from "react";
-import { userInteresctionDataMl } from "../API/ml";
 import { userInteresctionDataServer } from "../API/api";
 import Search from "./Sections/Product/search";
+import SendVerification from "./Sections/User/sendVerification";
+import VerifyAccount from "./Sections/User/verifyAccount";
+import ForgotPassword from "./Sections/User/forgotPassword";
 
 const GOOGLE_CLIENT_ID = "316084868865-6cm9ag49f38mgqp25ttja2i61cbjbl6l.apps.googleusercontent.com";
 
@@ -65,7 +67,7 @@ const App = () => {
   const [items, setItems] = useState(0);
   const [cmenu, setCmenu] = useState(false);
   const location = useLocation();
-  const isSignupPage = ["/signup", "/signin", "/checkout" ,"/vendor/dashboard"].includes(location.pathname);
+  const isSignupPage = ["/signup", "/signin", "/checkout" ,"/vendor/dashboard", "/user/verify", "/user/verify/:verificationcode", "/user/forgotpassword"].includes(location.pathname);
 
   useEffect(() => {
     const sendInteractionData = async () => {
@@ -73,7 +75,6 @@ const App = () => {
 
       try {
         const res = await userInteresctionDataServer(dataForMl);
-        console.log("Interaction data sent:", res?.data);
 
         setDataForMl({user: data?.user?._id, products: [], currentView: null });
         localStorage.removeItem("interaction");
@@ -156,6 +157,9 @@ const App = () => {
         <Route path="/vendor/dashboard" element={<VendorDashboard/>} />
         <Route path="/orders/:orderId" element={<TrackOrder/>} />
         <Route path="/search/:text" element={<Search/>} />
+        <Route path="/user/send" element={<SendVerification/>} />
+        <Route path="/user/verify/:verificationcode" element={<VerifyAccount/>} />
+        <Route path="/user/forgotpassword" element={<ForgotPassword/>} />
       </Routes>
 
       {!isSignupPage && <FooterSection loadinguser={isLoading} />}

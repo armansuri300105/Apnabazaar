@@ -2,7 +2,6 @@ import { Truck } from "lucide-react";
 import dayjs from "dayjs"
 
 export default function OrderDetails({orderData}) {
-  console.log(orderData)
   return (
     <div className="orderdetail-page w-[48%] max-w-md bg-white shadow-md rounded-xl p-5 space-y-4 border">
       <div className="flex items-center gap-2 text-lg sm:text-xl font-semibold">

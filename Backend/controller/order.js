@@ -209,7 +209,6 @@ export const getOrder = async (req,res) => {
 }
 export const getOrderByID = async (req,res) => {
   const {orderId} = req.query
-  console.log(orderId)
   try {
     const order = await ORDER.findOne({orderId}).populate("items.product");
     if (!order){

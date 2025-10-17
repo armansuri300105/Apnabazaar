@@ -26,7 +26,6 @@ export default function Vendors() {
   }
 
   const vendors = data?.vendors;
-  console.log(vendors)
   // Toggle vendor details on mobile
   const toggleVendorDetails = (id) => {
     if (expandedVendor === id) {

@@ -46,7 +46,6 @@ export const sendMail = async ({ to, subject, html }) => {
       html,
     };
     const result = await sgMail.send(msg);
-    console.log("Email sent:", result);
     return result;
   } catch (error) {
     console.error("Error sending mail:", error);

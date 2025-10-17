@@ -26,8 +26,6 @@ export default function Orders() {
       </div>
     );
   }
-
-  console.log(data.orders)
   const orders = data.orders
 
   const stats = {

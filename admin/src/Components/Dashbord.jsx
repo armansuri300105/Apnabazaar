@@ -32,8 +32,6 @@ export default function Dashboard() {
     queryFn: dashboardDetail,
     select: (res) => res?.data || null
   })
-
-  console.log(detail)
   let salesCategory = [];
   if (sales?.success){
     salesCategory = sales?.data
@@ -69,7 +67,6 @@ export default function Dashboard() {
       navigate("/signin");
     }
   };
-  console.log(salesCategory)
   return (
     <div className="p-6 space-y-6 transition-all duration-300">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
