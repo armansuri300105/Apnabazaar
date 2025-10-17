@@ -1,5 +1,5 @@
 import express from "express"
-import { authCheck, deleteWishlist, googleLogin, login, signup, updateWishlist, verify, verifyEmail, logout, getWishlist, updateUser, addVendor, interection, addRatingReview, editReview, deleteReview, chat } from "../controller/user.js";
+import { authCheck, deleteWishlist, googleLogin, login, signup, sendVerification,  updateWishlist, verify, verifyEmail, logout, getWishlist, updateUser, addVendor, interection, addRatingReview, editReview, deleteReview, chat } from "../controller/user.js";
 import { auth } from "../services/auth.js";
 
 const router = express.Router();
@@ -21,5 +21,6 @@ router.post('/addratingreview', auth, addRatingReview)
 router.put('/editreview', auth, editReview)
 router.delete('/deletereview', auth, deleteReview)
 router.post('/chat', auth, chat)
+router.get('/sendverification', auth, sendVerification)
 
 export default router

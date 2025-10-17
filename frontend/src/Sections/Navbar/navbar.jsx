@@ -11,7 +11,7 @@ import NavbarSkeleton from "./NavbarSkeleton.jsx"
 
 export const NavBar = () =>{
     const [menu, setMenu] = useState(false);
-    const {cartItems, items, setItems, checkAuth, cmenu, setCmenu, loadinguser} = useContext(CartProductContext)
+    const {cartItems, items, setItems, checkAuth, cmenu, setCmenu, loadinguser, user} = useContext(CartProductContext)
     useEffect(() => {
         let total = 0;
         for (let i=0;i<cartItems.length;i++){
@@ -69,6 +69,10 @@ export const NavBar = () =>{
                     </div>
                     <Icon onClick={() => setMenu(!menu)} className="menu-icon cursor-pointer hidden text-2xl font-medium"/>
                 </div>
+                {user ? user?.isVerified ? "" : <div className="email-verification-alert absolute left-0 bottom-[-30px] bg-green-500 p-[7px] w-full flex gap-[20px] justify-center">
+                    <p>Your Account is Not verified, Please verify for placing orders</p>
+                    <a href="/user/send" className="text-blue-600 cursor-pointer">Verify Now</a>
+                </div> : ""}
                 <div className={`absolute top-0 right-0 duration-300 ease-linear transition-transform ${cmenu ? "translate-x-0" : "translate-x-[100%]"}`}><Cart cmenu={cmenu} setCmenu={setCmenu}/></div>
             </nav>)}
         </div>

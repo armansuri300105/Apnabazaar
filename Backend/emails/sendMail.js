@@ -2,7 +2,7 @@ import { sendMail } from "./mailer.js";
 
 // ✅ Verification Mail
 export const sendVerificationMail = (to, token) => {
-  const verificationUrl = `${process.env.server_url}/api/user/verifyEmail?Token=${token}`;
+  const verificationUrl = `${process.env.client_url}/user/verify/${token}`;
 
   const html = `
     <div style="
@@ -62,12 +62,12 @@ export const sendVerificationMail = (to, token) => {
           If the button doesn’t work, copy and paste this link into your browser:
         </p>
 
-        <a href="\${verificationUrl}" style="
+        <a href="${verificationUrl}" style="
           color: #2563eb;
           font-size: 13px;
           word-break: break-all;
           text-decoration: none;
-        ">\${verificationUrl}</a>
+        ">"${verificationUrl}"</a>
 
         <hr style="
           border: none;

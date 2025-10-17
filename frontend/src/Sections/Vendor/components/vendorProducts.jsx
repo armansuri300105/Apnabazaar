@@ -79,7 +79,6 @@ export default function Products() {
 
     if (result.isConfirmed) {
       const res = await removeVendorProduct(id);
-      console.log(res?.data)
       if (res?.data?.success) {
         Swal.fire({
           title: "Deleted!",
@@ -113,7 +112,6 @@ export default function Products() {
       description: product?.description,
       images: product?.images,
     })
-    console.log(product)
   }
 
   return (

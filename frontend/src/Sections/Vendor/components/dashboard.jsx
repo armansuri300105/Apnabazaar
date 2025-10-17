@@ -30,8 +30,6 @@ const Dashboard = ({handleLogout}) => {
       </div>
     );
   }
-  
-  console.log(salesCategory)
 
   const COLORS = Array.from(
     { length: salesCategory.length },

@@ -156,7 +156,7 @@ const VendorOrders = () => {
                   <p>{o?.user?.name}</p>
                   <p className="text-sm text-gray-500">{o?.user?.email}</p>
                 </td>
-                <td className="p-3">{o?.createdAt}</td>
+                <td className="p-3">{new Date(o?.createdAt).toLocaleString()}</td>
                 <td className="p-3">
                   <span
                     className={`px-2 py-1 rounded-full text-sm font-medium ${
@@ -172,7 +172,7 @@ const VendorOrders = () => {
                     {o?.orderStatus}
                   </span>
                 </td>
-                <td className="p-3 font-semibold">${o?.totalAmount?.toFixed(2)}</td>
+                <td className="p-3 font-semibold">₹{o?.totalAmount?.toFixed(2)}</td>
                 <td onClick={() => {setIsOpenDetail(true); setSelectedOrder(o)}} className="p-3 text-blue-600 cursor-pointer">👁 View</td>
               </tr>
             ))}
@@ -205,8 +205,8 @@ const VendorOrders = () => {
             </div>
             <p className="text-sm">{o?.user?.name}</p>
             <p className="text-xs text-gray-500">{o?.user?.email}</p>
-            <p className="text-sm">📅 {o?.createdAt}</p>
-            <p className="text-sm font-bold">💰 ${o?.totalAmount?.toFixed(2)}</p>
+            <p className="text-sm">📅 {new Date(o?.createdAt).toLocaleString()}</p>
+            <p className="text-sm font-bold">💰 ₹{o?.totalAmount?.toFixed(2)}</p>
             <button onClick={() => {setIsOpenDetail(true); setSelectedOrder(o)}} className="text-blue-600 text-sm mt-1">👁 View</button>
           </div>
         ))}

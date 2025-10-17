@@ -20,7 +20,7 @@ const Addresses = ({user, addNew, setaddNew, addressForm, setAddressForm, setCou
   return (
     <>
         {user?.addresses?.map((address, index) => (
-          <div onClick={() => handleSelectAddress(index)} key={index} className={`${count===1 ? "cursor-pointer" : "cursor-not-allowed"} flex flex-col gap-[7px] p-6 border-2 rounded-xl ${select ? "border-yellow-400" : ""}`}>
+          <div onClick={() => handleSelectAddress(index)} key={index} className={`${count===1 ? "cursor-pointer" : "cursor-not-allowed"} flex flex-col gap-[7px] p-6 border-2 rounded-xl ${select && count===2 ? "border-yellow-400" : ""}`}>
             <div className="flex justify-between items-center">
                 <h2 className="font-medium">Address</h2>
             </div>
@@ -33,8 +33,8 @@ const Addresses = ({user, addNew, setaddNew, addressForm, setAddressForm, setCou
             <p>{address?.state}</p>
           </div>
         ))}
-        {!select && <button onClick={() => setaddNew(!addNew)} className="w-full h-[30px] bg-black text-white rounded-md text-[13px]">{addNew ? "Cancel"  : "Add New Address"}</button>}
-        {addNew && <AddressForm addressForm={addressForm} setAddressForm={setAddressForm} setCount={setCount} addNew={addNew}/>}
+        {count===1 && <button onClick={() => {setaddNew(!addNew); setCount(1)}} className="w-full h-[30px] bg-black text-white rounded-md text-[13px]">{addNew ? "Cancel"  : "Add New Address"}</button>}
+        {addNew && <AddressForm addressForm={addressForm} setAddressForm={setAddressForm} setCount={setCount} addNew={addNew} count={count}/>}
     </>
   )
 }

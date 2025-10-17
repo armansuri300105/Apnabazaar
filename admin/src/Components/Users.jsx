@@ -44,8 +44,6 @@ export default function UsersManagement() {
     );
     setUsers(searchResult);
   };
-
-  console.log(users) 
   return (
     <div className="p-4 sm:p-5 md:p-6">
       {/* Header */}

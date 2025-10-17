@@ -139,8 +139,6 @@ const AddProductForm = ({setAddProduct, refetch, product, setProduct, mode}) => 
     // Submit the product
     const res = await editVendorProduct(product);
     try {
-      console.log(res)
-
       if (res?.data?.success) {
         Swal.fire({
           icon: "success",

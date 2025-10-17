@@ -69,9 +69,12 @@ export default function SigninForm() {
     }
     const res = await sendData(formData);
     refetch()
-    if (res.data.success){
+    if (res?.data?.success){
       setLoading(false)
       navigate('/');
+    } else {
+      setLoading(false)
+      setErrorMessage(res?.data?.message)
     }
     setFormData({
       email: "",
@@ -138,10 +141,11 @@ export default function SigninForm() {
                 <input type={eye1 ? "text" : "password"} name="password" placeholder="Create a strong password" value={formData.password} onChange={handleChange} className=" outline-none bg-[#f3f3f5] w-full pl-10 pr-3 h-[30px] border rounded-md text-sm"/>
                 <Icon1 onClick={() => setEye1(!eye1)} className="absolute cursor-pointer right-3 top-[8px] text-gray-600"/>
                 <p className="text-xs text-gray-500 mt-1">
-                Must be at least 8 characters with numbers and letters
-                </p> 
+                  Must be at least 8 characters with numbers and letters
+                </p>
             </div>
           </div>
+          <NavLink to="/user/forgotpassword" className="text-blue-600 text-[12px]">Forgot Password</NavLink>
 
           {/* Submit Button */}
           <button type="submit" disabled={showbtn ? false : true} className={`w-full h-[30px] text-[13px] text-white rounded-md ${showbtn ? "bg-gray-800" : "bg-gray-500"}`}>

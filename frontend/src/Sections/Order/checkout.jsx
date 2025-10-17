@@ -117,7 +117,6 @@ const Checkout = () => {
             }
             const response = await createOrder(orderData);
             const data = response?.data;
-            console.log(data);
 
             if (!data.success) {
                 alert(data.msg || "Order creation failed");

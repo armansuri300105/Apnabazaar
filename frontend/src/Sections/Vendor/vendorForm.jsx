@@ -44,9 +44,7 @@ export default function VendorForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-      console.log("Vendor Data: ", vendor);
       const res = await addVendor(vendor);
-      console.log(res);
     if (res?.data?.success) alert("Application Submitted successfully!");
     else alert("Something went wrong")
   };
@@ -61,7 +59,6 @@ export default function VendorForm() {
       </div>
     );
   }
-  console.log(user?.role === 'vendor' && user?.vendor?.status === "Pending")
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
       {user?.role === 'vendor' && user?.vendor?.status === "Pending" ? (

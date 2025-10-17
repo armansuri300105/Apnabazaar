@@ -18,7 +18,6 @@ const Overview = ({user}) => {
         return a>b ? b : a
     }
 
-    console.log(orders)
   return (
     <>
         <div className="w-full">

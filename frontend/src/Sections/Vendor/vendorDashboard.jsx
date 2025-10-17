@@ -15,7 +15,6 @@ export const VendorDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(loadinguser)
     if(loadinguser) return
     if (!checkAuth){
       navigate("/signin")

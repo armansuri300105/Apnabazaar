@@ -68,7 +68,6 @@ export default function SigninForm({setCheckAuth}) {
 
     try {
       const res = await sendData(formData);
-      console.log(res); // Now res is defined
       
       if (res?.data?.success){
         // Update the authentication state in context

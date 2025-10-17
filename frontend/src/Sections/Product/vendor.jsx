@@ -1,5 +1,4 @@
 const Vendor = ({vendor}) => {
-  console.log(vendor)
   return (
     <>
       <div className="w-full p-[20px] border-2 rounded-xl">
