@@ -367,7 +367,7 @@ export const editReview = async (req, res) => {
     product.reviews.map((review) => (
         avgrating += review.rating
     ))
-    avgrating = avgrating/(product.ratings.count + 1)
+    avgrating = avgrating/(product.ratings.count)
     product.ratings.average = avgrating
 
     await product.save()
@@ -547,4 +547,5 @@ export const chat = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
+
 };
