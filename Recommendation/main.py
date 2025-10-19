@@ -120,3 +120,28 @@ async def main_page(request: Request):
     recs = list(recs)
     
     return JSONResponse(content={"Top_rated_products": recs})
+
+
+
+@app.post("/als-recommend", response_class=JSONResponse)
+async def als_recommend(user_id: str):  
+
+    # df1 = pd.read_csv("D:\College\SEM 5\LAB\SE\dataset\data.csv", nrows=10000)
+    df_product, df_user = making_data_endpoint()
+
+    if user_id not in df_user['user_id'].unique():
+        return JSONResponse(content={"Error": "User not Found"}, status_code=404)
+    
+    model, user_encoder, item_encoder, interactions = als_recommendation(user_id)
+
+    recom = get_als_recommendations(user_id, model, user_encoder, item_encoder, interactions)
+
+    recommended_products = df_product[df_product['productID'].isin(recom)]['category'].unique()
+
+    if isinstance(recommended_products, pd.DataFrame):
+        recommended_products = recommended_products.to_dict(orient="records")
+
+    recs_json_serializable = make_serializable(recommended_products)
+
+    return JSONResponse(content={"recommendations": recs_json_serializable})
+
