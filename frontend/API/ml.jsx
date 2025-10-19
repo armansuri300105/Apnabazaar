@@ -1,7 +1,8 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "https://recommendation-system-5-4b7p.onrender.com",
+    // baseURL: "https://recommendation-system-5-4b7p.onrender.com",
+    baseURL: "http://127.0.0.1:8000",
     withCredentials: true
 })
 

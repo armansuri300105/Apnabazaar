@@ -11,3 +11,16 @@ python-multipart
 implicit
 jinja2
 pymysql
+fastapi
+uvicorn
+pandas
+numpy
+fuzzywuzzy
+scikit-learn
+scipy
+python-dotenv
+pymongo
+python-multipart
+implicit
+jinja2
+pymysql
