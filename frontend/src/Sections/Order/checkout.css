@@ -36,10 +36,14 @@
         margin-top: 180px;
     }
 }
+@media screen and (max-width: 750px) {
+    .checkout-section{
+        padding: 20px;
+    }
+}
 @media screen and (max-width: 600px) {
     .checkout-section{
-        width: 100vw;
-        padding-left: 20px;
+        padding: 10px;
     }
     .order-section{
         width: 80vw;
@@ -50,9 +54,6 @@
     .shipping-page, .orders-page{
         width: 80vw;
     }
-}
-
-@media screen and (max-width: 600px) {
     .orders-detail-section-2{
         flex-direction: column;
     }
@@ -64,5 +65,19 @@
     }
     .orders-section-filters div select{
         width: 100%;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .track-order-details{
+        flex-direction: column;
+        gap: 10px;
+        align-items: start;
+    }
+    .track-order-bars{
+        width: 1px;
+        height: 100px;
+        background-color: #9ca3af;
+        flex: 0 0 auto;
     }
 }

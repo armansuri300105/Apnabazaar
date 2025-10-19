@@ -78,11 +78,11 @@ const Cart = ({setCmenu}) => {
                 <div className="flex h-[100px] flex-col gap-[7px] w-[85%] border-t-2 border-[#ececf0] border-b-2 py-[7px]">
                     <div className="flex justify-between items-center">
                         <p>Subtotal</p>
-                        <p>₹{priceDetail?.subtototal}</p>
+                        <p>₹{parseFloat(priceDetail?.subtototal).toFixed(2)}</p>
                     </div>
                     <div className="flex justify-between items-center">
                         <p>Platform Fees</p>
-                        <p>₹{priceDetail?.platform_fess}</p>
+                        <p>₹{parseFloat(priceDetail?.platform_fess).toFixed(2)}</p>
                     </div>
                     <div className="flex justify-between items-center">
                         <p>Delivery</p>
@@ -91,7 +91,7 @@ const Cart = ({setCmenu}) => {
                 </div>
                 <div className="flex w-[85%] justify-between items-center">
                     <p>Total</p>
-                    <p>₹{priceDetail?.total}</p>
+                    <p>₹{parseFloat(priceDetail?.total).toFixed(2)}</p>
                 </div>
                 <div className="flex flex-col gap-[5px]">
                     <button onClick={handleCheckout} className="w-[90%] h-[35px] bg-black text-white rounded-md">Checkout</button>

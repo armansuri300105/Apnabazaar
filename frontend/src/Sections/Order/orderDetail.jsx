@@ -8,7 +8,7 @@ const OrderDetail = ({cartItems, priceDetail}) => {
             {
                 cartItems.map((item, index) => {
                     return (
-                        <div key={index} className="grid h-[70px] grid-cols-[15%_65%_10%] items-center gap-[10px] p-[5px] border-2 border-dotted rounded-md">
+                        <div key={index} className="grid h-fit grid-cols-[15%_65%_10%] items-center gap-[10px] p-[5px] border-2 border-dotted rounded-md">
                             <img className="w-[60px] h-[60px] rounded-md" src={item?.images[0]} alt="" />
                             <div className="flex flex-col">
                                 <p>{item?.name}</p>
@@ -22,11 +22,11 @@ const OrderDetail = ({cartItems, priceDetail}) => {
             <div className="flex flex-col gap-[7px] w-[100%] border-t-2 border-[#ececf0] border-b-2 py-[7px]">
                 <div className="flex justify-between items-center">
                     <p>Subtotal</p>
-                    <p>₹{priceDetail?.subtotal}</p>
+                    <p>₹{parseFloat(priceDetail?.subtotal).toFixed(2)}</p>
                 </div>
                 <div className="flex justify-between items-center">
                     <p>Platform Fees</p>
-                    <p>₹{priceDetail?.platform_fees}</p>
+                    <p>₹{parseFloat(priceDetail?.platform_fees).toFixed(2)}</p>
                 </div>
                 <div className="flex justify-between items-center">
                     <p>Delivery</p>
@@ -35,7 +35,7 @@ const OrderDetail = ({cartItems, priceDetail}) => {
             </div>
             <div className="flex justify-between items-center">
                 <p>Total</p>
-                <p>₹{priceDetail?.total}</p>
+                <p>₹{parseFloat(priceDetail?.total).toFixed(2)}</p>
             </div>
         </div>
     </>

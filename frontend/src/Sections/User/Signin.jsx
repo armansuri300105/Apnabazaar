@@ -6,6 +6,7 @@ import {NavLink, useNavigate} from "react-router-dom"
 import { googleLogin, signin } from "../../../API/api";
 import {useGoogleLogin} from "@react-oauth/google"
 import LoginError from "./loginError";
+import Loading from "../Loading/loading"
 
 import { CartProductContext } from "../../services/context";
 
@@ -14,6 +15,7 @@ export default function SigninForm() {
     const [showbtn, setShowbtn] = useState(false);
     const [check, setCheck] = useState(false);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false)
     const [errorMessage, setErrorMessage] = useState("");
     const [formData, setFormData] = useState({
       email: "",
@@ -53,6 +55,7 @@ export default function SigninForm() {
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (!isValidEmail(formData.email)){
       setCheck(true);
       setTimeout(() => {
@@ -66,8 +69,12 @@ export default function SigninForm() {
     }
     const res = await sendData(formData);
     refetch()
-    if (res.data.success){
+    if (res?.data?.success){
+      setLoading(false)
       navigate('/');
+    } else {
+      setLoading(false)
+      setErrorMessage(res?.data?.message)
     }
     setFormData({
       email: "",
@@ -92,6 +99,10 @@ export default function SigninForm() {
     onError: responseGoogle,
     flow: "auth-code"
   })
+
+  if (loading){
+    return <Loading/>
+  }
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="w-full max-w-md p-8 rounded-lg">
@@ -130,10 +141,11 @@ export default function SigninForm() {
                 <input type={eye1 ? "text" : "password"} name="password" placeholder="Create a strong password" value={formData.password} onChange={handleChange} className=" outline-none bg-[#f3f3f5] w-full pl-10 pr-3 h-[30px] border rounded-md text-sm"/>
                 <Icon1 onClick={() => setEye1(!eye1)} className="absolute cursor-pointer right-3 top-[8px] text-gray-600"/>
                 <p className="text-xs text-gray-500 mt-1">
-                Must be at least 8 characters with numbers and letters
-                </p> 
+                  Must be at least 8 characters with numbers and letters
+                </p>
             </div>
           </div>
+          <NavLink to="/user/forgotpassword" className="text-blue-600 text-[12px]">Forgot Password</NavLink>
 
           {/* Submit Button */}
           <button type="submit" disabled={showbtn ? false : true} className={`w-full h-[30px] text-[13px] text-white rounded-md ${showbtn ? "bg-gray-800" : "bg-gray-500"}`}>

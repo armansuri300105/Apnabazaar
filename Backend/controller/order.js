@@ -5,7 +5,7 @@ import crypto from 'crypto'
 import 'dotenv/config'
 import USER from '../models/user.js';
 import { generateOrderId } from '../services/generateOrderId.js';
-import { sendOrderConfirmation } from '../emails/sendMail.js';
+import { sendOrderConfirmation, sendOrderToVendor } from '../emails/sendMail.js';
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
@@ -22,11 +22,33 @@ export const CreateOrder =  async (req, res) => {
       deliveryMethod
     }
     let totalAmount = 0;
+    let vendors = []
     for (const item of items) {
       const product = await PRODUCT.findById(item.productID);
       if (!product) return res.status(400).json({ message: `Product not found for ID ${item.productID}` });
+      const populate_prd = await product.populate("vendor");
+      const vendorEmail = populate_prd?.vendor?.email;
+
+      let vendor = vendors.find(v => v.email === vendorEmail);
+      if (!vendor) {
+        vendor = {
+          email: vendorEmail,
+          products: []
+        };
+        vendors.push(vendor);
+      }
+
+      vendor.products.push({
+        productID: product._id,
+        name: product.name,
+        price: product.price,
+        quantity: item.quantity
+      });
+
+      product.stock -= item.quantity;
       totalAmount += product.price * item.quantity;
     }
+    console.log(vendors)
     let delivery = totalAmount >= 499 ? 0 : 40;
     totalAmount += totalAmount*2/100;
     if (OrderData?.deliveryMethod === 'Express') delivery = 60;
@@ -40,8 +62,8 @@ export const CreateOrder =  async (req, res) => {
         }));
         OrderData = {
           ...OrderData,
-          paymentStatus: 'pending',
-          orderStatus: 'processing',
+          paymentStatus: 'Pending',
+          orderStatus: 'Processing',
           totalAmount,
         }
         const newOrderData = {
@@ -57,12 +79,14 @@ export const CreateOrder =  async (req, res) => {
         }
         const newOrder = new ORDER(newOrderData);
         await newOrder.save();
-        if (newOrderData?.shippingAddress?.remember){
+        if (newOrderData?.shippingAddress?.remember) {
           await USER.findByIdAndUpdate(
             newOrderData.user,
-            { 
-              $push: { orders: newOrder._id },
-              $set: { addresses : newOrderData.shippingAddress }
+            {
+              $push: {
+                orders: newOrder._id,
+                addresses: newOrderData.shippingAddress
+              }
             },
             { new: true }
           );
@@ -73,7 +97,18 @@ export const CreateOrder =  async (req, res) => {
             { new: true }
           );
         }
-        return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder._id });
+        for (const v of vendors) {
+          await sendOrderToVendor(
+            v?.email,
+            v?.name || "Vendor",
+            newOrder.orderId,
+            v.products,
+            newOrderData.shippingAddress,
+            newOrderData?.user?.name
+          );
+        }
+        await sendOrderConfirmation(OrderData?.user?.email, OrderData.user?.name, newOrderData?.orderId, OrderData?.items, newOrderData?.totalAmount)
+        return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder.orderId });
     }
     const orderId = generateOrderId()
     const orderOptions = {
@@ -105,12 +140,31 @@ export const verifyPayment =  async (req, res) => {
   let {orderData} = req.body;
 
   let totalAmount = 0;
+  let vendors = []
   for (const item of orderData.items) {
     const product = await PRODUCT.findById(item.productID);
     if (!product) return res.status(400).json({ message: `Product not found for ID ${item.ProductID}` });
-    product.stock -= 1;
+    const populate_prd = await product.populate("vendor");
+    const vendorEmail = populate_prd?.vendor?.email;
+
+    let vendor = vendors.find(v => v.email === vendorEmail);
+    if (!vendor) {
+      vendor = {
+        email: vendorEmail,
+        products: []
+      };
+      vendors.push(vendor);
+    }
+
+    vendor.products.push({
+      productID: product._id,
+      name: product.name,
+      price: product.price,
+      quantity: item.quantity
+    });
     totalAmount += product.price * item.quantity;
   }
+  console.log(vendors)
   totalAmount += totalAmount*2/100;
   let delivery = totalAmount >= 499 ? 0 : 40;
   if (orderData?.deliveryMethod === 'Express') delivery = 60;
@@ -145,20 +199,33 @@ export const verifyPayment =  async (req, res) => {
     try {
         const newOrder = new ORDER(newOrderData);
         await newOrder.save();
-        if (newOrderData?.shippingAddress?.remember){
+        if (newOrderData?.shippingAddress?.remember) {
           await USER.findByIdAndUpdate(
             newOrderData.user,
             {
-              $push: { orders: newOrder._id },
-              $set: { addresses: newOrderData.shippingAddress }
+              $push: {
+                orders: newOrder._id,
+                addresses: newOrderData.shippingAddress
+              }
             },
             { new: true }
           );
-        } else {
+        }
+        else {
           await USER.findByIdAndUpdate(
             newOrderData.user,
             { $push: { orders: newOrder._id } },
             { new: true }
+          );
+        }
+        for (const v of vendors) {
+          await sendOrderToVendor(
+            v?.email,
+            v?.name || "Vendor",
+            newOrder.orderId,
+            v.products,
+            orderData.shippingAddress,
+            newOrderData?.user?.name
           );
         }
         await sendOrderConfirmation(orderData?.user?.email, orderData.user?.name, newOrderData?.orderId, orderData.items, newOrderData?.totalAmount)
@@ -208,7 +275,6 @@ export const getOrder = async (req,res) => {
 }
 export const getOrderByID = async (req,res) => {
   const {orderId} = req.query
-  console.log(orderId)
   try {
     const order = await ORDER.findOne({orderId}).populate("items.product");
     if (!order){

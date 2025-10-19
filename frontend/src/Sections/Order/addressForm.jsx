@@ -27,13 +27,13 @@ const AddressForm = ({ addressForm, setAddressForm, setCount, count }) => {
             setCheck(true);
             return;
         }
-        console.log(addressForm);
         setCount(2);
     }
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
+
   return (
     <>
         <div className={` ${count!==1 ? "cursor-not-allowed" : ""} checkout-section-left bg-white w-[600px] relative rounded-md border-2`}>

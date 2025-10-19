@@ -35,7 +35,6 @@ const PersonalInfo = ({user, loadinguser}) => {
   const updateUser = async () => {
     try {
       const res = await updateUserDetail(formData)
-      console.log(res);
     } catch (error) {
       console.log(error)
     }

@@ -9,7 +9,6 @@ const Detail = ({product}) => {
     html = html.replace(/\n/g, "<br/>");
     return html;
   }
-  console.log(product)
   return (
     <>
         <div className="product-other-detail w-full p-[20px] border-2 rounded-xl flex gap-[30px]">

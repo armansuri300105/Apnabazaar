@@ -5,8 +5,8 @@ const Vendor = ({vendor}) => {
         <div className="flex gap-[20px]">
             <img className="w-[50px] h-[50px] rounded-[50%]" src="/profile.jpg" alt="" />
             <div>
-                <p>{vendor?.companyName}</p>
-                <p className="text-[#717182]">{vendor?.address}</p>
+                <p>{vendor?.companyName ? vendor?.companyName : "ApnaBazaar"}</p>
+                <p className="text-[#717182]">{vendor?.address ? vendor?.address : "IIITDM KURNOOL"}</p>
             </div>
         </div>
       </div>

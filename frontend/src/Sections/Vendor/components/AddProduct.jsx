@@ -139,8 +139,6 @@ const AddProductForm = ({setAddProduct, refetch, product, setProduct, mode}) => 
     // Submit the product
     const res = await editVendorProduct(product);
     try {
-      console.log(res)
-
       if (res?.data?.success) {
         Swal.fire({
           icon: "success",
@@ -181,7 +179,7 @@ const AddProductForm = ({setAddProduct, refetch, product, setProduct, mode}) => 
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6 mt-[30px] mb-[30px]">
       <h2 className="text-lg font-semibold mb-4">Add New Product</h2>
-      <form onSubmit={mode==="add" ? handleSubmit : handleEdit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={mode==="add" ? handleSubmit : handleEdit} className="addproduct-form grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Product Name */}
         <input
           type="text"

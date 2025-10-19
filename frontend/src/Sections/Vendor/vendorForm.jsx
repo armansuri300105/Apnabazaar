@@ -1,9 +1,12 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { addVendor } from "../../../API/api";
 import { CartProductContext } from "../../services/context";
+import { useNavigate } from "react-router-dom";
+import Loading from "../Loading/loading";
 
 export default function VendorForm() {
     const {user, loadinguser} = useContext(CartProductContext)
+    const navigate = useNavigate()
 
   const [vendor, setVendor] = useState({
     address: "",
@@ -23,6 +26,16 @@ export default function VendorForm() {
     return Object.keys(newErrors).length === 0;
   };
 
+  if (loadinguser){
+    return <Loading/>
+  }
+
+  useEffect(() => {
+    if (!loadinguser && !user){
+      navigate(`/signup`)
+    }
+  },[user])
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setVendor((prev) => ({ ...prev, [name]: value }));
@@ -31,9 +44,7 @@ export default function VendorForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-      console.log("Vendor Data: ", vendor);
       const res = await addVendor(vendor);
-      console.log(res);
     if (res?.data?.success) alert("Application Submitted successfully!");
     else alert("Something went wrong")
   };
@@ -48,7 +59,6 @@ export default function VendorForm() {
       </div>
     );
   }
-  console.log(user?.role === 'vendor' && user?.vendor?.status === "Pending")
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
       {user?.role === 'vendor' && user?.vendor?.status === "Pending" ? (

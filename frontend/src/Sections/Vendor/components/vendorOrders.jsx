@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getVendorOrders, updateOrderStatus } from "../../../../API/api";
 import OrderCard from "./OrderDetail";
 import Loading from "../../Loading/loading"
+import Swal from "sweetalert2";
 
 const VendorOrders = () => {
   const [statusFilter, setStatusFilter] = useState("All");
@@ -11,7 +12,7 @@ const VendorOrders = () => {
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const {data, isLoading} = useQuery({
+  const {data, isLoading, refetch} = useQuery({
     queryKey: [`orders`],
     queryFn: getVendorOrders,
     select: (res) => res?.data || null
@@ -69,7 +70,7 @@ const VendorOrders = () => {
   }
   return (
     <div className="p-4 md:p-6 w-full mt-[20px]">
-        {isOpenDetail ? <OrderCard order={selectedOrder} setIsOpenDetail={setIsOpenDetail} onUpdateStatus={onUpdateStatus} /> : ""}
+        {isOpenDetail ? <OrderCard refetch={refetch} order={selectedOrder} setIsOpenDetail={setIsOpenDetail} onUpdateStatus={onUpdateStatus} /> : ""}
       {/* Header */}
       <h2 className="text-xl md:text-2xl font-bold mb-2">Orders Management</h2>
       <p className="text-gray-500 mb-6 text-sm md:text-base">
@@ -155,7 +156,7 @@ const VendorOrders = () => {
                   <p>{o?.user?.name}</p>
                   <p className="text-sm text-gray-500">{o?.user?.email}</p>
                 </td>
-                <td className="p-3">{o?.createdAt}</td>
+                <td className="p-3">{new Date(o?.createdAt).toLocaleString()}</td>
                 <td className="p-3">
                   <span
                     className={`px-2 py-1 rounded-full text-sm font-medium ${
@@ -171,7 +172,7 @@ const VendorOrders = () => {
                     {o?.orderStatus}
                   </span>
                 </td>
-                <td className="p-3 font-semibold">${o?.totalAmount?.toFixed(2)}</td>
+                <td className="p-3 font-semibold">₹{o?.totalAmount?.toFixed(2)}</td>
                 <td onClick={() => {setIsOpenDetail(true); setSelectedOrder(o)}} className="p-3 text-blue-600 cursor-pointer">👁 View</td>
               </tr>
             ))}
@@ -204,8 +205,8 @@ const VendorOrders = () => {
             </div>
             <p className="text-sm">{o?.user?.name}</p>
             <p className="text-xs text-gray-500">{o?.user?.email}</p>
-            <p className="text-sm">📅 {o?.createdAt}</p>
-            <p className="text-sm font-bold">💰 ${o?.totalAmount?.toFixed(2)}</p>
+            <p className="text-sm">📅 {new Date(o?.createdAt).toLocaleString()}</p>
+            <p className="text-sm font-bold">💰 ₹{o?.totalAmount?.toFixed(2)}</p>
             <button onClick={() => {setIsOpenDetail(true); setSelectedOrder(o)}} className="text-blue-600 text-sm mt-1">👁 View</button>
           </div>
         ))}

@@ -5,8 +5,10 @@ import bcrypt from "bcrypt"
 import {oauth2Client} from "../services/googleAuth.js"
 import { sendVendorApplicationMail, sendVerificationMail } from "../emails/sendMail.js";
 import PRODUCT from "../models/product.js";
+import ORDER from "../models/order.js"
 
 export const signup = async (req,res) => {
+  try {
     const {name, email, phone, password} = req.body;
     const user = await USER.findOne({email});
     if (user){
@@ -15,7 +17,7 @@ export const signup = async (req,res) => {
     const saltround = 11;
     const hashedpass = await bcrypt.hash(password, saltround);
     const verificationToken =  Math.floor(100000 + Math.random() * 900000)
-    const verificationTokenExpiry = Date.now() + 15*60*60*1000 // 15 min
+    const verificationTokenExpiry = Date.now() + 15*60*60*1000
     const token = setuserandcookies(res, {name, email})
     await USER.create({
         name,
@@ -28,6 +30,33 @@ export const signup = async (req,res) => {
     })
     await sendVerificationMail(email, verificationToken);
     return res.json({success: true, message: "user registered successfully", user: {name, email, phone}, token});
+  } catch (error) {
+    return res.status(500).json({success: false, message: error.message})
+  }
+}
+
+export const sendVerification = async (req,res) => {
+  try {
+    const user_id = req?.user?._id
+    const user = await USER.findById(user_id);
+    if (!user){
+        return res.status(404).json({success:false, message: "User Not Found"})
+    }
+    if (user.isVerified){
+      return res.json({success: false, message: "Already verified"})
+    }
+    const verificationToken =  Math.floor(100000 + Math.random() * 900000)
+    const verificationTokenExpiry = Date.now() + 15*60*60*1000
+    user.verificationToken = verificationToken
+    user.verificationTokenExpiry = verificationTokenExpiry
+    const email = user?.email
+    await user.save()
+    await sendVerificationMail(email, verificationToken);
+
+    res.status(200).json({success: true, message: `Verification code send to ${email}`})
+  } catch (error) {
+    
+  }
 }
 
 export const login = async (req,res) => {
@@ -56,10 +85,10 @@ export const verifyEmail = async (req,res) => {
     const {Token} = req.query
     const user = await USER.findOne({verificationToken: Token});
     if (!user){
-        return res.json({ success: false, message: "Invalid or expired verification link" })
+        return res.status(404).json({ success: false, message: "Invalid or expired verification link" })
     }
     if (user?.verificationTokenExpiry < Date.now()){
-        return res.json({ success: false, message: "Verification link has expired" });
+        return res.status(401).json({ success: false, message: "Verification link has expired" });
     }
 
     await USER.updateOne(
@@ -67,7 +96,7 @@ export const verifyEmail = async (req,res) => {
         { $set: { isVerified: true }, $unset: { verificationToken: "", verificationTokenExpiry: "" } }
     );
 
-    return res.json({ success: true, message: "User verified successfully" });
+    return res.status(200).json({ success: true, message: "User verified successfully" });
 }
 
 export const verify = (req,res) => {
@@ -79,28 +108,28 @@ export const verify = (req,res) => {
 }
 
 export const googleLogin = async (req,res) => {
-    const {code} = req.query;
-    const googleres = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(googleres.tokens);
-    const userRes = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleres.tokens.access_token}`);
-    const {email, name } = userRes.data;
-    let user = await USER.findOne({email});
-    if (!user){
-        const newUser = await USER.create({
-            email,
-            name,
-            authProvider: "google",
-            isVerified: true,
-        });
-        user = newUser;
+    try {
+      const {code} = req.query;
+      const googleres = await oauth2Client.getToken(code);
+      oauth2Client.setCredentials(googleres.tokens);
+      const userRes = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleres.tokens.access_token}`);
+      const {email, name } = userRes.data;
+      let user = await USER.findOne({email});
+      if (!user){
+          const newUser = await USER.create({
+              email,
+              name,
+              authProvider: "google",
+              isVerified: true,
+          });
+          user = newUser;
+      }
+      const token = setuserandcookies(res, user);
+      res.send({success: true,user: {email,name,token}})
+    } catch (error) {
+        console.log("Error while authenticating user: ", error.message);
+        res.send({success: false, message: "Error while authenticating user: ", error: error.message});
     }
-    const token = setuserandcookies(res, user);
-    res.send({success: true,user: {email,name,token}})
-    // try {
-    // } catch (error) {
-    //     console.log("Error while authenticating user: ", error.message);
-    //     res.send({success: false, message: "Error while authenticating user: ", error: error.message});
-    // }
 }
 
 export const authCheck = async (req,res) => {
@@ -125,7 +154,6 @@ export const authCheck = async (req,res) => {
 }
 
 export const updateWishlist = async (req,res) => {
-    console.log(req.user)
     try {
         const user = await USER.findByIdAndUpdate(
             req.user._id,
@@ -154,9 +182,12 @@ export const deleteWishlist = async (req,res) => {
 export const logout = (req,res) => {
     try{
         res.clearCookie("token", {
+            // httpOnly: true,
+            // secure: false,
+            // sameSite: "lax",
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: true,
+            sameSite: "none",
         });
         res.status(200).json({ message: "Logout successful" , success: true});
     } catch (err) {
@@ -166,32 +197,50 @@ export const logout = (req,res) => {
 
 export const getWishlist = async (req,res) => {
     try {
-        const data = await USER.findById(req.user._id).populate("wishlist")
+        const data = await USER.findById(req.user._id).populate({
+        path: "wishlist",
+        match: { isActive: true },
+      })
         return res.status(200).json({success: true, data})
     } catch (error) {
         res.status(500).json({ message: err.message , success: false});
     }
 }
 
-export const updateUser = async (req,res) => {
-    const formData = req.body;
-    const data = {
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        phone: formData.phone
-    }
-    try {
-        const updatedUser = await USER.findByIdAndUpdate(
-            req.user._id,
-            {$set : data},
-            {new: true, runValidators: true}
-        )
+export const updateUser = async (req, res) => {
+  const formData = req.body;
 
-        res.status(200).json({ success: true, message: "User updated successfully", user: updatedUser });
-    } catch (error) {
-        res.status(500).json({ message: err.message , success: false});
+  try {
+    const user = await USER.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
-}
+
+    const emailChanged = formData.email && formData.email !== user.email;
+
+    const data = {
+      name: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email,
+      phone: formData.phone,
+    };
+
+    if (emailChanged) {
+      data.isVerified = false;
+    }
+
+    const updatedUser = await USER.findByIdAndUpdate(
+      req.user._id,
+      { $set: data },
+      { new: true, runValidators: true }
+    );
+
+    res
+      .status(200)
+      .json({ success: true, message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export const addVendor = async (req, res) => {
   try {
@@ -240,7 +289,6 @@ export const addVendor = async (req, res) => {
 
 export const interection = async (req,res) => {
     const data = req.body
-    console.log("Data",data)
     try {
         const user = await USER.findById(data?.user)
         if (!user){
@@ -257,7 +305,6 @@ export const interection = async (req,res) => {
                 duration: product?.duration
             }
         })
-        console.log("user History",userHistory)
         user.history = [...user.history, ...userHistory]
 
         await user.save()
@@ -268,30 +315,29 @@ export const interection = async (req,res) => {
 }
 
 export const addRatingReview = async (req,res) => {
-    try {
-        const reviewData = req.body
-        const ProductID = reviewData?.productID
-        const product = await PRODUCT.findOne({_id: ProductID})
-        if (!product){
-            return res.status(404).json({success: false, message: "Product not found"})
-        }
-
-        product.reviews = [...product.reviews, {
-            user: reviewData.user,
-            username: reviewData.name,
-            rating: reviewData.rating,
-            comment: reviewData.review,
-            createdAt: reviewData.date
-        }]
-        let avgrating = 0 
-        product.reviews.map((review) => (
-            avgrating += review.rating
-        ))
-        avgrating = avgrating/(product.ratings.count + 1)
-        product.ratings.count += 1
-        product.ratings.average = avgrating
-        await product.save()
-        return res.status(200).json({ success: true, message: "Review added successfully"})
+  try {
+      const reviewData = req.body
+      const ProductID = reviewData?.productID
+      const product = await PRODUCT.findOne({_id: ProductID})
+      if (!product){
+          return res.status(404).json({success: false, message: "Product not found"})
+      }
+      product.reviews = [...product.reviews, {
+          user: reviewData.user,
+          username: reviewData.name,
+          rating: reviewData.rating,
+          comment: reviewData.review,
+          createdAt: reviewData.date
+      }]
+      let avgrating = 0 
+      product.reviews.map((review) => (
+          avgrating += review.rating
+      ))
+      avgrating = avgrating/(product.ratings.count + 1)
+      product.ratings.count += 1
+      product.ratings.average = avgrating
+      await product.save()
+      return res.status(200).json({ success: true, message: "Review added successfully"})
     } catch (error) {
         res.status(500).json({success: false, message: error.message})
     }
@@ -321,7 +367,7 @@ export const editReview = async (req, res) => {
     product.reviews.map((review) => (
         avgrating += review.rating
     ))
-    avgrating = avgrating/(product.ratings.count + 1)
+    avgrating = avgrating/(product.ratings.count)
     product.ratings.average = avgrating
 
     await product.save()
@@ -340,7 +386,6 @@ export const deleteReview = async (req, res) => {
   try {
     const { productID } = req.query
     const userID = req?.user?._id
-    console.log(productID, userID)
 
     const product = await PRODUCT.findById(productID)
     if (!product) {
@@ -380,3 +425,127 @@ export const deleteReview = async (req, res) => {
     res.status(500).json({ success: false, message: error.message })
   }
 }
+
+export const chat = async (req, res) => {
+  const user_id = req?.user?._id;
+  try {
+    const { input } = req.body;
+
+    if (!input) {
+      return res.status(400).json({ success: false, message: "Input is required" });
+    }
+
+    const lowerInput = input.toLowerCase();
+    const user = await USER.findById(user_id).populate("orders");
+
+    switch (lowerInput) {
+      case "order related":
+        return res.json({
+          success: true,
+          message: "Please choose an option related to your orders:",
+          options: ["Recent Order", "All Orders", "Track Order", "Back"],
+        });
+
+      case "product related":
+        return res.json({
+          success: true,
+          message: "Need help with products? Select an option below:",
+          options: ["Request Product", "Back"],
+        });
+
+      case "others":
+        return res.json({
+          success: true,
+          message: "You can chat with our AI assistant for general help 💬",
+          options: ["Chat with AI Assistant", "Back"],
+        });
+
+      case "recent order": {
+        if (!user || user.orders.length === 0)
+          return res.json({
+            success: true,
+            message: "You have no recent orders 😔",
+            options: ["Back"],
+          });
+
+        const recentOrder = user.orders[user.orders.length - 1];
+        return res.json({
+          success: true,
+          message: `🛍️ Your most recent order (${recentOrder.orderId}) is currently *${recentOrder.orderStatus}* 🚚`,
+          options: ["Track Order", "Back"],
+        });
+      }
+
+      case "all orders": {
+        if (!user)
+          return res.json({
+            success: true,
+            message: "User not found. Please log in again.",
+            options: ["Back"],
+          });
+
+        const totalOrder = user.orders?.length || 0;
+        return res.json({
+          success: true,
+          message: `You have ${totalOrder} total orders. Would you like to track your latest one?`,
+          options: ["Track Order", "Back"],
+        });
+      }
+
+      case "track order": {
+        if (!user || user.orders.length === 0)
+          return res.json({
+            success: true,
+            message: "No orders found to track 😅",
+            options: ["Back"],
+          });
+
+        const latestOrder = await ORDER.findById(user.orders[user.orders.length - 1]);
+
+        if (!latestOrder)
+          return res.json({
+            success: true,
+            message: "Sorry, we couldn't find your latest order details.",
+            options: ["Back"],
+          });
+
+        return res.json({
+          success: true,
+          message: `📦 *Order Details*\n\nOrder ID: ${latestOrder.orderId}\nStatus: ${latestOrder.orderStatus}\nEstimated Delivery: ${new Date(latestOrder.createdAt).toDateString()}`,
+          options: ["Back"],
+        });
+      }
+
+      case "request product":
+        return res.json({
+          success: true,
+          message: "Please share the product name or details you want us to add 🛒",
+          options: ["Back"],
+        });
+
+      case "chat with ai assistant":
+        return res.json({
+          success: true,
+          message: "Hi there! 👋 I’m your AI assistant. How can I help you today?",
+          options: ["Back"],
+        });
+
+      case "back":
+        return res.json({
+          success: true,
+          message: "Welcome back! How can we assist you today?",
+          options: ["Order Related", "Product Related", "Others"],
+        });
+
+      default:
+        return res.json({
+          success: true,
+          message: "Sorry, I didn’t quite get that. Please select a valid option:",
+          options: ["Order Related", "Product Related", "Others"],
+        });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+
+};

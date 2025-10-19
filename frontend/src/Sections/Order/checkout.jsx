@@ -12,9 +12,10 @@ import Addresses from "./addresses";
 import OrderPage from "./orderPage";
 import {useQuery} from "@tanstack/react-query"
 import CheckoutSkeleton from "./Skeletons/checkoutSkeleton"
+import Loading from "../Loading/loading"
 
 const Checkout = () => {
-    const {cartItems , user, setCartItems} = useContext(CartProductContext)
+    const {cartItems , user, setCartItems, setCmenu, dataForMl, setDataForMl} = useContext(CartProductContext)
     const [priceDetail, setPriceDetail] = useState({subtotal: "", platform_fees: "", delivery: "", total: ""});
     const [count, setCount] = useState(1);
     const [selected, setSelected] = useState(0);
@@ -71,6 +72,7 @@ const Checkout = () => {
 
     const handleCreateOrder = async (e) => {
         e.preventDefault();
+        setCmenu(false)
         setLoading(true);
         if (cartItems?.length<=0){
             alert("Cart Should Not be Empty")
@@ -115,7 +117,6 @@ const Checkout = () => {
             }
             const response = await createOrder(orderData);
             const data = response?.data;
-            console.log(data);
 
             if (!data.success) {
                 alert(data.msg || "Order creation failed");
@@ -144,7 +145,7 @@ const Checkout = () => {
                     if (verifyData.success) {
                         setCartItems([]);
                         setLoading(false)
-                        console.log(verifyData)
+
                         setOrderId(verifyData.orderid)
                         localStorage.removeItem("Cart");
                         setOrderStatus(true)
@@ -173,6 +174,10 @@ const Checkout = () => {
             console.error("Payment error:", err);
         }
     };
+
+    if (loading){
+        return <Loading/>
+    }
   return isLoading ? <CheckoutSkeleton/> : (
     <>
       <section className="min-h-screen flex justify-center bg-[#f3f3f5]">
@@ -199,7 +204,7 @@ const Checkout = () => {
                         )
                     )}
                 </div>
-                {user?.addresses?.length > 0 ? 
+                {user?.addresses?.length > 0 ?
                     <Addresses user={user} addNew={addNew} setaddNew={setaddNew} addressForm={addressForm} setAddressForm={setAddressForm} setCount={setCount} count={count}/> :
                     <AddressForm addressForm={addressForm} setAddressForm={setAddressForm} setCount={setCount} count={count}/>
                 }

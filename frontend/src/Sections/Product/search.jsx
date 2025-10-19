@@ -9,7 +9,7 @@ import { useState } from "react";
 
 const Search = () => {
     const {text} = useParams();
-    const [selected, setSelected] = useState('name');
+    const [selected, setSelected] = useState('filter');
     const {data, isLoading} = useQuery({
         queryKey: ["search", text],
         queryFn: () => searchProduct(text),
@@ -30,10 +30,11 @@ const Search = () => {
     if (data?.success){
         products = data?.data;
     }
-    console.log(data)
-    console.log("ml products", mlprd)
 
-    if (selected === 'name') {
+    if (selected=== 'filter'){
+        products = products
+    }
+    else if (selected === 'name') {
         products = [...products].sort((a, b) =>
         a.name.localeCompare(b.name) // A-Z
         );
@@ -59,7 +60,8 @@ const Search = () => {
                     </div>
                     <div className="category-section-items flex items-center gap-4 justify-start">
                         <div className="flex gap-[10px] items-center">
-                            <select className="outline-none border-solid border-[1px] h-9 px-2 flex justify-center rounded-md border-grey-100" value={selected} onChange={e => setSelected(e.target.value)}>
+                            <select className="outline-none border-solid border-[1px] h-9 px-1 flex justify-center rounded-md border-grey-100" value={selected} onChange={e => setSelected(e.target.value)}>
+                                <option value="filter">Filter</option>
                                 <option value="name">Sort by Name</option>
                                 <option value="date">Sort by Date</option>
                                 <option value="priority">Sort by Priority</option>
@@ -77,9 +79,9 @@ const Search = () => {
                 </div>
             </div> : <h2 className="text-[22px] font-bold mt-[50px] mb-[50px]">No Product Found with <b>"{text}"</b></h2>}
 
-            <div className="feature-products">
+            <div className="feature-products mt-[30px]">
                 <div className="flex justify-center">
-                    <div className="text-[24px] text-black text-center">
+                    <div className="text-[24px] text-black text-center font-medium underline">
                         You Might Also Like
                     </div>
                 </div>

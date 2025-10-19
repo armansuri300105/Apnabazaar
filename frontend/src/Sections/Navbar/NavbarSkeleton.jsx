@@ -1,3 +1,5 @@
+import "./navbar.css"
+
 const NavbarSkeleton = () => {
   return (
     <>
