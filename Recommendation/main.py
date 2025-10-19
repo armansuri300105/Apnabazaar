@@ -145,3 +145,28 @@ async def als_recommend(user_id: str):
 
     return JSONResponse(content={"recommendations": recs_json_serializable})
 
+
+@app.post("/recommend")
+async def recommend(req: RecommendRequest):
+    item_name = req.item_name
+    user_id = req.user_id
+    print(f"Received item_name: {item_name}, user_id: {user_id}")
+    df_products, df_user = making_data_endpoint()
+    df = df_products
+    
+    # if not user_id:  
+    #     corrected_item_name = get_closest_match(item_name, df['name'].tolist())
+    #     recommendations = hybrid_recommendation_system(df, user_id, corrected_item_name, top_n=10)
+    #     # recommendations = content_based_recommendations(df, corrected_item_name, top_n=10)
+    # else:
+    corrected_item_name = get_closest_match(item_name, df['name'].tolist())
+    recommendations = content_based_recommendations_improved(df, corrected_item_name, top_n=10)
+    print(recommendations)
+
+    if isinstance(recommendations, pd.DataFrame):
+        recommendations = recommendations.to_dict(orient="records")
+
+    recs_json_serializable = make_serializable(recommendations)
+
+    return JSONResponse(content={"recommendations": recs_json_serializable})
+
