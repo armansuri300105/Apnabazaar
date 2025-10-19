@@ -7,6 +7,7 @@ import datetime
 from decimal import Decimal
 from fastapi.middleware.cors import CORSMiddleware
 
+
 from recommendation import (
     hybrid_recommendation_system,
     rating_based_recommendation_system,
@@ -17,6 +18,24 @@ from recommendation import (
     making_data,
     content_based_recommendations_improved
 )
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'https://apnabzaar.netlify.app'
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class RecommendRequest(BaseModel):
+    item_name: str
+    user_id: str | None = None
 
 app = FastAPI()
 
