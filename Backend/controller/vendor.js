@@ -33,18 +33,20 @@ export const addVendorProduct = async (req, res) => {
       { new: true }
     );
 
-    const admin = await USER.find({role: "Admin"})
+    const admins = await USER.find({role: "Admin"})
 
     const vendor_id = req?.user?._id
     const vendor = await USER.findById(vendor_id).populate("vendor")
 
-    await notification.create({
-      receiver: admin._id,
-      title: "New Product Added",
-      message: `New Product Added by ${vendor?.vendor?.companyName}`,
-      type: "new_product",
-      isRead: false
-    })
+    for (const admin of admins){
+      await notification.create({
+        receiver: admin._id,
+        title: "New Product Added",
+        message: `New Product Added by ${vendor?.vendor?.companyName}`,
+        type: "new_product",
+        isRead: false
+      })
+    }
 
     return res.json({
       success: true,
