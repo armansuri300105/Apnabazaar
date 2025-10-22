@@ -19,6 +19,15 @@ const AddressForm = ({ addressForm, setAddressForm, setCount, count }) => {
             [name]: type === "checkbox" ? checked : value
         }))
     }
+    const generateAlphanumericString = (length) => {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
     const handleAddressForm = (e) => {
         e.preventDefault();
         if (isValidEmail(addressForm.email)){
@@ -27,6 +36,10 @@ const AddressForm = ({ addressForm, setAddressForm, setCount, count }) => {
             setCheck(true);
             return;
         }
+        setAddressForm(prev => ({
+            ...prev,
+            id: generateAlphanumericString(6)
+        }))
         setCount(2);
     }
     const isValidEmail = (email) => {

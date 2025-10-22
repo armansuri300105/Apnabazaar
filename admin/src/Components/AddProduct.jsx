@@ -10,7 +10,7 @@ const CLOUDINARY_CLOUD_NAME = "do9m8kc0b";
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
 const AddProductForm = ({setAddProduct, refetch, mode, product, setProduct}) => {
-
+  const [block, setBlock] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   // Handle input changes
@@ -53,6 +53,7 @@ const AddProductForm = ({setAddProduct, refetch, mode, product, setProduct}) => 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setBlock(true)
 
     // Form Validation
     if (!product.name.trim()) {
@@ -113,10 +114,13 @@ const AddProductForm = ({setAddProduct, refetch, mode, product, setProduct}) => 
         text: err.message || "Server error",
       });
     }
+
+    setBlock(false)
   };
 
   const handleEdit = async (e) => {
     e.preventDefault();
+    setBlock(true)
 
     // Form Validation
     if (!product.name.trim()) {
@@ -176,6 +180,8 @@ const AddProductForm = ({setAddProduct, refetch, mode, product, setProduct}) => 
         text: err.message || "Server error",
       });
     }
+
+    setBlock(false)
   }
   const options = ["Groceries & Staples","Fruits & Vegetables","Dairy & Bakery","Snacks & Beverages","Personal Care","Home & Cleaning Essentials","Packaged Foods","Baby & Kids Care","Stationery & Household Items","Meat, Fish & Frozen Foods", "Dry Fruits"]
   return (
@@ -264,10 +270,11 @@ const AddProductForm = ({setAddProduct, refetch, mode, product, setProduct}) => 
         {/* Buttons */}
         <div className="col-span-2 flex gap-3 mt-2">
           <button
+            disabled={block}
             type="submit"
-            className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800"
+            className={`bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 disabled:cursor-not-allowed`}
           >
-            {mode==="add" ? "Add Product" : "Edit Product"}
+            {block ? "Loading..." : mode==="add" ? "Add Product" : "Edit Product"}
           </button>
           <button
             onClick={() => setAddProduct(false)}

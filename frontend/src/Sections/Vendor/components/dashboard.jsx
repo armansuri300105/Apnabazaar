@@ -3,8 +3,9 @@ import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Responsi
 import { CartProductContext } from "../../../services/context";
 import { useQuery } from "@tanstack/react-query";
 import { getlast7daysorders, getordersbycategory } from "../../../../API/api";
+import NotificationPanel from "./notificationPannel";
 
-const Dashboard = ({handleLogout}) => {
+const Dashboard = ({handleLogout, setSelectedField}) => {
   const { user, loadinguser } = useContext(CartProductContext);
 
   const {data: ordersData} = useQuery({
@@ -42,7 +43,7 @@ const Dashboard = ({handleLogout}) => {
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <div className="flex flex-wrap gap-2">
             <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg">Settings</button>
-            <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg">Notifications</button>
+            <NotificationPanel setSelectedField={setSelectedField}/>
             <button onClick={handleLogout} className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-lg">
                 Logout
             </button>

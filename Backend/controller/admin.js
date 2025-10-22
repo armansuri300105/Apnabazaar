@@ -3,11 +3,12 @@ import USER from "../models/user.js";
 import { getuser } from "../services/auth.js";
 import ORDER from "../models/order.js"
 import { sendVendorApprovalMail } from "../emails/sendMail.js";
+import notification from "../models/notification.js";
 
 
 export const getProducts = async (req,res) => {
-    const products = await PRODUCT.find({ isActive: true })
-      .populate("vendor", "vendor.companyName") // only bring vendor's companyName
+    const products = await PRODUCT.find()
+      .populate("vendor", "vendor.companyName")
       .lean();
     if (products.length===0) return res.json({products: []})
     const formattedProducts = products.map(p => ({
@@ -60,6 +61,7 @@ export const removeproduct = async (req,res) => {
         return res.status(400).json({success: false, message: "Product not found with this id"});
     }
     product.isActive = false
+    product.status = "Deleted"
     await product.save()
     return res.json({success: true, message: "product successfully removed"});
 }
@@ -130,6 +132,14 @@ export const approveVendor = async (req,res) => {
         user.vendor.approvedAt = Date.now()
 
         await user.save();
+
+        await notification.create({
+          receiver: id,
+          title: "Vendor Application Approved",
+          message: "Your Vendor Application Approved",
+          type: "vendor_application",
+          isRead: false
+        })
 
         await sendVendorApprovalMail(user?.email, user?.name)
 
@@ -273,5 +283,57 @@ export const getTotalDetail = async (req,res) => {
     res.status(200).json({success: true, totalOrder: orders.length, totalRevenue, totalVendors})
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+export const updateProductStatus = async (req, res) => {
+  try {
+    const {product_id, status} = req.body
+    const product = await PRODUCT.findById(product_id)
+    if (!product){
+      return res.status(404).json({success: true, message: "Product Not Found!"})
+    }
+
+    product.status = status
+    product.isActive = true
+    await product.save()
+
+    await notification.create({
+      receiver: product.vendor,
+      title: "Product Status Updated",
+      message: `Your Product is ${status} by Admin`,
+      type: "product_status",
+      isRead: false
+    })
+
+    return res.status(200).json({success: true, status: product.status})
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message})
+  }
+}
+
+export const getNotifications = async (req,res) => {
+  const admin_id = req?.user?.id
+  try {
+    const notifications = await notification.find({receiver: admin_id})
+
+    return res.status(200).json({success: true, notifications})
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message})
+  }
+}
+
+export const readNotification = async (req,res) => {
+  const {note_id} = req.body
+  try {
+    const note = await notification.findById(note_id)
+    if (!note) return res.status(404).json({success: false, message: "Notification not Found!"})
+    
+    note.isRead = true
+    await note.save()
+
+    return res.status(200).json({success: true, message: "Notification Readed"})
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message})
   }
 }

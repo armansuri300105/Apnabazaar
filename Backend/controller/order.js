@@ -6,6 +6,7 @@ import 'dotenv/config'
 import USER from '../models/user.js';
 import { generateOrderId } from '../services/generateOrderId.js';
 import { sendOrderConfirmation, sendOrderToVendor } from '../emails/sendMail.js';
+import notification from '../models/notification.js';
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
@@ -26,12 +27,14 @@ export const CreateOrder =  async (req, res) => {
     for (const item of items) {
       const product = await PRODUCT.findById(item.productID);
       if (!product) return res.status(400).json({ message: `Product not found for ID ${item.productID}` });
+      const vendor_id = product?.vendor
       const populate_prd = await product.populate("vendor");
       const vendorEmail = populate_prd?.vendor?.email;
 
       let vendor = vendors.find(v => v.email === vendorEmail);
       if (!vendor) {
         vendor = {
+          vendor_id,
           email: vendorEmail,
           products: []
         };
@@ -48,11 +51,11 @@ export const CreateOrder =  async (req, res) => {
       product.stock -= item.quantity;
       totalAmount += product.price * item.quantity;
     }
-    console.log(vendors)
     let delivery = totalAmount >= 499 ? 0 : 40;
     totalAmount += totalAmount*2/100;
     if (OrderData?.deliveryMethod === 'Express') delivery = 60;
     totalAmount += delivery;
+    totalAmount = parseFloat(totalAmount.toFixed(2));
 
     if (paymentMethod==='COD'){
         const finalItems = OrderData?.items?.map(item => ({
@@ -107,6 +110,15 @@ export const CreateOrder =  async (req, res) => {
             newOrderData?.user?.name
           );
         }
+        for (const v of vendors) {
+          await notification.create({
+            receiver: v.vendor_id,
+            title: `New Order`,
+            message: `You have received a new Order ${newOrderData?.orderId}`,
+            type: "new_order",
+            isRead: false,
+          })
+        }
         await sendOrderConfirmation(OrderData?.user?.email, OrderData.user?.name, newOrderData?.orderId, OrderData?.items, newOrderData?.totalAmount)
         return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder.orderId });
     }
@@ -144,12 +156,14 @@ export const verifyPayment =  async (req, res) => {
   for (const item of orderData.items) {
     const product = await PRODUCT.findById(item.productID);
     if (!product) return res.status(400).json({ message: `Product not found for ID ${item.ProductID}` });
+    const vendor_id = product?.vendor
     const populate_prd = await product.populate("vendor");
     const vendorEmail = populate_prd?.vendor?.email;
 
     let vendor = vendors.find(v => v.email === vendorEmail);
     if (!vendor) {
       vendor = {
+        vendor_id,
         email: vendorEmail,
         products: []
       };
@@ -164,11 +178,11 @@ export const verifyPayment =  async (req, res) => {
     });
     totalAmount += product.price * item.quantity;
   }
-  console.log(vendors)
   totalAmount += totalAmount*2/100;
   let delivery = totalAmount >= 499 ? 0 : 40;
   if (orderData?.deliveryMethod === 'Express') delivery = 60;
   totalAmount += delivery;
+  totalAmount = parseFloat(totalAmount.toFixed(2));
 
   const finalItems = orderData.items.map(item => ({
     product: item._id,
@@ -228,6 +242,15 @@ export const verifyPayment =  async (req, res) => {
             newOrderData?.user?.name
           );
         }
+        for (const v of vendors) {
+          await notification.create({
+            receiver: v.vendor_id,
+            title: `New Order`,
+            message: `You have received a new Order ${newOrderData?.orderId}`,
+            type: "new_order",
+            isRead: false,
+          })
+        }
         await sendOrderConfirmation(orderData?.user?.email, orderData.user?.name, newOrderData?.orderId, orderData.items, newOrderData?.totalAmount)
         return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder._id });
     } catch (error) {
@@ -273,6 +296,7 @@ export const getOrder = async (req,res) => {
     return res.status(500).json({ message: 'Error fatching order', error });
   }
 }
+
 export const getOrderByID = async (req,res) => {
   const {orderId} = req.query
   try {

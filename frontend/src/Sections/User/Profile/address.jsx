@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import AddressSkeleton from "./Skeletons/addressSkeleton";
+import { updateAddress } from "../../../../API/api";
 
 const AddressCard = ({ address, onEdit }) => {
   return (
@@ -41,10 +42,14 @@ export const SavedAddresses = ({user, loadinguser}) => {
     setForm(address);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setAddresses((prev) =>
       prev.map((addr) => (addr.id === editing ? form : addr))
     );
+    const res = await updateAddress(form)
+    if (!res?.data?.success){
+      alert("Something went wrong")
+    }
     setEditing(null);
   };
 
@@ -57,7 +62,7 @@ export const SavedAddresses = ({user, loadinguser}) => {
         </div>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex gap-6 flex-col">
         {addresses?.map((addr, index) =>
           editing === addr.id ? (
             <div key={index} className="border rounded-2xl p-4 min-w-[280px] bg-gray-50" >

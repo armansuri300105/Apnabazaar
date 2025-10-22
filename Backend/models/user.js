@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const addressSchema = new mongoose.Schema(
   {
+    id: {type: String},
     name: { type: String },
     email: { type: String },
     street: { type: String },

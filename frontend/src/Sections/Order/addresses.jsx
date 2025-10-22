@@ -21,7 +21,6 @@ const Addresses = ({ user, addNew, setaddNew, addressForm, setAddressForm, setCo
     setCount(2);
     setSelectedIndex(index); // mark which address is selected
   };
-  console.log(addressForm)
   return (
     <>
       {user?.addresses?.map((address, index) => (

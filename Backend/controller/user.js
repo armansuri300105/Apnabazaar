@@ -74,6 +74,7 @@ export const login = async (req,res) => {
             return res.json({success: false, message: "incorrect possword"});
         } else {
             const token = setuserandcookies(res, user);
+            req.user = user
             return res.json({success: true, message: "user login successfully", token});
         }
     } catch (error) {
@@ -125,6 +126,7 @@ export const googleLogin = async (req,res) => {
           user = newUser;
       }
       const token = setuserandcookies(res, user);
+      req.user = user
       res.send({success: true,user: {email,name,token}})
     } catch (error) {
         console.log("Error while authenticating user: ", error.message);
@@ -367,7 +369,7 @@ export const editReview = async (req, res) => {
     product.reviews.map((review) => (
         avgrating += review.rating
     ))
-    avgrating = avgrating/(product.ratings.count + 1)
+    avgrating = avgrating/(product.ratings.count)
     product.ratings.average = avgrating
 
     await product.save()
@@ -548,3 +550,21 @@ export const chat = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const updateAddress = async (req,res) => {
+    try {
+        const user_id = req.user._id;
+        const address = req.body
+        const user = await USER.findById(user_id)
+        if (!user){
+          return res.status(404).json({success: false, message: "User Not Found!"})
+        }
+
+        user.addresses = user.addresses.map(addr => (addr.id === address.id) ? address : addr)
+        await user.save()
+        
+        return res.status(200).json({success: true, message: "Address Updated Successfully"})
+    } catch (error) {
+        return res.status(500).json({success: false, message: error.message})
+    }
+}

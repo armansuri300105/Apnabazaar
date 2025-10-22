@@ -1,6 +1,6 @@
 import express from "express"
 import { checkAdmin } from "../services/auth.js";
-import { addproduct, editproduct, removeproduct, updateproduct, checkAuth, getProducts, getAllOrders, getAllUsers, getVendors, approveVendor, logout, getLast7DaysOrders, getSalesByVendors, getOrdersByCategory, getTotalDetail } from "../controller/admin.js";
+import { addproduct, editproduct, removeproduct, updateproduct, checkAuth, getProducts, getAllOrders, getAllUsers, getVendors, approveVendor, logout, getLast7DaysOrders, getSalesByVendors, getOrdersByCategory, getTotalDetail, updateProductStatus, getNotifications, readNotification } from "../controller/admin.js";
 
 const router = express.Router();
 
@@ -19,5 +19,8 @@ router.get('/last7daysorders', checkAdmin, getLast7DaysOrders)
 router.get('/salesbycategories', checkAdmin, getOrdersByCategory)
 router.get('/salesbyvendors', checkAdmin, getSalesByVendors)
 router.get('/dashboarddetail', checkAdmin, getTotalDetail)
+router.put('/updateproductstatus', checkAdmin, updateProductStatus)
+router.get('/notification', checkAdmin, getNotifications)
+router.put('/readnotification', checkAdmin, readNotification)
 
 export default router

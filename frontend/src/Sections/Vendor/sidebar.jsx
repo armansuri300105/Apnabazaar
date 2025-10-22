@@ -1,5 +1,3 @@
-import { Menu, X } from "lucide-react";
-
 export default function Sidebar({setSelectedField, isOpen, setIsOpen}) {
   return (
     <>

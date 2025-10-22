@@ -1,6 +1,6 @@
 import express from "express"
 import { checkVendor } from "../services/auth.js";
-import { addVendorProduct, editVendorProduct, getVendorProducts, getVendorOrders, updateOrderStatus, removeProduct, getVendorLast7DaysOrders, getVendorsOrdersByCategory } from "../controller/vendor.js";
+import { addVendorProduct, editVendorProduct, getVendorProducts, getVendorOrders, updateOrderStatus, removeProduct, getVendorLast7DaysOrders, getVendorsOrdersByCategory, getNotifications, readNotification } from "../controller/vendor.js";
 const router = express.Router();
 
 router.post('/addproduct', checkVendor, addVendorProduct)
@@ -11,5 +11,7 @@ router.put('/updateorderstatus', checkVendor, updateOrderStatus)
 router.delete('/deleteproduct', checkVendor, removeProduct)
 router.get('/getlast7daysorders', checkVendor, getVendorLast7DaysOrders)
 router.get('/getordersbycategory', checkVendor, getVendorsOrdersByCategory)
+router.get('/notification', checkVendor, getNotifications)
+router.put('/readnotification', checkVendor, readNotification)
 
 export default router

@@ -2,6 +2,7 @@ import PRODUCT from "../models/product.js";
 import ORDER from "../models/order.js"; // assuming you have an order model
 import { sendOrderStatusMail } from "../emails/sendMail.js";
 import USER from "../models/user.js";
+import notification from "../models/notification.js";
 
 // ✅ Add Product by Vendor
 export const addVendorProduct = async (req, res) => {
@@ -15,7 +16,6 @@ export const addVendorProduct = async (req, res) => {
       });
     }
 
-    // Create product
     const newProduct = await PRODUCT.create({
       name,
       description,
@@ -24,14 +24,27 @@ export const addVendorProduct = async (req, res) => {
       images,
       stock,
       vendor: req?.user?._id,
+      status: "Pending"
     });
 
-    // Add product _id to vendor's profile
     await USER.findByIdAndUpdate(
       req.user._id,
       { $push: { "vendor.products": newProduct._id } },
       { new: true }
     );
+
+    const admin = await USER.find({role: "Admin"})
+
+    const vendor_id = req?.user?._id
+    const vendor = await USER.findById(vendor_id).populate("vendor")
+
+    await notification.create({
+      receiver: admin._id,
+      title: "New Product Added",
+      message: `New Product Added by ${vendor?.vendor?.companyName}`,
+      type: "new_product",
+      isRead: false
+    })
 
     return res.json({
       success: true,
@@ -229,6 +242,7 @@ export const removeProduct = async (req,res) => {
       return res.status(400).json({success: false, message: "Product not found with this id"});
   }
   product.isActive = false
+  product.status = "Deleted"
   await product.save()
   return res.json({success: true, message: "product successfully removed"});
 }
@@ -330,3 +344,29 @@ export const getVendorsOrdersByCategory = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getNotifications = async (req,res) => {
+  const vendor_id = req?.user?.id
+  try {
+    const notifications = await notification.find({receiver: vendor_id})
+
+    return res.status(200).json({success: true, notifications})
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message})
+  }
+}
+
+export const readNotification = async (req,res) => {
+  const {note_id} = req.body
+  try {
+    const note = await notification.findById(note_id)
+    if (!note) return res.status(404).json({success: false, message: "Notification not Found!"})
+    
+    note.isRead = true
+    await note.save()
+
+    return res.status(200).json({success: true, message: "Notification Readed"})
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message})
+  }
+}
