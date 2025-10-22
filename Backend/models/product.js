@@ -66,7 +66,12 @@ const productSchema = new mongoose.Schema({
     ],
     isActive: {
         type: Boolean,
-        default: true
+        default: false
+    },
+    status : {
+        type: String,
+        default: "Pending",
+        enum: ["Pending", "Approved", "reject", "Deleted"]
     },
     createdAt: {
         type: Date,

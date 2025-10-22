@@ -49,9 +49,9 @@ export const VendorDashboard = () => {
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
         {
-          selectedField === "dashboard" ? <Dashboard handleLogout={handleLogout}/> 
-          : selectedField === "products" ? <VendorProducts/>
-          : selectedField === "orders" ? <VendorOrders/> : ""
+          selectedField === "dashboard" ? <Dashboard setSelectedField={setSelectedField} handleLogout={handleLogout}/> 
+          : selectedField === "products" ? <VendorProducts setSelectedField={setSelectedField}/>
+          : selectedField === "orders" ? <VendorOrders setSelectedField={setSelectedField}/> : ""
         }
     </section>
   );

@@ -1,9 +1,10 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from "recharts";
 import { CartProductContext } from "../services/context";
 import { useNavigate } from "react-router-dom";
 import { dashboardDetail, getLast7DaysOrders, getOrdersByCategory, getSalesByVendors, logout } from "../../API/product";
 import {useQuery} from "@tanstack/react-query"
+import NotificationPanel from "./notificationPannel";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -72,8 +73,7 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <div className="flex flex-wrap gap-2">
-          <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg">Settings</button>
-          <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg">Notifications</button>
+          <NotificationPanel/>
           <button onClick={handleLogout} className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-lg">
             Logout
           </button>

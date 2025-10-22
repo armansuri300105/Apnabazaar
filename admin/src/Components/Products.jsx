@@ -5,11 +5,16 @@ import { getproducts, getVendors, removeproduct } from "../../API/product";
 import AddProductForm from "./AddProduct";
 import Swal from "sweetalert2";
 import "./Products.css";
+import ProductDetail from "./productDetail";
+import NotificationPanel from "./notificationPannel";
 
 export default function Products() {
   const [addProduct, setAddProduct] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [selected, setSelected] = useState("All")
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [view, setView] = useState(false);
+  const [productStatus, setProductStatus] = useState("All")
   const {data, isLoading, refetch} = useQuery({
     queryKey: ["product"],
     queryFn: getproducts,
@@ -119,24 +124,29 @@ export default function Products() {
   }
 
   const filteredProducts = products.filter(p => {
-    if (selected === "All") return true;
-
-    if (selected === "Apnabazaar") {
-      return !p?.vendor?.vendor?.companyName; // products without vendor name
+    let vendorMatch = false;
+    if (selected === "All") {
+      vendorMatch = true;
+    } else if (selected === "Apnabazaar") {
+      vendorMatch = !p?.vendor?.vendor?.companyName;
+    } else {
+      vendorMatch = p?.vendor?.vendor?.companyName === selected;
     }
 
-    return p?.vendor?.vendor?.companyName === selected;
+    let statusMatch = productStatus === "All" || p?.status === productStatus;
+
+    return vendorMatch && statusMatch;
   });
+
   return (
     <div className="products-container min-h-screen bg-gray-50">
+      {view ? <ProductDetail product={selectedProduct} setView={setView}/> : ""}
       <div className="flex-1 w-full p-4 overflow-x-hidden products-content">
         {/* Top Bar - Enhanced for Responsiveness */}
         <div className="products-desktop-header flex justify-between items-center gap-3 mb-6 w-full">
           <h2 className="products-title text-2xl font-bold">Products Management</h2>
           <div className="flex gap-3 items-center">
-            <button className="p-2 rounded-full hover:bg-gray-200">
-              <Bell className="w-5 h-5" />
-            </button>
+            <NotificationPanel/>
             <button className="p-2 rounded-full hover:bg-gray-200">
               <Settings className="w-5 h-5" />
             </button>
@@ -150,18 +160,18 @@ export default function Products() {
         <div className="products-summary-grid grid grid-cols-4 gap-4 mb-6">
           <div className="p-4 bg-white rounded-lg shadow">
             <p className="text-gray-500 text-sm">Total Products</p>
-            <p className="products-summary-number text-xl font-bold">{products.length}</p>
+            <p className="products-summary-number text-xl font-bold">{filteredProducts.length}</p>
           </div>
           <div className="p-4 bg-white rounded-lg shadow">
             <p className="text-gray-500 text-sm">In Stock</p>
             <p className="products-summary-number text-xl font-bold">
-              {products.filter((p) => p.stock > 0).length}
+              {filteredProducts.filter((p) => p.stock > 0).length}
             </p>
           </div>
           <div className="p-4 bg-white rounded-lg shadow">
             <p className="text-gray-500 text-sm">Out of Stock</p>
             <p className="products-summary-number text-xl font-bold text-red-500">
-              {products.filter((p) => p.stock <= 0).length}
+              {filteredProducts.filter((p) => p.stock <= 0).length}
             </p>
           </div>
           <div className="p-4 bg-white rounded-lg shadow">
@@ -169,7 +179,7 @@ export default function Products() {
             <p className="products-summary-number text-xl font-bold">
               ₹
               {(
-                products.reduce((acc, p) => acc + p.price, 0) / products.length
+                filteredProducts.reduce((acc, p) => acc + p.price, 0) / filteredProducts.length
               ).toFixed(2)}
             </p>
           </div>
@@ -198,6 +208,15 @@ export default function Products() {
                     }
                 </select>
             </div>
+            <div className="flex gap-[10px] items-center">
+                <select className="outline-none border-solid border-[1px] h-9 px-2 flex justify-center rounded-md border-grey-100" value={productStatus} onChange={e => setProductStatus(e.target.value)}>
+                  <option value="All">All</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Deleted">Deleted</option>
+                </select>
+            </div>
         </div>
         {/* Mobile Product Cards for Small Screens */}
         <div className="products-mobile-cards mb-6">
@@ -213,7 +232,7 @@ export default function Products() {
             />
           </div>
           <div className="flex flex-col gap-[15px]">
-            {filteredProducts.map((p, index) => (
+            {filteredProducts.reverse().map((p, index) => (
               <div key={index} className="bg-white rounded-lg shadow p-4">
                 <div className="flex items-start gap-3 mb-3">
                   <div className="p-3">
@@ -260,7 +279,7 @@ export default function Products() {
                 
                 <div className="flex justify-end gap-2 pt-2 border-t">
                   <button className="p-2 hover:bg-gray-100 rounded">
-                    <Eye className="w-4 h-4" />
+                    <Eye onClick={() => {setView(true); setSelectedProduct(p)}} className="w-4 h-4" />
                   </button>
                   <button className="p-2 hover:bg-gray-100 rounded">
                     <Edit onClick={() => handleEdit(p)} className="w-4 h-4" />
@@ -352,7 +371,7 @@ export default function Products() {
                   </td>
                   <td className="p-3 flex gap-2">
                     <button className="p-2 hover:bg-gray-100 rounded">
-                      <Eye className="w-4 h-4" />
+                      <Eye onClick={() => {setView(true); setSelectedProduct(p)}} className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded">
                       <Edit onClick={() => handleEdit(p)} className="w-4 h-4" />

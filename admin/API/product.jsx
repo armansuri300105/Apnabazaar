@@ -73,3 +73,13 @@ export const getSalesByVendors = () => {
 export const dashboardDetail = () => {
     return api.get('/api/admin/dashboarddetail')
 }
+export const updateProjectStatus = (data) => {
+    return api.put('/api/admin/updateproductstatus', data)
+}
+
+export const getNotifications = () => {
+    return api.get('/api/admin/notification')
+}
+export const readNotification = (note_id) => {
+    return api.put('/api/admin/readnotification', {note_id})
+}

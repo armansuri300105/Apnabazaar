@@ -57,6 +57,10 @@ export const deleteWishlist = (Productid) => {
     return api.delete(`/api/user/wishlist/${Productid}`)
 }
 
+export const updateAddress = (address) => {
+    return api.put('/api/user/updateaddress', address)
+}
+
 export const logout = () => {
     return api.get('/api/user/logout')
 }
@@ -139,4 +143,11 @@ export const searchProduct = (name) => {
 
 export const sendInputToBot = (input) => {
     return api.post('/api/user/chat', {input})
+}
+
+export const getNotifications = () => {
+    return api.get('/api/vendor/notification')
+}
+export const readNotification = (note_id) => {
+    return api.put('/api/vendor/readnotification', {note_id})
 }

@@ -6,8 +6,9 @@ import AddProductForm from "./AddProduct";
 import Swal from "sweetalert2";
 import "./product.css";
 import Loading from "../../Loading/loading";
+import NotificationPanel from "./notificationPannel";
 
-export default function Products() {
+export default function Products({setSelectedField}) {
   const [addProduct, setAddProduct] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const {data, isLoading, refetch} = useQuery({
@@ -121,9 +122,7 @@ export default function Products() {
         <div className="products-desktop-header mt-[20px] flex justify-between items-center gap-3 mb-6 w-full">
           <h2 className="products-title text-2xl font-bold">Products Management</h2>
           <div className="flex gap-3 items-center">
-            <button className="p-2 rounded-full hover:bg-gray-200">
-              <Bell className="w-5 h-5" />
-            </button>
+            <NotificationPanel setSelectedField={setSelectedField}/>
             <button className="p-2 rounded-full hover:bg-gray-200">
               <Settings className="w-5 h-5" />
             </button>
@@ -188,7 +187,7 @@ export default function Products() {
             />
           </div>
           <div className="flex flex-col gap-[15px]">
-            {products.map((p, index) => (
+            {products.reverse().map((p, index) => (
               <div key={index} className="bg-white rounded-lg shadow p-4">
                 <div className="flex items-start gap-3 mb-3">
                   <div className="p-3">
@@ -231,6 +230,14 @@ export default function Products() {
                     <p className="text-gray-500">Rating</p>
                     <p>{p?.ratings?.average} <span className="text-gray-400 text-xs">({p.reviews.length})</span></p>
                   </div>
+                  <div className="justify-self-end">
+                    <p className="text-gray-500">Admin Status</p>
+                    <p className={`px-2 py-1 rounded-full text-xs text-center ${
+                            p?.status === "Approved"
+                          ? "bg-green-100 text-green-600" 
+                          : "bg-red-100 text-red-600"
+                      }`}>{p?.status}</p>
+                  </div>
                 </div>
                 
                 <div className="flex justify-end gap-2 pt-2 border-t">
@@ -267,7 +274,7 @@ export default function Products() {
                 </th>
                 <th className="p-3">Product</th>
                 <th className="p-3">Category</th>
-                <th className="p-3">Vendor</th>
+                <th className="p-3">Admin Status</th>
                 <th className="p-3">Price</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Rating</th>
@@ -275,7 +282,7 @@ export default function Products() {
               </tr>
             </thead>
             <tbody>
-              {products.map((p, index) => (
+              {products.reverse().map((p, index) => (
                 <tr
                   key={index}
                   className="border-t hover:bg-gray-50 text-sm"
@@ -303,7 +310,15 @@ export default function Products() {
                       {p.category}
                     </span>
                   </td>
-                  <td className="p-3">{p?.vendor?.vendor?.companyName}</td>
+                  <td>
+                    <span className={`px-2 py-1 rounded-full text-xs text-center ${
+                          p?.status === "Approved"
+                        ? "bg-green-100 text-green-600" :
+                          p?.status === "Pending" ?
+                          "bg-yellow-500" 
+                        : "bg-red-100 text-red-600"
+                    }`}>{p?.status}</span>
+                  </td>
                   <td className="p-3">
                     <span className="font-bold">₹{p.price}</span>
                     {p.oldPrice && (
