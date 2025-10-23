@@ -5,8 +5,8 @@ const api = axios.create({
     withCredentials: true
 })
 
-export const userInteresctionDataMl = (data) => {
-    return api.post(`/`, data)
+export const recommendedProducts = (user_id) => {
+    return api.post(`/user-recommend`, user_id)
 }
 export const userSearchMl = (name) => {
     return api.post(`/recommend`, {item_name: name})

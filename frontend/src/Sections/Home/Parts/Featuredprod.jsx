@@ -2,17 +2,31 @@ import { ProductShow } from "../Components/productshow"
 import { getProducts } from "../../../../API/api";
 import { useQuery } from "@tanstack/react-query"
 import FavoritesSkeleton from "../../User/Profile/Skeletons/favoritesSkeleton";
+import { recommendedProducts } from "../../../../API/ml";
+import { CartProductContext } from "../../../services/context";
+import { useContext } from "react";
 
 export const FeaturedLocalProducts = () => {
+    const {user} = useContext(CartProductContext)
+
     const { data: products, isLoading } = useQuery({
         queryKey: ["featurePrd"],
         queryFn: getProducts,
         select: (res) => res?.data?.products || []
     })
+
+    const {data: recommendedProduct, isLoading: prdLoading} = useQuery({
+        queryKey: ["recommendedPrd"],
+        queryFn: () => recommendedProducts(user?._id),
+        select: (res) => res?.data,
+        enabled: !!user
+    })
     
     if (isLoading){
         return <FavoritesSkeleton/>
     }
+
+    console.log(recommendedProduct);
     return (
         <div  id="feature-products" className="bg-white mb-[30px] relative flex flex-col items-center">
             <div className="feature-products w-[1200px]">
