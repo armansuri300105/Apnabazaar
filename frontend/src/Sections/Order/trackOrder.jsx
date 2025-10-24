@@ -132,23 +132,26 @@ export default function TrackOrder() {
         {/* Items */}
         <div className="bg-white shadow rounded-2xl p-6">
           <h3 className="font-medium text-gray-700 mb-4">Items in this Order</h3>
-          {order?.items?.map((item, index) => {
-            return (<div key={index} className="flex justify-between items-center border rounded-xl p-4">
-              <div className="flex items-center space-x-4">
-                <img
-                  src={item?.product?.images[0]}
-                  alt={item?.name}
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
-                <div>
-                  <h4 className="font-medium text-gray-800">{item?.name}</h4>
-                  <p className="text-sm text-gray-500">{item?.category}</p>
-                  <p className="text-sm text-gray-600">Quantity: {item?.quantity} × ₹{item?.product?.price}</p>
+          <div className="flex flex-col gap-[20px]">
+            {order?.items?.map((item, index) => {
+              return (
+              <div key={index} className="flex justify-between items-center border rounded-xl p-4">
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={item?.product?.images[0]}
+                    alt={item?.name}
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                  <div>
+                    <h4 className="font-medium text-gray-800">{item?.name}</h4>
+                    <p className="text-sm text-gray-500">{item?.category}</p>
+                    <p className="text-sm text-gray-600">Quantity: {item?.quantity} × ₹{item?.product?.price}</p>
+                  </div>
                 </div>
-              </div>
-              <p className="font-medium text-gray-800">₹{item?.product?.price}</p>
-            </div>)
-          })}
+                <p className="font-medium text-gray-800">₹{item?.product?.price}</p>
+              </div>)
+            })}
+          </div>
         </div>
       </div>
     </div>

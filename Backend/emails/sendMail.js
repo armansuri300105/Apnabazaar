@@ -281,3 +281,56 @@ export const sendVendorApprovalMail = (to, userName) => {
   `;
   return sendMail({ to, subject: "Vendor Application Approved", html });
 };
+
+
+export const sendCustomerQueryMail = (to, name, category, subject, message) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 40px; text-align: center;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <img 
+          src="https://res.cloudinary.com/do9m8kc0b/image/upload/v1760161496/esftuk6irpikvltmbevx.png" 
+          alt="ApnaBazaar" 
+          style="width: 140px; margin-bottom: 25px;"
+        />
+        
+        <h2 style="color: #27ae60;">New Customer Query Received</h2>
+        <p style="color: #333; font-size: 16px;">Hello ApnaBazaar Team,</p>
+        <p style="color: #333; font-size: 15px;">
+          You have received a new query from <b>${name}</b> via the Contact Us form.
+        </p>
+
+        <div style="text-align: left; margin: 25px auto; background: #f9f9f9; padding: 20px; border-radius: 8px;">
+          <p><b>Category:</b> ${category}</p>
+          <p><b>Subject:</b> ${subject}</p>
+          <p><b>Message:</b></p>
+          <p style="white-space: pre-line; border-left: 3px solid #27ae60; padding-left: 10px; color: #555;">
+            ${message}
+          </p>
+        </div>
+
+        <p style="color: #555; font-size: 14px;">Please respond to this query at your earliest convenience.</p>
+
+        <a href="mailto:${to}" style="
+          display: inline-block;
+          margin: 20px 0;
+          padding: 12px 25px;
+          background-color: #27ae60;
+          color: #fff;
+          text-decoration: none;
+          border-radius: 5px;
+          font-weight: bold;
+        ">Reply to ${name}</a>
+
+        <p style="color: #999; font-size: 12px; margin-top: 20px;">
+          This is an automated message from ApnaBazaar.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendMail({
+    to,
+    subject: `New Customer Query: ${subject}`,
+    html,
+  });
+};

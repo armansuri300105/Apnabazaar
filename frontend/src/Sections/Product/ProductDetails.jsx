@@ -67,11 +67,12 @@ const ProductDetails = () => {
   useEffect(() => {
     const product = cartItems.filter(p => p._id === Productid)
     product.length===0 ? setBtn("Add to Cart") : setBtn("Go to Cart")
-  },[cartItems])
+    console.log(product)
+  },[cartItems, Productid])
 
   useEffect(() => {
     return () => {
-      if (dataForMl?.currentView) {
+      if (dataForMl?.currentView?.product){
         const duration = Date.now() - dataForMl.currentView.startTime;
 
         setDataForMl(prev => {
@@ -81,24 +82,23 @@ const ProductDetails = () => {
               ...(prev.products || []),
               {
                 product: {
-                  productID: prev.currentView.product.productID,
-                  category: prev.currentView.product.category,
-                  name: prev.currentView.product.name
+                  productID: prev?.currentView?.product?.productID,
+                  category: prev?.currentView?.product?.category,
+                  name: prev?.currentView?.product?.name,
                 },
-                time: new Date(Date.now()).toLocaleString(),
+                time: new Date().toLocaleString(),
                 duration,
-                event: { type: "view", time: new Date(Date.now()).toLocaleString() },
+                event: { type: "view", time: new Date().toLocaleString() },
               },
             ],
             currentView: null,
           };
-
           localStorage.setItem("interaction", JSON.stringify(updated));
           return updated;
         });
       }
     };
-  }, [dataForMl?.currentView]);
+  }, [Productid]);
 
   const handleAddtoCart = () => {
     if (btn === "Add to Cart") {
@@ -115,9 +115,9 @@ const ProductDetails = () => {
             ...(prev.products || []),
             {
               product: {
-                productID: prev.currentView.product.productID,
-                category: prev.currentView.product.category,
-                name: prev.currentView.product.name
+                productID: prev.currentView?.product?.productID,
+                category: prev.currentView?.product?.category,
+                name: prev.currentView?.product?.name
               },
               time: new Date(Date.now()).toLocaleString(),
               duration:
@@ -136,6 +136,7 @@ const ProductDetails = () => {
       setCmenu(true);
     }
   };
+
   const handleWishlist = async () => {
     setWishlist(!wishlist);
     if (user?.wishlist?.includes(Productid)){
@@ -160,6 +161,7 @@ const ProductDetails = () => {
   if (isLoading || mlLoading){
     return <ProductDetailSkeleton/>
   }
+  
   function renderBoldItalic(text) {
     let html = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
     html = html.replace(/\*(.*?)\*/g, "<i>$1</i>");
@@ -223,11 +225,11 @@ const ProductDetails = () => {
           <div className="product-detail-section-btns flex items-center justify-between">
             <div className="flex flex-col gap-[10px]">
               <p className="text-[14px] text-gray-800">Quantity</p>
-              <div className="flex items-center">
+              {btn === "Add to Cart" ? <div className="flex items-center">
                 <button className="border-[1px] rounded-md w-[30px] relative h-[30px] text-[20px]" onClick={() => setQuantity(Math.max(1, quantity - 1))} ><p className="absolute bottom-[2px] left-[34%]">-</p></button>
                 <span  className="px-8">{quantity}</span>
                 <button className="border-[1px] rounded-md w-[30px] relative h-[30px] text-[20px]" onClick={() => setQuantity(quantity + 1)}><p className="absolute bottom-[2px] left-[25%]">+</p></button>
-              </div>
+              </div> : ""}
             </div>
             <button onClick={(e) => {
                                       if (btn === "Add to Cart") {

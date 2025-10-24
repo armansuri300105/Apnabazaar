@@ -9,9 +9,6 @@ import DeliveryOption from "./deliveryOption";
 import AddressForm from "./addressForm";
 import { createOrder, getOrder, verifyPayment } from "../../../API/api";
 import Addresses from "./addresses";
-import OrderPage from "./orderPage";
-import {useQuery} from "@tanstack/react-query"
-import CheckoutSkeleton from "./Skeletons/checkoutSkeleton"
 import Loading from "../Loading/loading"
 
 const Checkout = () => {
@@ -22,8 +19,6 @@ const Checkout = () => {
     const [paymentSelected, setPaymentSelected] = useState(0);
     const [addNew, setaddNew] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [orderStatus, setOrderStatus] = useState(false);
-    const [orderId, setOrderId] = useState(null)
     const navigate = useNavigate();
     const [addressForm, setAddressForm] = useState({
         id: "",
@@ -35,13 +30,6 @@ const Checkout = () => {
         phone: "",
         zipcode: "",
         remember: false
-    })
-
-    const {data: orderData, isLoading} = useQuery({
-        queryKey: ["orders"],
-        queryFn: () => getOrder(orderId),
-        select: (res) => (res?.data?.order) || [],
-        enabled: !!orderStatus && !!orderId,
     })
 
     useEffect(() => {
@@ -98,9 +86,8 @@ const Checkout = () => {
                 }
                 setCartItems([]);
                 setLoading(false);
-                setOrderId(data?.orderid);
                 localStorage.removeItem("Cart");
-                setOrderStatus(true);
+                navigate(`/checkout/order/${data?.orderid}`)
             } catch (err) {
                 console.error("COD Order Error:", err);
                 alert("Failed to create COD order.");
@@ -147,9 +134,8 @@ const Checkout = () => {
                         setCartItems([]);
                         setLoading(false)
 
-                        setOrderId(verifyData.orderid)
                         localStorage.removeItem("Cart");
-                        setOrderStatus(true)
+                        navigate(`/checkout/order/${verifyData.orderid}`)
                     } else {
                         setLoading(false)
                         alert("❌ Payment Verification Failed");
@@ -179,11 +165,10 @@ const Checkout = () => {
     if (loading){
         return <Loading/>
     }
-  return isLoading ? <CheckoutSkeleton/> : (
+    return (
     <>
-      <section className="min-h-screen flex justify-center bg-[#f3f3f5]">
-        {orderStatus ? <OrderPage orderData={orderData}/> : 
-        (<div className="checkout-section w-[1200px] relative flex gap-[30px] p-[30px] mt-[50px]">
+      <section className="min-h-screen flex justify-center bg-[#f3f3f5]"> 
+        <div className="checkout-section w-[1200px] relative flex gap-[30px] p-[30px] mt-[50px]">
             <div className="checkout-section-left flex flex-col gap-[30px] w-[600px]">
                 <div className="flex gap-[20px] items-center">
                     <FaArrowLeft onClick={() => navigate(-1)} className="cursor-pointer text-[16px]"/>
@@ -213,7 +198,7 @@ const Checkout = () => {
                 <PaymentOptions count={count} setCount={setCount} paymentSelected={paymentSelected} setPaymentSelected={setPaymentSelected} handleCreateOrder={handleCreateOrder} loading={loading}/>
             </div>
             <OrderDetail cartItems={cartItems} priceDetail={priceDetail}/>
-        </div>)}
+        </div>
       </section>
     </>
   )

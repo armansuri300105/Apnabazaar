@@ -18,11 +18,11 @@ export const FeaturedLocalProducts = () => {
     const {data: recommendedProduct, isLoading: prdLoading} = useQuery({
         queryKey: ["recommendedPrd"],
         queryFn: () => recommendedProducts(user?._id),
-        select: (res) => res?.data,
+        select: (res) => res?.data?.recommendations,
         enabled: !!user
     })
     
-    if (isLoading){
+    if (isLoading && prdLoading){
         return <FavoritesSkeleton/>
     }
 
@@ -39,8 +39,10 @@ export const FeaturedLocalProducts = () => {
                     </div>
                 </div>
                 <div className="w-full mt-8 flex gap-4 flex-wrap justify-center">
-                    {
-                        products && products.slice(0, 10).map((product, index) => {
+                    { user ? products && products?.slice(0,10).map((product, index) => {
+                            return <ProductShow key={index} product={product} />
+                        }) :
+                        recommendedProduct && recommendedProduct?.map((product, index) => {
                             return <ProductShow key={index} product={product} />
                         })
                     }

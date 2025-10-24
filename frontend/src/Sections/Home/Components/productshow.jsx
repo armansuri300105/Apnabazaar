@@ -9,7 +9,7 @@ import CartPopup from "../../Product/cartPopUp";
 import '../home.css'
 
 export const ProductShow= ({product}) =>{
-    const {cartItems, setCartItems, setDataForMl } = useContext(CartProductContext)
+    const {cartItems, setCartItems, setDataForMl, dataForMl } = useContext(CartProductContext)
     const [popUp, setPopUp] = useState(false);
     const updateQuantity = (productId, newQty) => {
         setCartItems(prevCart =>
@@ -29,6 +29,8 @@ export const ProductShow= ({product}) =>{
         return () => clearTimeout(timer);
         }
     }, [popUp]);
+    
+
     const handleAddtoCart = (product) => {
         for (let i=0;i<cartItems.length;i++){
             if (cartItems[i]._id === product._id){
@@ -38,21 +40,51 @@ export const ProductShow= ({product}) =>{
         }
         product["quantity"] = 1;
         setCartItems(prev => [...prev, product])
+
+        setDataForMl(prev => {
+        const updated = {
+          ...prev,
+          products: [
+            ...(prev.products || []),
+            {
+              product: {
+                productID: product?.productID,
+                category: product?.category,
+                name: product?.name
+              },
+              time: new Date(Date.now()).toLocaleString(),
+              duration: 0,
+              event: { type: "add_to_cart", time: new Date(Date.now()).toLocaleString() },
+            },
+          ],
+        };
+
+        localStorage.setItem("interaction", JSON.stringify(updated));
+        return updated;
+      });
     }
 
     const handleClickedData = () => {
-        setDataForMl(prev => ({
-            ...prev,
-            currentView: {
-                product: {
-                    productID: product._id,
-                    category: product?.category,
-                    name: product?.name
-                },
-                startTime: Date.now(),
+        const newView = {
+            product: {
+            productID: product.productID || product._id,
+            category: product?.category,
+            name: product?.name,
             },
-        }));
-    }
+            startTime: Date.now(),
+        };
+
+        setDataForMl(prev => {
+            const updated = {
+            ...prev,
+            currentView: newView,
+            };
+
+            localStorage.setItem("interaction", JSON.stringify(updated));
+
+            return updated;
+        });
+    };
 
     return (
     <NavLink onClick={handleClickedData} to={`/productdetail/${product.productID || product._id}`}>

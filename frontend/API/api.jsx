@@ -1,8 +1,8 @@
 import axios from "axios"
 
 const api = axios.create({
-    // baseURL: "http://localhost:3000",
-    baseURL: "https://apnabazaar-backend-3iwt.onrender.com",
+    baseURL: "http://localhost:3000",
+    // baseURL: "https://apnabazaar-backend-3iwt.onrender.com",
     withCredentials: true
 })
 
@@ -150,4 +150,8 @@ export const getNotifications = () => {
 }
 export const readNotification = (note_id) => {
     return api.put('/api/vendor/readnotification', {note_id})
+}
+
+export const sendCustomerQuery = (data) => {
+    return api.post('/api/user/sendmail', data)
 }
