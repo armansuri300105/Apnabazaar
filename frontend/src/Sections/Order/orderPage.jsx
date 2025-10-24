@@ -3,10 +3,24 @@ import { ArrowRight } from "lucide-react";
 import OrderDetails from "./Parts/OrderDetails"
 import Shipping from "./Parts/Shipping"
 import "./checkout.css"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { getOrder } from "../../../API/api";
+import { useQuery } from "@tanstack/react-query";
+import Loading from "../Loading/loading";
 
-const OrderPage = ({orderData}) => {
+const OrderPage = () => {
   const navigate = useNavigate();
+  const {orderId} = useParams();
+
+  const {data: orderData, isLoading} = useQuery({
+      queryKey: ["orders"],
+      queryFn: () => getOrder(orderId),
+      select: (res) => (res?.data?.order) || [],
+  })
+
+  if (isLoading){
+      return <Loading/>
+  }
   return (
     <section className="flex justify-center bg-gray-100">
       <div className="order-section flex flex-col w-[800px] relative flex-wrap pt-10">

@@ -3,7 +3,7 @@ import USER from "../models/user.js"
 import axios from "axios"
 import bcrypt from "bcrypt"
 import {oauth2Client} from "../services/googleAuth.js"
-import { sendVendorApplicationMail, sendVerificationMail } from "../emails/sendMail.js";
+import { sendCustomerQueryMail, sendVendorApplicationMail, sendVerificationMail } from "../emails/sendMail.js";
 import PRODUCT from "../models/product.js";
 import ORDER from "../models/order.js"
 
@@ -567,4 +567,14 @@ export const updateAddress = async (req,res) => {
     } catch (error) {
         return res.status(500).json({success: false, message: error.message})
     }
+}
+
+export const sendMail = async (req,res) => {
+  try {
+    const data = req.body
+    await sendCustomerQueryMail("arshadmansuri572@gmail.com", data?.name, data?.category, data?.subject, data?.message)
+    return res.status(200).json({success: true, message: "Email sent successfully"})
+  } catch (error) {
+    return res.status(500).json({success: false, message: error.message})
+  }
 }
