@@ -200,7 +200,7 @@ const ContactUs = () => {
               <div className="text-sm text-gray-500 mb-1">
                 Questions about our platform or services
               </div>
-              <div className="font-mono text-sm text-gray-700">hello@Apnabazaar.com</div>
+              <div className="font-mono text-sm text-gray-700">apnabazaarbussiness@gmail.com</div>
               <div className="text-xs text-gray-400">
                 Response: <span className="font-medium text-gray-700">Within 24 hours</span>
               </div>
@@ -211,7 +211,7 @@ const ContactUs = () => {
               <div className="text-sm text-gray-500 mb-1">
                 Help for current and prospective vendors
               </div>
-              <div className="font-mono text-sm text-gray-700">vendor@Apnabazaar.com</div>
+              <div className="font-mono text-sm text-gray-700">apnabazaarbussiness@gmail.com</div>
               <div className="text-xs text-gray-400">
                 Response: <span className="font-medium text-gray-700">Within 12 hours</span>
               </div>

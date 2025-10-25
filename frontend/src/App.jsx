@@ -132,6 +132,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomeBody />} />
         <Route path="/categories" element={<CategoryPage />} />
+        <Route path="/categories/:catname" element={<CategoryPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route

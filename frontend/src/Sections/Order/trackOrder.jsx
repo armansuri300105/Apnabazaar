@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Truck, CheckCircle, Package } from "lucide-react";
-import { getOrderById } from "../../../API/api";
+import { cancelOrder, getOrderById } from "../../../API/api";
 import { useNavigate, useParams } from "react-router-dom";
 import "./checkout.css"
+import CancelForm from "./cancelForm"
 
 export default function TrackOrder() {
     const {orderId} = useParams();
     const navigate = useNavigate();
-    const {data, isLoading} = useQuery({
+    const {data, isLoading, refetch} = useQuery({
         queryKey: ["order"],
         queryFn: () => getOrderById(orderId),
         select: (res) => res?.data || null
@@ -52,6 +53,11 @@ export default function TrackOrder() {
         {/* Back to Orders */}
         <button onClick={() => navigate(-1)} className="text-sm text-gray-600 hover:underline">← Back to Orders</button>
 
+        {order.orderStatus === "Cancelled" ? 
+          <div className="text-red-500 text-xl font-bold">
+            Cancelled
+          </div> : ""
+        }
         {/* Order Info */}
         <div className="bg-white shadow rounded-2xl p-6">
           <div className="flex justify-between items-start">
@@ -80,54 +86,65 @@ export default function TrackOrder() {
           </div>
         </div>
 
-        {/* Order Progress */}
         <div className="bg-white shadow rounded-2xl p-6">
           <h3 className="font-medium text-gray-700 mb-4">Order Progress</h3>
           <div className="track-order-details flex items-center justify-between">
-          {/* Processing */}
-          <div className={`flex flex-col items-center text-center ${
-              ["Processing", "Shipped", "Delivered"].includes(order?.orderStatus)
-                ? "text-black"
-                : "text-gray-400"
-            }`}
-          >
-            <div className="flex items-center space-x-2">
-              <Clock className="w-6 h-6" />
-              <span className="font-medium">Processing</span>
+            {/* Processing */}
+            <div className={`flex flex-col items-center text-center ${
+                ["Processing", "Shipped", "Delivered"].includes(order?.orderStatus)
+                  ? "text-black"
+                  : "text-gray-400"
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <Clock className="w-6 h-6" />
+                <span className="font-medium">Processing</span>
+              </div>
             </div>
-          </div>
 
-          <div className="track-order-bars flex-1 border-t border-gray-300 mx-2"></div>
+            <div className="track-order-bars flex-1 border-t border-gray-300 mx-2"></div>
 
-          {/* Shipped */}
-          <div
-            className={`flex flex-col items-center text-center ${
-              ["Shipped", "Delivered"].includes(order?.orderStatus)
-                ? "text-black"
-                : "text-gray-400"
-            }`}
-          >
-            <div className="flex items-center space-x-2">
-              <Truck className="w-6 h-6" />
-              <span>Shipped</span>
+            {/* Shipped */}
+            <div className={`flex flex-col items-center text-center ${
+                ["Shipped", "Delivered"].includes(order?.orderStatus)
+                  ? "text-black"
+                  : "text-gray-400"
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <Truck className="w-6 h-6" />
+                <span>Shipped</span>
+              </div>
             </div>
-          </div>
 
-          <div className="track-order-bars flex-1 border-t border-gray-300 mx-2"></div>
+            <div className="track-order-bars flex-1 border-t border-gray-300 mx-2"></div>
 
-          {/* Delivered */}
-          <div
-            className={`flex flex-col items-center text-center ${
-              order?.orderStatus === "Delivered" ? "text-black" : "text-gray-400"
-            }`}
-          >
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-6 h-6" />
-              <span>Delivered</span>
+            {/* Delivered */}
+            <div className={`flex flex-col items-center text-center ${
+                order?.orderStatus === "Delivered" ? "text-black" : "text-gray-400"
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-6 h-6" />
+                <span>Delivered</span>
+              </div>
             </div>
+
+            {/* Cancelled */}
+            {order?.orderStatus === "Cancelled" && (
+              <>
+                <div className="track-order-bars flex-1 border-t border-gray-300 mx-2"></div>
+                <div className="flex flex-col items-center text-center text-red-500">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-6 h-6" />
+                    <span>Cancelled</span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
-        </div>
+
 
         {/* Items */}
         <div className="bg-white shadow rounded-2xl p-6">
@@ -153,6 +170,7 @@ export default function TrackOrder() {
             })}
           </div>
         </div>
+        {order.orderStatus=== "Cancelled" ? "" : <CancelForm orderId={orderId} refetch={refetch}/>}
       </div>
     </div>
   );

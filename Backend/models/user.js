@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema(
     addresses: [addressSchema],
     role: {
       type: String,
-      enum: ["customer", "admin", "vendor"],
+      enum: ["customer", "Admin", "vendor"],
       default: "customer",
     },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
@@ -86,6 +86,7 @@ const userSchema = new mongoose.Schema(
       }
     ],
     vendor: vendorSchema,
+    totalSpent: {type: Number}
   },
   { timestamps: true }
 );

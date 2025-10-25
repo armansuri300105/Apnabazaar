@@ -1,6 +1,6 @@
 const FavoritesSkeleton = () => {
   return (
-    <section className="flex flex-wrap gap-[20px] justify-center animate-pulse">
+    <section className="flex flex-wrap gap-[20px] justify-center animate-pulse pt-[20px] pb-[20px]">
       {Array.from({ length: 6 }).map((_, index) => (
         <div
           key={index}

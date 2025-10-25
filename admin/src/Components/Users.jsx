@@ -68,8 +68,8 @@ export default function UsersManagement() {
           <p className="text-xl sm:text-2xl font-bold">
             ₹
             {users.length
-              ? (
-                  users.reduce((sum, u) => sum + (u.spent || 0), 0) / users.length
+              ? Math.floor(
+                  users.reduce((sum, u) => sum + (u.totalSpent || 0), 0) / users.length
                 ).toFixed(2)
               : 0}
           </p>
@@ -133,7 +133,7 @@ export default function UsersManagement() {
                     <p className="text-gray-500">{u.phone}</p>
                   </td>
                   <td className="p-2 sm:p-3">{u?.orders?.length}</td>
-                  <td className="p-2 sm:p-3">₹{u.spent}</td>
+                  <td className="p-2 sm:p-3">{parseFloat(u?.totalSpent.toFixed(2))!==0 ? `₹${Math.floor(u?.totalSpent)}` : "NA"}</td>
                 </tr>
               ))
             )}

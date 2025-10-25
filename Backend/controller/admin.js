@@ -104,12 +104,32 @@ export const getAllOrders = async (req, res) => {
 
 export const getAllUsers = async (req,res) => {
     try {
-        const users = await USER.find().lean()
+        const users = await USER.find().select("email name createdAt phone orders totalSpent").lean()
+
         return res.status(200).send({ success: true, message: `All User`, users})
     } catch (error) {
         res.send({success: false, message: `Unable to get All Users`})
     }
 }
+
+export const calculateTotalSpent = async (req,res) => {
+  const users = await USER.find({}).populate("orders")
+
+  for (const user of users){
+    const orders = user.orders
+    let totalSpent = 0
+    for (const order of orders){
+      totalSpent += order.totalAmount
+    }
+
+    user.totalSpent = totalSpent
+    await user.save()
+  }
+
+
+  return res.status(200).json({success: true, message: "Users updated successfully"})
+}
+
 
 export const getVendors = async (req,res) => {
     try {

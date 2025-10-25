@@ -334,3 +334,64 @@ export const sendCustomerQueryMail = (to, name, category, subject, message) => {
     html,
   });
 };
+
+export const sendCancelledOrderMail = (to, name, orderId, reason, refundStatus) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 40px; text-align: center;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        <img 
+          src="https://res.cloudinary.com/do9m8kc0b/image/upload/v1760161496/esftuk6irpikvltmbevx.png" 
+          alt="ApnaBazaar" 
+          style="width: 140px; margin-bottom: 25px;"
+        />
+
+        <h2 style="color: #e74c3c;">Order Cancelled</h2>
+        <p style="color: #333; font-size: 16px;">Dear ${name},</p>
+
+        <p style="color: #333; font-size: 15px;">
+          We’re writing to inform you that your order <b>#${orderId}</b> has been <b>cancelled</b>.
+        </p>
+
+        <div style="text-align: left; margin: 25px auto; background: #f9f9f9; padding: 20px; border-radius: 8px;">
+          <p><b>Reason for Cancellation:</b></p>
+          <p style="white-space: pre-line; border-left: 3px solid #e74c3c; padding-left: 10px; color: #555;">
+            ${reason || "No specific reason provided."}
+          </p>
+
+          <p style="margin-top: 15px;"><b>Refund Status:</b> ${refundStatus || "Pending"}</p>
+        </div>
+
+        <p style="color: #555; font-size: 15px;">
+          If your payment was already processed, any applicable refund will be issued within <b>5–7 business days</b>.
+        </p>
+
+        <a href="https://apnabazaar.com/orders/${orderId}" style="
+          display: inline-block;
+          margin: 20px 0;
+          padding: 12px 25px;
+          background-color: #e74c3c;
+          color: #fff;
+          text-decoration: none;
+          border-radius: 5px;
+          font-weight: bold;
+        ">View Order Details</a>
+
+        <p style="color: #999; font-size: 13px; margin-top: 20px;">
+          Need help? Contact our support team at 
+          <a href="mailto:support@apnabazaar.com" style="color: #27ae60;">support@apnabazaar.com</a>.
+        </p>
+
+        <p style="color: #999; font-size: 12px; margin-top: 20px;">
+          This is an automated message from ApnaBazaar. Please do not reply directly to this email.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendMail({
+    to,
+    subject: `Order #${orderId} Cancelled`,
+    html,
+  });
+};
