@@ -32,11 +32,11 @@ const Orders = ({user}) => {
                     <div className="relative">
                         <select onChange={(e) => setFilter(e.target.value)} className="bg-gray-100 text-sm w-[100px] rounded-md px-4 appearance-none py-2 focus:outline-none">
                             <option value={"All"}>All Orders</option>
-                            <option value={"processing"}>Processing</option>
-                            <option value={"pending"}>Pending</option>
-                            <option value={"shipped"}>Shipped</option>
-                            <option value={"delivered"}>Delivered</option>
-                            <option value={"cancelled"}>Cancelled</option>
+                            <option value={"Processing"}>Processing</option>
+                            <option value={"Pending"}>Pending</option>
+                            <option value={"Shipped"}>Shipped</option>
+                            <option value={"Delivered"}>Delivered</option>
+                            <option value={"Cancelled"}>Cancelled</option>
                         </select>
                         <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"/>
                     </div>

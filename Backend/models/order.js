@@ -39,6 +39,12 @@ const orderSchema = new mongoose.Schema({
         enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
         default: "Pending"
     },
+
+    cancelInfo: {
+        reason: { type: String, default: "" },
+        note: { type: String, default: "" },
+        cancelledAt: { type: Date }
+    },
     totalAmount: { type: Number, required: true },
     createdAt: { type: Date, default: Date.now }
 }, {timestamps: true})

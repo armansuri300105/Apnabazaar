@@ -73,3 +73,31 @@ export const searchProduct = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getCategories = async (req, res) => {
+  try {
+    const products = await PRODUCT.find({isActive: true});
+
+    const categories = [];
+
+    for (const product of products) {
+      const existingCategory = categories.find(
+        (c) => c.Categoryname === product.category
+      );
+
+      if (existingCategory) {
+        existingCategory.no_of_items += 1;
+      } else {
+        categories.push({
+          Categoryname: product.category,
+          no_of_items: 1,
+          img_link: product.images?.[0] || "",
+        });
+      }
+    }
+
+    return res.status(200).json({ success: true, categories });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

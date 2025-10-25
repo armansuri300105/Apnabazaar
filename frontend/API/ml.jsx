@@ -11,3 +11,9 @@ export const recommendedProducts = (user_id) => {
 export const userSearchMl = (name) => {
     return api.post(`/recommend`, {item_name: name})
 }
+export const recommend_2 = (user_id) => {
+    return api.post('/als-recommend', user_id)
+}
+export const frequentlyBoughtTogether = (product_id) => {
+    return api.post('/frequently-bought-together', {product_id})
+}

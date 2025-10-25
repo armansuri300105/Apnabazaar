@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, CheckCircle, Clock, Package, Eye, EyeIcon } from "lucide-react";
+import { Search, Filter, CheckCircle, Clock, Package, EyeIcon, Ban } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllOrders } from "../../API/product";
 import OrderCard from "./orderDetail"
@@ -32,7 +32,8 @@ export default function Orders() {
     total: orders.length,
     pending: orders.filter((o) => o.orderStatus === "Pending").length,
     processing: orders.filter((o) => o.orderStatus === "Processing").length,
-    completed: orders.filter((o) => o.orderStatus === "Completed").length,
+    completed: orders.filter((o) => o.orderStatus === "Delivered").length,
+    cancelled: orders.filter((o) => o.orderStatus === "Cancelled").length
   };
 
   const filteredOrders = orders.filter((o) => {
@@ -85,6 +86,13 @@ export default function Orders() {
           <div className="flex items-center justify-between">
             <span className="text-lg md:text-2xl font-bold">{stats?.completed}</span>
             <CheckCircle className="text-green-500 w-5 h-5 md:w-6 md:h-6" />
+          </div>
+        </div>
+        <div className="p-3 md:p-4 rounded-xl border bg-white shadow">
+          <p className="text-gray-500 text-sm">Cancelled</p>
+          <div className="flex items-center justify-between">
+            <span className="text-lg md:text-2xl font-bold">{stats?.cancelled}</span>
+            <Ban className="text-red-500 w-5 h-5 md:w-6 md:h-6" />
           </div>
         </div>
       </div>
@@ -153,7 +161,7 @@ export default function Orders() {
                     {o?.orderStatus}
                   </span>
                 </td>
-                <td className="p-3 font-semibold">${o?.totalAmount?.toFixed(2)}</td>
+                <td className="p-3 font-semibold">₹{o?.totalAmount?.toFixed(2)}</td>
                 <td onClick={() => {setIsOpenDetail(true); setSelectedOrder(o)}} className="p-3 text-blue-600 cursor-pointer flex gap-[7px]"><EyeIcon className="w-[14px]"/> View</td>
               </tr>
             ))}
@@ -187,7 +195,7 @@ export default function Orders() {
             <p className="text-sm">{o?.user?.name}</p>
             <p className="text-xs text-gray-500">{o?.user?.email}</p>
             <p className="text-sm">📅 {o?.createdAt}</p>
-            <p className="text-sm font-bold">💰 ${o?.totalAmount?.toFixed(2)}</p>
+            <p className="text-sm font-bold">💰 ₹{o?.totalAmount?.toFixed(2)}</p>
             <button onClick={() => {setIsOpenDetail(true); setSelectedOrder(o)}} className="text-blue-600 text-sm mt-1 flex gap-[7px]"><EyeIcon className="w-[14px]"/> View</button>
           </div>
         ))}

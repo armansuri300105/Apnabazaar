@@ -1,8 +1,8 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "http://localhost:3000",
-    // baseURL: "https://apnabazaar-backend-3iwt.onrender.com",
+    // baseURL: "http://localhost:3000",
+    baseURL: "https://apnabazaar-backend-3iwt.onrender.com",
     withCredentials: true
 })
 
@@ -16,6 +16,10 @@ export const getProductByCat = (cat) => {
 
 export const getProductsById = (id) => {
     return api.get(`/api/product/getbyid?id=${id}`)
+}
+
+export const getCategories = () => {
+    return api.get('/api/product/getcategories')
 }
 
 export const signup = (userData) => {
@@ -50,6 +54,9 @@ export const verifyPayment = (credentials) => {
     return api.post('/api/order/verifypayment', credentials)
 }
 
+export const cancelOrder = (data) => {
+    return api.post('/api/user/cancelorder', data)
+}
 export const updateWishlist = (Productid) => {
     return api.post(`/api/user/wishlist/${Productid}`)
 }

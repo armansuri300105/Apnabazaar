@@ -3,7 +3,7 @@ import USER from "../models/user.js"
 import axios from "axios"
 import bcrypt from "bcrypt"
 import {oauth2Client} from "../services/googleAuth.js"
-import { sendCustomerQueryMail, sendVendorApplicationMail, sendVerificationMail } from "../emails/sendMail.js";
+import { sendCancelledOrderMail, sendCustomerQueryMail, sendVendorApplicationMail, sendVerificationMail } from "../emails/sendMail.js";
 import PRODUCT from "../models/product.js";
 import ORDER from "../models/order.js"
 
@@ -289,32 +289,49 @@ export const addVendor = async (req, res) => {
   }
 };
 
-export const interection = async (req,res) => {
-    const data = req.body
-    try {
-        const user = await USER.findById(data?.user)
-        if (!user){
-            return res.status(404).json({success: false, message: "User Not Found"})
-        }
-        const userHistory = data?.products.map(product => {
-            return {
-                productID: product?.product?.productID,
-                event: {
-                    type: product?.event?.type,
-                    timeStamp: product?.event?.time
-                },
-                time: product?.time,
-                duration: product?.duration
-            }
-        })
-        user.history = [...user.history, ...userHistory]
+export const interection = async (req, res) => {
+  const data = req.body;
 
-        await user.save()
-        res.status(200).json({success: true, message: "Data saved Successfully"})
-    } catch (error) {
-        res.status(500).json({success: false, message: error.message})
+  try {
+    const user = await USER.findById(data?.user);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User Not Found" });
     }
-}
+
+
+    const userHistory = (data?.products || [])
+      .filter(p => p?.product && Object.keys(p.product).length > 0)
+      .map(p => {
+        const duration = Number(p?.duration);
+        return {
+          productID: p?.product?.productID,
+          event: {
+            type: p?.event?.type || "unknown",
+            timeStamp: p?.event?.time || new Date().toISOString(),
+          },
+          time: p?.time || new Date().toISOString(),
+          duration: !isNaN(duration) ? duration : 0,
+        };
+      });
+
+    if (userHistory.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No valid product data to save",
+      });
+    }
+
+    user.history = [...user.history, ...userHistory];
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Data saved successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export const addRatingReview = async (req,res) => {
   try {
@@ -574,6 +591,37 @@ export const sendMail = async (req,res) => {
     const data = req.body
     await sendCustomerQueryMail("arshadmansuri572@gmail.com", data?.name, data?.category, data?.subject, data?.message)
     return res.status(200).json({success: true, message: "Email sent successfully"})
+  } catch (error) {
+    return res.status(500).json({success: false, message: error.message})
+  }
+}
+
+export const cancelOrder = async (req,res) => {
+  try {
+    const user_id = req.user._id
+    const {orderId, reason, note} = req.body
+    console.log(orderId)
+    const order = await ORDER.findOne({orderId})
+    if (!order){
+      return res.status(404).json({success: false, message: "Order not found!"})
+    }
+
+    if (["Delivered", "Cancelled"].includes(order.orderStatus)) {
+      return res.status(400).json({ success: false, message: "Order cannot be cancelled" });
+    }
+
+    order.orderStatus = "Cancelled"
+    order.cancelInfo = {
+      reason,
+      note,
+      cancelledAt: Date.now()
+    }
+    await order.save()
+    const user = await USER.findById(user_id)
+    user.totalSpent -= order.totalAmount
+    await user.save()
+    await sendCancelledOrderMail(user.email, user.name, order.orderId, reason, "Completed")
+    return res.status(200).json({success: true, message: "order cancelled successfully!"})
   } catch (error) {
     return res.status(500).json({success: false, message: error.message})
   }

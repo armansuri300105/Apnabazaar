@@ -119,6 +119,10 @@ export const CreateOrder =  async (req, res) => {
             isRead: false,
           })
         }
+
+        const user = await USER.findById(newOrderData.user)
+        user.totalSpent += totalAmount
+        await user.save()
         await sendOrderConfirmation(OrderData?.user?.email, OrderData.user?.name, newOrderData?.orderId, OrderData?.items, newOrderData?.totalAmount)
         return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder._id });
     }
@@ -128,6 +132,7 @@ export const CreateOrder =  async (req, res) => {
         currency: 'INR',
         receipt: orderId
     };
+
     try {
         const order = await instance.orders.create(orderOptions);
         res.json({
@@ -251,6 +256,9 @@ export const verifyPayment =  async (req, res) => {
             isRead: false,
           })
         }
+        const user = await USER.findById(newOrderData.user)
+        user.totalSpent += totalAmount
+        await user.save()
         await sendOrderConfirmation(orderData?.user?.email, orderData.user?.name, newOrderData?.orderId, orderData.items, newOrderData?.totalAmount)
         return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder._id });
     } catch (error) {
@@ -262,27 +270,29 @@ export const verifyPayment =  async (req, res) => {
   }
 };
 
-export const getOrders = async (req,res) => {
+export const getOrders = async (req, res) => {
   try {
-    const userId = req?.user?._id
-    const user = await USER.findById(userId).populate({
-      path: "orders",
-      populate: {
-        path: "items.product",
-        model: "Product",
-        select: "name price images"
-      }
-    })
+    const userId = req?.user?._id;
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!userId) {
+      return res.status(400).json({ message: "User ID not provided" });
     }
-    
-    res.status(200).json({ orders: user.orders });
+
+    const orders = await ORDER.find({ user: userId }).select("orderId items totalAmount createdAt orderStatus").populate({
+      path: "items.product",
+      model: "Product",
+      select: "name price images"
+    });
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for this user" });
+    }
+
+    res.status(200).json({ orders });
   } catch (error) {
-    return res.status(500).json({ message: 'Error saving order', error });
+    return res.status(500).json({ message: "Error fetching orders", error });
   }
-}
+};
 
 export const getOrder = async (req,res) => {
   const {id} = req.query
