@@ -50,7 +50,7 @@ const Profile = () => {
 
         <div className="profile-section-box bg-white shadow rounded-xl p-6 flex justify-between items-center mb-6">
           <div className="profile-view-section flex items-center gap-4">
-            <img src="/profile.jpg" alt="profile" className="w-20 h-20 rounded-full object-cover" />
+            <img src="/profile.webp" alt="profile" className="w-20 h-20 rounded-full object-cover" />
             <div>
               <h2 className="text-xl font-bold">{user?.name}</h2>
               <p className="text-gray-500">{user?.email}</p>

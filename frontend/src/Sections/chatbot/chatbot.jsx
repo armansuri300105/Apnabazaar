@@ -2,15 +2,16 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, MessageCircle } from "lucide-react";
 import { sendInputToBot } from "../../../API/api";
-import { send } from "../../../API/chat";
+import AIChat from "./AIChat"; // 👈 import the AI chat component
 
 const ChatBot = () => {
   const [open, setOpen] = useState(false);
+  const [switchToAI, setSwitchToAI] = useState(false); // 👈 state to switch mode
   const [messages, setMessages] = useState([
     {
       from: "bot",
       text: "👋 Hello Betwa! Welcome to ApnaBazzar! How may I help you today?",
-      options: ["Order Related", "Product Related", "Others"],
+      options: ["Order Related", "Product Related", "Chat with AI Assistant", "Others"],
     },
   ]);
   const [input, setInput] = useState("");
@@ -21,6 +22,12 @@ const ChatBot = () => {
     const userInput = customInput || input.trim();
     if (!userInput) return;
 
+    // ✅ if user selects AI assistant
+    if (userInput.toLowerCase() === "chat with ai assistant") {
+      setSwitchToAI(true);
+      return;
+    }
+
     const newMessages = [...messages, { from: "user", text: userInput }];
     setMessages(newMessages);
     setInput("");
@@ -28,7 +35,6 @@ const ChatBot = () => {
 
     try {
       const res = await sendInputToBot(userInput);
-      // const res2 = await send(userInput);
       const botMessage = res?.data?.message || "Sorry, I didn’t understand that 😅";
       const botOptions = res?.data?.options || [];
 
@@ -47,17 +53,17 @@ const ChatBot = () => {
     }
   };
 
-  const handleOptionClick = (option) => {
-    handleSend(option);
-  };
+  const handleOptionClick = (option) => handleSend(option);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
+  // 👇 If user switched to AI, show AIChat instead
+  if (switchToAI) return <AIChat onExit={() => setSwitchToAI(false)} />;
+
   return (
     <>
-      {/* Floating Button */}
       <motion.button
         whileTap={{ scale: 0.9 }}
         whileHover={{ scale: 1.05 }}
@@ -67,7 +73,6 @@ const ChatBot = () => {
         <MessageCircle size={26} />
       </motion.button>
 
-      {/* Chat Window with Animation */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -77,21 +82,11 @@ const ChatBot = () => {
               opacity: 1,
               scale: 1,
               y: 0,
-              transition: {
-                type: "spring",
-                stiffness: 120,
-                damping: 12,
-              },
+              transition: { type: "spring", stiffness: 120, damping: 12 },
             }}
-            exit={{
-              opacity: 0,
-              scale: 0.8,
-              y: 30,
-              transition: { duration: 0.25 },
-            }}
+            exit={{ opacity: 0, scale: 0.8, y: 30, transition: { duration: 0.25 } }}
             className="fixed bottom-[100px] max-w-[80vw] right-6 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden z-50"
           >
-            {/* Header */}
             <div className="bg-[#4F46E5] text-white p-3 font-semibold flex justify-between items-center">
               <span>🛍️ ApnaBazzar Support</span>
               <button onClick={() => setOpen(false)} className="text-white text-sm">
@@ -99,7 +94,6 @@ const ChatBot = () => {
               </button>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 p-3 overflow-y-auto max-h-[400px]">
               {messages.map((msg, i) => (
                 <div
@@ -122,7 +116,6 @@ const ChatBot = () => {
                 </div>
               ))}
 
-              {/* Options */}
               {messages[messages.length - 1]?.from === "bot" &&
                 messages[messages.length - 1]?.options?.length > 0 && (
                   <motion.div
@@ -146,11 +139,9 @@ const ChatBot = () => {
               {isLoading && (
                 <div className="text-gray-500 text-xs italic mt-2">Bot is typing...</div>
               )}
-
               <div ref={chatEndRef} />
             </div>
 
-            {/* Input */}
             <div className="p-2 border-t flex items-center bg-gray-50">
               <input
                 type="text"

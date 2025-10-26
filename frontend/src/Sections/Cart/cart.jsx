@@ -43,7 +43,7 @@ const Cart = ({setCmenu}) => {
   return (
     <>
       <section className="w-[450px] max-w-[100vw] bg-white h-screen relative">
-        <div className="p-[30px]">
+        <div className="p-[30px] flex flex-col items-center">
             <div className="flex justify-between w-[100%]">
                 <div className="flex gap-[7px] items-center">
                     <FiShoppingBag className="text-xl"/>
@@ -74,7 +74,8 @@ const Cart = ({setCmenu}) => {
                 )
             }
             </div>
-            {cartItems.length===0 ? "" : <div className="w-[100%] flex flex-col gap-[20px] absolute bottom-[20px] justify-center">
+            {cartItems.length===0 ? "" : 
+            <div className="w-[100%] flex flex-col gap-[20px] absolute bottom-[20px] items-center">
                 <div className="flex h-[100px] flex-col gap-[7px] w-[85%] border-t-2 border-[#ececf0] border-b-2 py-[7px]">
                     <div className="flex justify-between items-center">
                         <p>Subtotal</p>
@@ -93,9 +94,9 @@ const Cart = ({setCmenu}) => {
                     <p>Total</p>
                     <p>₹{parseFloat(priceDetail?.total).toFixed(2)}</p>
                 </div>
-                <div className="flex flex-col gap-[5px]">
-                    <button onClick={handleCheckout} className="w-[90%] h-[35px] bg-black text-white rounded-md">Checkout</button>
-                    <button onClick={handleContinue} className="w-[90%] h-[35px] text-[13px] rounded-md text-black border-black border-[1px] bg-white">Continue Shopping</button>
+                <div className="flex flex-col gap-[5px] w-[90%]">
+                    <button onClick={handleCheckout} className="w-[100%] h-[35px] bg-black text-white rounded-md">Checkout</button>
+                    <button onClick={handleContinue} className="w-[100%] h-[35px] text-[13px] rounded-md text-black border-black border-[1px] bg-white">Continue Shopping</button>
                 </div>
             </div>}
         </div>

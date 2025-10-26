@@ -12,7 +12,7 @@ export const Story = ()=>{
                     Local Commerce
                 </div>
                 <div className="about-story-detail text-[15.75px] text-[#717182] mb-[21px]">
-                    Founded in 2020, Apnabazaar was born from a simple belief: communities thrive when neighbors support
+                    Founded in 2025, Apnabazaar was born from a simple belief: communities thrive when neighbors support
                     each other. We're building a platform where local producers can reach more customers while shoppers
                     discover the best their community has to offer
                 </div>

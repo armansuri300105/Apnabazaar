@@ -21,6 +21,7 @@
 @media screen and (max-width: 1000px) {
     .checkout-section{
         flex-direction: column;
+        width: 900px;
     }
     .checkout-section-left{
         width: 90vw;
@@ -38,12 +39,13 @@
 }
 @media screen and (max-width: 750px) {
     .checkout-section{
-        padding: 20px;
+        margin-left: 0;
+        width: 90vw;
     }
 }
 @media screen and (max-width: 600px) {
     .checkout-section{
-        padding: 10px;
+        margin-left: 0;
     }
     .order-section{
         width: 80vw;

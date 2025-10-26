@@ -27,11 +27,10 @@ export const ProductTemplate = ({item}) => {
     }
   return (
     <>
-        <div className="flex items-center justify-between border border-gray-200 rounded-lg p-3 w-full">
+        <div className="grid gap-[10px] grid-cols-[20vw_60vw] mobile:grid-cols-[56px_210px_50px_40px] items-center justify-between border border-gray-200 rounded-lg p-3 w-full overflow-hidden">
             <img src={item?.images[0]} alt={item?.name} className="w-14 h-14 object-cover rounded-md"/>
             <div className="flex flex-col flex-1 ml-3">
-                <div className="font-semibold">{item?.name}</div>
-                <div className="text-sm text-blue-500">{item?.store}</div>
+                <div className="font-semibold truncate w-[60vw] mobile:w-48">{item?.name}</div>
                 <div className="font-bold mt-1">₹{item?.price?.toFixed(2)}</div>
             </div>
             <div className="flex items-center gap-2">

@@ -395,3 +395,122 @@ export const sendCancelledOrderMail = (to, name, orderId, reason, refundStatus) 
     html,
   });
 };
+
+export const sendForgotPasswordEmail = (to, name, resetLink) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 40px; text-align: center;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        <img 
+          src="https://res.cloudinary.com/do9m8kc0b/image/upload/v1760161496/esftuk6irpikvltmbevx.png" 
+          alt="ApnaBazaar" 
+          style="width: 140px; margin-bottom: 25px;"
+        />
+
+        <h2 style="color: #0f172a;">Reset Your Password</h2>
+        <p style="color: #333; font-size: 16px;">Dear ${name || "User"},</p>
+
+        <p style="color: #333; font-size: 15px;">
+          We received a request to reset the password for your ApnaBazaar account.
+          If you made this request, please click the button below to set a new password.
+        </p>
+
+        <a href="${resetLink}" target="_blank" style="
+          display: inline-block;
+          margin: 25px 0;
+          padding: 12px 25px;
+          background-color: #0f172a;
+          color: #fff;
+          text-decoration: none;
+          border-radius: 5px;
+          font-weight: bold;
+        ">Reset Password</a>
+
+        <div style="text-align: left; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-top: 20px;">
+          <p style="font-size: 14px; color: #555;">
+            🔒 <b>Security Notice:</b><br>
+            For your protection, this link will expire in <b>15 minutes</b>.
+            If you didn’t request a password reset, you can safely ignore this email — your password will remain unchanged.
+          </p>
+        </div>
+
+        <p style="color: #555; font-size: 15px; margin-top: 25px;">
+          If you continue to experience issues, please reach out to our support team.
+        </p>
+
+        <p style="color: #999; font-size: 13px; margin-top: 20px;">
+          Need help? Contact us at 
+          <a href="mailto:support@apnabazaar.com" style="color: #0f172a;">support@apnabazaar.com</a>.
+        </p>
+
+        <p style="color: #999; font-size: 12px; margin-top: 20px;">
+          This is an automated message from ApnaBazaar. Please do not reply directly to this email.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendMail({
+    to,
+    subject: "Reset Your Password - ApnaBazaar",
+    html,
+  });
+};
+
+export const sendPasswordResetSuccessMail = (to, name) => {
+  const html = `
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f4f7; padding: 40px; text-align: center;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+        <img 
+          src="https://res.cloudinary.com/do9m8kc0b/image/upload/v1760161496/esftuk6irpikvltmbevx.png" 
+          alt="ApnaBazaar" 
+          style="width: 140px; margin-bottom: 25px;"
+        />
+
+        <h2 style="color: #16a34a;">Password Changed Successfully</h2>
+        <p style="color: #333; font-size: 16px;">Hello ${name},</p>
+
+        <p style="color: #444; font-size: 15px;">
+          This is a confirmation that your password for your <b>ApnaBazaar</b> account has been successfully reset.
+        </p>
+
+        <div style="text-align: left; margin: 25px auto; background: #f9f9f9; padding: 20px; border-radius: 8px;">
+          <p style="font-size: 14px; color: #555;">
+            If you did not request this change, please <b>reset your password immediately</b> or contact our support team.
+          </p>
+        </div>
+
+        <a href="https://apnabazaar.com/signin" style="
+          display: inline-block;
+          margin: 20px 0;
+          padding: 12px 25px;
+          background-color: #16a34a;
+          color: #fff;
+          text-decoration: none;
+          border-radius: 5px;
+          font-weight: bold;
+        ">Go to Login</a>
+
+        <p style="color: #777; font-size: 14px; margin-top: 20px;">
+          For your security, we recommend not sharing your password with anyone.
+        </p>
+
+        <p style="color: #999; font-size: 13px; margin-top: 20px;">
+          Need help? Contact our support team at 
+          <a href="mailto:support@apnabazaar.com" style="color: #27ae60;">support@apnabazaar.com</a>.
+        </p>
+
+        <p style="color: #999; font-size: 12px; margin-top: 20px;">
+          This is an automated message from ApnaBazaar. Please do not reply directly to this email.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendMail({
+    to,
+    subject: "Your Password Has Been Reset - ApnaBazaar",
+    html,
+  });
+};

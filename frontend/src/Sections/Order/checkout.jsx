@@ -168,7 +168,7 @@ const Checkout = () => {
     return (
     <>
       <section className="min-h-screen flex justify-center bg-[#f3f3f5]"> 
-        <div className="checkout-section w-[1200px] relative flex gap-[30px] p-[30px] mt-[50px]">
+        <div className="checkout-section w-[1200px] relative flex gap-[30px] ml-[30px] mt-[50px] justify-center">
             <div className="checkout-section-left flex flex-col gap-[30px] w-[600px]">
                 <div className="flex gap-[20px] items-center">
                     <FaArrowLeft onClick={() => navigate(-1)} className="cursor-pointer text-[16px]"/>

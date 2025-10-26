@@ -111,7 +111,7 @@ const Reviews = ({ product, refetch }) => {
 
       {product?.reviews.map((r, idx) => (
         <div key={idx} className="grid grid-cols-[50px_1fr_100px] gap-4 border-b pb-4">
-          <img className="w-12 h-12 rounded-full" src="/profile.jpg" alt="profile" />
+          <img className="w-12 h-12 rounded-full" src="/profile.webp" alt="profile" />
           <div>
             <div className="flex gap-4 items-center flex-wrap">
               <p className="font-medium">{r?.username}</p>

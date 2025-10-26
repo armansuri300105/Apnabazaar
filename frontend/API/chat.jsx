@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "http://172.16.104.68:8001/docs#/default/chat_ai_endpoint_chat_ai_get",
+    baseURL: "http://172.16.104.68:8001/chat_ai_endpoint_chat_ai_get",
     withCredentials: true
 })
 

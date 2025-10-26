@@ -37,7 +37,7 @@ export const NavBar = () =>{
             (<nav className="navbar-section flex justify-around items-center w-[1200px]">
                 <div className="logo flex items-center">
                     <div>
-                        <NavLink to="/"><div className="font-semibold"><img className="w-[150px]" src="/logo.png" alt="ApnaBazaar" /></div></NavLink>
+                        <NavLink to="/"><div className="font-semibold"><img className="w-[150px]" src="/logo.webp" alt="ApnaBazaar" /></div></NavLink>
                     </div>
                 </div>
                 <ul className={`options flex gap-8 justify-between cursor-pointer text-[20px]`}>
@@ -56,7 +56,7 @@ export const NavBar = () =>{
                 <div className="icons flex gap-[15px] items-center">
                     {checkAuth ? 
                         (<NavLink to="/profile"><div className="w-[40px] h-[40px] relative rounded-[50%] group">
-                            <img className="cursor-pointer w-[40px] h-[40px] rounded-[50%]" src="/profile.jpg" alt="" />
+                            <img className="cursor-pointer w-[40px] h-[40px] rounded-[50%]" src="/profile.webp" alt="" />
                             <div className="absolute top-[50px] w-fit hidden bg-black/70 backdrop-blur-sm group-hover:block"><p className="text-white px-[5px] py-[2px] text-[11px]">Profile</p></div>
                         </div></NavLink>) : 
                         (<NavLink to="/signup">

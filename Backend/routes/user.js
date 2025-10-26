@@ -1,5 +1,5 @@
 import express from "express"
-import { authCheck, deleteWishlist, googleLogin, login, signup, sendVerification,  updateWishlist, verify, verifyEmail, logout, getWishlist, updateUser, addVendor, interection, addRatingReview, editReview, deleteReview, chat, updateAddress, sendMail, cancelOrder } from "../controller/user.js";
+import { authCheck, deleteWishlist, googleLogin, login, signup, generateResetLink, resetPassword, sendVerification,  updateWishlist, verify, verifyEmail, logout, getWishlist, updateUser, addVendor, interection, addRatingReview, editReview, deleteReview, chat, updateAddress, sendMail, cancelOrder } from "../controller/user.js";
 import { auth } from "../services/auth.js";
 import { calculateTotalSpent } from "../controller/admin.js";
 
@@ -27,5 +27,7 @@ router.put('/updateaddress', auth, updateAddress)
 router.post('/sendmail', auth, sendMail);
 router.get('/calculateTotalSpent', calculateTotalSpent)
 router.post('/cancelorder', auth, cancelOrder)
+router.post('/generateresetlink', generateResetLink)
+router.post('/resetpassword', resetPassword)
 
 export default router

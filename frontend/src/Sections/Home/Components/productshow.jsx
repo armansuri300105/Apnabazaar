@@ -15,7 +15,7 @@ export const ProductShow= ({product}) =>{
     const updateQuantity = (productId, newQty) => {
         setCartItems(prevCart =>
             prevCart.map(item =>
-            item.id === productId
+            item.productID === productId
                 ? { ...item, quantity: newQty }
                 : item
             )
@@ -35,7 +35,7 @@ export const ProductShow= ({product}) =>{
     const handleAddtoCart = (product) => {
         for (let i=0;i<cartItems.length;i++){
             if (cartItems[i]?.productID === product?.productID){
-                updateQuantity(cartItems[i].id, cartItems[i].quantity+1)
+                updateQuantity(cartItems[i].productID, cartItems[i].quantity+1)
                 return;
             }
         }

@@ -1,4 +1,5 @@
 import { Calendar, Truck } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 export default function Shipping({orderData}) {
   return (
@@ -33,9 +34,9 @@ export default function Shipping({orderData}) {
         </span>
       </div>
 
-      <button className="w-full py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
+      <NavLink to={`/orders/${orderData?.orderId}`}><button className="w-full py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
         Track Your Order
-      </button>
+      </button></NavLink>
     </div>
   );
 }

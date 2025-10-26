@@ -107,7 +107,7 @@ export default function SigninForm() {
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="w-full max-w-md p-8 rounded-lg">
         <div className="flex justify-center mb-4">
-          <div className="font-semibold"><img className="w-[150px]" src="/logo.png" alt="ApnaBazaar" /></div>
+          <div className="font-semibold"><img className="w-[150px]" src="/logo.webp" alt="ApnaBazaar" /></div>
         </div>
         {errorMessage && (
           <LoginError message={errorMessage} onClose={() => setErrorMessage("")} />
@@ -136,13 +136,10 @@ export default function SigninForm() {
           {/* Password */}
           <div>
             <label className="text-[13px] ml-[3px] font-medium">Password</label>
-            <div  className="relative w-full">
+            <div  className="relative w-full mb-[10px]">
                 <FiLock className="absolute left-3 top-[8px] text-gray-600" />
                 <input type={eye1 ? "text" : "password"} name="password" placeholder="Create a strong password" value={formData.password} onChange={handleChange} className=" outline-none bg-[#f3f3f5] w-full pl-10 pr-3 h-[30px] border rounded-md text-sm"/>
                 <Icon1 onClick={() => setEye1(!eye1)} className="absolute cursor-pointer right-3 top-[8px] text-gray-600"/>
-                <p className="text-xs text-gray-500 mt-1">
-                  Must be at least 8 characters with numbers and letters
-                </p>
             </div>
           </div>
           <NavLink to="/user/forgotpassword" className="text-blue-600 text-[12px]">Forgot Password</NavLink>
