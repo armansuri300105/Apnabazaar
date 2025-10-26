@@ -117,7 +117,7 @@ export default function UsersManagement() {
                 <tr key={index} className="border-b hover:bg-gray-50">
                   <td className="p-2 sm:p-3 flex items-center gap-2 sm:gap-3">
                     <img
-                      src={u?.avatar || `/profile.jpg`}
+                      src={u?.avatar || `/profile.webp`}
                       alt={u.name}
                       className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
                     />

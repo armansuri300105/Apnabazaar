@@ -11,7 +11,7 @@ export const FooterSection = ({loadinguser}) => {
       <footer className="bg-gray-50 border-t border-gray-200 px-6">
         <div className="footer-grid max-w-7xl mx-auto grid grid-cols-4 gap-12 p-[50px]">
           <div>
-            <NavLink to="/"><div className="font-semibold mb-[25px]"><img className="w-[150px]" src="/logo.png" alt="ApnaBazaar" /></div></NavLink>
+            <NavLink to="/"><div className="font-semibold mb-[25px]"><img className="w-[150px]" src="/logo.webp" alt="ApnaBazaar" /></div></NavLink>
             <p className="text-[12px] text-gray-600 mb-4">
               Connecting communities with fresh, local products from trusted vendors. Support your neighborhood while enjoying quality goods.
             </p>
@@ -25,22 +25,22 @@ export const FooterSection = ({loadinguser}) => {
           <div>
             <h4 className="font-semibold mb-3">Quick Links</h4>
             <ul className="space-y-2 text-[12px] text-gray-700">
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">How It Works</a></li>
-              <li><a href="#">Become a Vendor</a></li>
-              <li><a href="#">Delivery Info</a></li>
-              <li><a href="#">Help & Support</a></li>
+              <li><NavLink to='/about'>About Us</NavLink></li>
+              <li><NavLink to='/'>How It Works</NavLink></li>
+              <li><NavLink to='/vendor/form'>Become a Vendor</NavLink></li>
+              <li><NavLink to='/'>Delivery Info</NavLink></li>
+              <li><NavLink to='/'>Help & Support</NavLink></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold mb-3">Categories</h4>
             <ul className="space-y-2 text-[12px] text-gray-700">
-              <li><a href="#">Fresh Produce</a></li>
-              <li><a href="#">Dairy & Eggs</a></li>
-              <li><a href="#">Bakery</a></li>
-              <li><a href="#">Meat & Seafood</a></li>
-              <li><a href="#">Artisan Crafts</a></li>
+              <li><NavLink to='/categories/Dry%20Fruits'>Dry Fruits</NavLink></li>
+              <li><NavLink to='/categories/Home%20%26%20Cleaning%20Essentials'>Home & Cleaning Essentials</NavLink></li>
+              <li><NavLink to='/categories/Groceries%20%26%20Staples'>Groceries & Staples</NavLink></li>
+              <li><NavLink to='/categories/Fruits%20%26%20Vegetables'>Fruits & Vegetables</NavLink></li>
+              <li><NavLink to='/categories/Personal%20Care'>Personal Care</NavLink></li>
             </ul>
           </div>
 
@@ -62,10 +62,10 @@ export const FooterSection = ({loadinguser}) => {
             </form>
             <div className="text-sm text-gray-700 flex flex-col space-y-1">
               <span>
-                <span className="font-medium">✉</span> hello@apnabazaar.com
+                <span className="font-medium">✉</span> apnabazaarbussiness.com
               </span>
               <span>
-                <span className="font-medium">☎</span> (555) 123-4567
+                <span className="font-medium">☎</span> 8529921648
               </span>
             </div>
           </div>

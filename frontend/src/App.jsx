@@ -30,6 +30,7 @@ import SendVerification from "./Sections/User/sendVerification";
 import VerifyAccount from "./Sections/User/verifyAccount";
 import ForgotPassword from "./Sections/User/forgotPassword";
 import OrderPage from "./Sections/Order/orderPage";
+import ResetPassword from "./Sections/User/resetPassword";
 
 const GOOGLE_CLIENT_ID = "316084868865-6cm9ag49f38mgqp25ttja2i61cbjbl6l.apps.googleusercontent.com";
 
@@ -68,7 +69,7 @@ const App = () => {
   const [items, setItems] = useState(0);
   const [cmenu, setCmenu] = useState(false);
   const location = useLocation();
-  const isSignupPage = ["/signup", "/signin", "/checkout" ,"/vendor/dashboard", "/user/verify", "/user/forgotpassword"].includes(location.pathname) || location.pathname.startsWith("/user/verify/") || location.pathname.startsWith("/checkout/order/");;
+  const isSignupPage = ["/signup", "/signin", "/checkout" ,"/vendor/dashboard", "/user/verify", "/user/forgotpassword"].includes(location.pathname) || location.pathname.startsWith("/user/verify/") || location.pathname.startsWith("/checkout/order/") || location.pathname.startsWith("/reset-password/");;
 
   useEffect(() => {
     const sendInteractionData = async () => {
@@ -163,6 +164,7 @@ const App = () => {
         <Route path="/user/verify/:verificationcode" element={<VerifyAccount/>} />
         <Route path="/user/forgotpassword" element={<ForgotPassword/>} />
         <Route path="/checkout/order/:orderId" element={<OrderPage/>} />
+        <Route path="/reset-password/:verificationToken" element={<ResetPassword/>} />
       </Routes>
 
       {!isSignupPage && <FooterSection loadinguser={isLoading} />}

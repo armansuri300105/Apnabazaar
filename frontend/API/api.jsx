@@ -1,8 +1,8 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "http://localhost:3000",
-    // baseURL: "https://apnabazaar-backend-3iwt.onrender.com",
+    // baseURL: "http://localhost:3000",
+    baseURL: "https://apnabazaar-backend-3iwt.onrender.com",
     withCredentials: true
 })
 
@@ -36,6 +36,14 @@ export const verifyEmail = (code) => {
 
 export const signin = (userData) => {
     return api.post('/api/user/login', userData)
+}
+
+export const forgotPassword = (email) => {
+    return api.post('/api/user/generateresetlink', {email})
+}
+
+export const resetPassword = (data) => {
+    return api.post('/api/user/resetpassword', data)
 }
 
 export const googleLogin = (code) => {

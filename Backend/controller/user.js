@@ -3,17 +3,19 @@ import USER from "../models/user.js"
 import axios from "axios"
 import bcrypt from "bcrypt"
 import {oauth2Client} from "../services/googleAuth.js"
-import { sendCancelledOrderMail, sendCustomerQueryMail, sendVendorApplicationMail, sendVerificationMail } from "../emails/sendMail.js";
+import { sendCancelledOrderMail, sendCustomerQueryMail, sendVendorApplicationMail, sendVerificationMail, sendForgotPasswordEmail, sendPasswordResetSuccessMail } from "../emails/sendMail.js";
 import PRODUCT from "../models/product.js";
 import ORDER from "../models/order.js"
+import jwt from "jsonwebtoken";
 
 export const signup = async (req,res) => {
   try {
     const {name, email, phone, password} = req.body;
     const user = await USER.findOne({email});
     if (user){
-        return res.json({message: "This Email already registered"})
+        return res.json({success: false, message: "This Email already registered"})
     }
+
     const saltround = 11;
     const hashedpass = await bcrypt.hash(password, saltround);
     const verificationToken =  Math.floor(100000 + Math.random() * 900000)
@@ -99,6 +101,63 @@ export const verifyEmail = async (req,res) => {
 
     return res.status(200).json({ success: true, message: "User verified successfully" });
 }
+
+export const generateResetLink = async (req, res) => {
+  try {
+    const {email} = req.body;
+    const user = await USER.findOne({ email });
+    if (!user) {
+      return res.json({ success: false, message: "User not registered" });
+    }
+
+    const verificationToken = jwt.sign(
+      { id: user._id },
+      process.env.SECRET_KEY,
+      { expiresIn: "15m" }
+    );
+
+    const resetLink = `${process.env.client_url}/reset-password/${verificationToken}`;
+
+    await sendForgotPasswordEmail(email, user.name, resetLink);
+
+    return res.json({
+      success: true,
+      message: "Password reset link sent successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { verificationToken, password } = req.body;
+    const decoded = jwt.verify(verificationToken, process.env.SECRET_KEY);
+    const user = await USER.findById(decoded.id);
+
+    console.log(decoded)
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    const saltround = 11;
+    const hashedpass = await bcrypt.hash(password, saltround);
+
+    user.password = hashedpass
+    await user.save();
+
+    await sendPasswordResetSuccessMail(user.email, user.name)
+
+    return res.json({ success: true, message: "Password reset successfully" });
+  } catch (error) {
+    res.json({ success: false, message: "Invalid or expired token" });
+  }
+};
 
 export const verify = (req,res) => {
     const {token} = req.body;

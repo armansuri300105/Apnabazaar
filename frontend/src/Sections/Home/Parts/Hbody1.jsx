@@ -35,7 +35,7 @@ export const Hbody1 = () => {
               quality products.
             </div>
             <div className="home-buttons-div flex gap-4 mt-5">
-              <div onClick={handleScroll} className="shopnow-btn h-[35px] w-[114px] bg-black text-white font-semibold flex justify-between px-3 items-center rounded-lg text-[12.25px]">
+              <div onClick={handleScroll} className="shopnow-btn cursor-pointer h-[35px] w-[114px] bg-black text-white font-semibold flex justify-between px-3 items-center rounded-lg text-[12.25px]">
                 Shop Now
                 <FaArrowRight/>
               </div>

@@ -115,7 +115,7 @@ export default function SigninForm({setCheckAuth}) {
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="w-full max-w-md p-8 rounded-lg">
         <div className="flex justify-center mb-4">
-          <div className="font-semibold"><img className="w-[150px]" src="/logo.png" alt="ApnaBazaar" /></div>
+          <div className="font-semibold"><img className="w-[150px]" src="/logo.webp" alt="ApnaBazaar" /></div>
         </div>
 
         {errorMessage && (
