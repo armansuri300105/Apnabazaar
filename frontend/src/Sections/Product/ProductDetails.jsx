@@ -14,7 +14,7 @@ import Reviews from "./reviews";
 import {useQuery} from "@tanstack/react-query"
 import ProductDetailSkeleton from "./productDetailSkeleton";
 import CartPopup from "./cartPopUp";
-import { frequentlyBoughtTogether, userSearchMl } from "../../../API/ml";
+import { userSearchMl } from "../../../API/ml";
 import { ProductShow } from "../Home/Components/productshow";
 import FavoritesSkeleton from "../User/Profile/Skeletons/favoritesSkeleton"
 
@@ -42,13 +42,6 @@ const ProductDetails = () => {
     queryFn: () => userSearchMl(product?.name),
     select: (res) => res?.data,
     enabled: !!product?.name
-  })
-
-  const {data: frequent, freLoading} = useQuery({
-    queryKey: ['freqprd', Productid],
-    queryFn: () => frequentlyBoughtTogether(Productid),
-    select: (res) => res?.data?.recommendations,
-    enabled: !!Productid
   })
 
   useEffect(() => {
@@ -109,7 +102,9 @@ const ProductDetails = () => {
 
   const handleAddtoCart = () => {
     if (btn === "Add to Cart") {
-      const exists = cartItems.some(item => item._id === product._id);
+      console.log(cartItems)
+      console.log(product)
+      const exists = cartItems.some(item => item.productID === product.productID);
       if (exists) return;
 
       product.quantity = quantity;
@@ -179,8 +174,6 @@ const ProductDetails = () => {
   if (mlLoading){
     return <FavoritesSkeleton/>
   }
-
-  console.log(frequent)
   return (
     <section className="product-detail flex flex-col items-center">
       <div className="product-detail-section w-[1200px] mt-[120px] mx-auto grid grid-cols-2 gap-10 p-6">
@@ -282,26 +275,6 @@ const ProductDetails = () => {
                 }
             </div>}
         </div>
-
-        {frequent?.products?.length > 0 && (
-          <div className="feature-products w-[1200px]">
-            <div className="flex justify-start">
-              <div className="font-medium text-[24px] text-black text-center mt-[30px] mb-[30px]">
-                Frequently Bought Together
-              </div>
-            </div>
-
-            {freLoading ? (
-              <FavoritesSkeleton />
-            ) : (
-              <div className="w-full flex gap-4 flex-wrap justify-start">
-                {frequent.products.slice(0, 10).map((product, index) => (
-                  <ProductShow key={index} product={product} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
       <CartPopup show={popUp} message="Product added to cart!" />
     </section>

@@ -86,7 +86,7 @@ export const Hbody1 = () => {
               </div>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=600&fit=crop"
+              src="https://res.cloudinary.com/do9m8kc0b/image/upload/v1761470552/cznquruiggogxjiusc30.webp"
               className="hero-text w-[532px] h-[399px] object-cover rounded-xl"
             />
             <div className="fruitimg-left h-[76px] w-[105px] bg-white rounded-2xl shadow-lg flex justify-center items-center -translate-x-6 -translate-y-12 ">

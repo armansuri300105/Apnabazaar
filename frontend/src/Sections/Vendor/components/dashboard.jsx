@@ -39,10 +39,9 @@ const Dashboard = ({handleLogout, setSelectedField}) => {
   return (
     <>
       <div className="p-6 space-y-6 transition-all mt-[20px] duration-300 bg-gray-50 w-full">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="vendor-dashboard flex sm:flex-row justify-between items-start sm:items-center gap-4">
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <div className="flex flex-wrap gap-2">
-            <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg">Settings</button>
             <NotificationPanel setSelectedField={setSelectedField}/>
             <button onClick={handleLogout} className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-lg">
                 Logout

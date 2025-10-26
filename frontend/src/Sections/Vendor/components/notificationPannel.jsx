@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { getNotifications, readNotification } from "../../../../API/api";
 import { useNavigate } from "react-router-dom"
+import "./product.css"
 
 const NotificationPanel = ({setSelectedField}) => {
   const [open, setOpen] = useState(false);
@@ -54,7 +55,7 @@ const NotificationPanel = ({setSelectedField}) => {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white shadow-xl rounded-xl border border-gray-200 z-50 overflow-hidden">
+        <div className="notification-pannel absolute right-0 mt-2 w-80 bg-white shadow-xl rounded-xl border border-gray-200 z-50 overflow-hidden">
           <div className="p-3 border-b border-gray-100 font-semibold text-gray-800 bg-gray-50">
             Notifications
           </div>
