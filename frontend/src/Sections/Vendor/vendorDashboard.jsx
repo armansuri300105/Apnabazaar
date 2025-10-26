@@ -50,7 +50,7 @@ export const VendorDashboard = () => {
         </button>
         {
           selectedField === "dashboard" ? <Dashboard setSelectedField={setSelectedField} handleLogout={handleLogout}/> 
-          : selectedField === "products" ? <VendorProducts setSelectedField={setSelectedField}/>
+          : selectedField === "products" ? <VendorProducts setSelectedField={setSelectedField} handleLogout={handleLogout}/>
           : selectedField === "orders" ? <VendorOrders setSelectedField={setSelectedField}/> : ""
         }
     </section>

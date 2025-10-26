@@ -130,9 +130,6 @@ const VendorOrders = () => {
           <option value="Shipped">Shipped</option>
           <option value="Delivered">Delivered</option>
         </select>
-        <button className="flex items-center justify-center gap-1 border rounded-lg px-3 py-2 bg-white text-sm md:text-base">
-          <Filter className="w-4 h-4" /> More Filters
-        </button>
       </div>
 
       {/* Orders Table (desktop) */}
@@ -182,7 +179,7 @@ const VendorOrders = () => {
 
       {/* Mobile Card List */}
       <div className="md:hidden space-y-3">
-        {filteredOrders.map((o) => (
+        {filteredOrders.reverse().map((o) => (
           <div
             key={o._id}
             className="border rounded-xl bg-white shadow p-3 space-y-1"

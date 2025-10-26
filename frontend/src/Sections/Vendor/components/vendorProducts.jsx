@@ -8,7 +8,7 @@ import "./product.css";
 import Loading from "../../Loading/loading";
 import NotificationPanel from "./notificationPannel";
 
-export default function Products({setSelectedField}) {
+export default function Products({setSelectedField, handleLogout}) {
   const [addProduct, setAddProduct] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const {data, isLoading, refetch} = useQuery({
@@ -123,10 +123,7 @@ export default function Products({setSelectedField}) {
           <h2 className="products-title text-2xl font-bold">Products Management</h2>
           <div className="flex gap-3 items-center">
             <NotificationPanel setSelectedField={setSelectedField}/>
-            <button className="p-2 rounded-full hover:bg-gray-200">
-              <Settings className="w-5 h-5" />
-            </button>
-            <button className="p-2 rounded-full hover:bg-red-100 text-red-600">
+            <button onClick={handleLogout} className="p-2 rounded-full hover:bg-red-100 text-red-600">
               <LogOut className="w-5 h-5" />
             </button>
           </div>
@@ -282,7 +279,7 @@ export default function Products({setSelectedField}) {
               </tr>
             </thead>
             <tbody>
-              {products.reverse().map((p, index) => (
+              {products.map((p, index) => (
                 <tr
                   key={index}
                   className="border-t hover:bg-gray-50 text-sm"
@@ -323,7 +320,7 @@ export default function Products({setSelectedField}) {
                     <span className="font-bold">₹{p.price}</span>
                     {p.oldPrice && (
                       <span className="ml-2 line-through text-gray-400 text-xs">
-                        ${p.oldPrice}
+                        ₹{p.oldPrice}
                       </span>
                     )}
                   </td>

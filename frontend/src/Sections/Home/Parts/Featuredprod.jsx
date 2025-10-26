@@ -9,10 +9,10 @@ import { useContext } from "react";
 export const FeaturedLocalProducts = () => {
     const { user } = useContext(CartProductContext);
 
-    const { data: recommendedProduct, isLoading: prdLoading } = useQuery({
+    const { data, isLoading: prdLoading } = useQuery({
         queryKey: ["recommendedPrd", user?._id],
         queryFn: () => recommendedProducts(user?._id),
-        select: (res) => res?.data?.recommendations || [],
+        select: (res) => res?.data || [],
         enabled: !!user
     });
 
@@ -25,8 +25,13 @@ export const FeaturedLocalProducts = () => {
     if (prdLoading || allLoading) {
         return <FavoritesSkeleton />;
     }
+    let recommendedProduct = []
 
-    const productsToShow = (!user || (user && recommendedProduct.length === 0))
+    if (data?.success){
+        recommendedProduct = data?.recommendations
+    }
+
+    const productsToShow = (!user || (user && recommendedProduct && recommendedProduct?.length === 0))
         ? allProducts.slice(0, 10)
         : recommendedProduct;
 
@@ -42,7 +47,7 @@ export const FeaturedLocalProducts = () => {
                     </div>
                 </div>
                 <div className="w-full mt-8 flex gap-4 flex-wrap justify-center">
-                    {productsToShow.map((product, index) => (
+                    {productsToShow?.map((product, index) => (
                         <ProductShow key={index} product={product} />
                     ))}
                 </div>

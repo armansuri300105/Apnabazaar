@@ -6,6 +6,7 @@ import { CartProductContext } from "../../../services/context";
 import { NavLink } from "react-router-dom";
 import { Star } from "lucide-react";
 import CartPopup from "../../Product/cartPopUp";
+import {optimizeImage} from "../../../services/optimizeImage"
 import '../home.css'
 
 export const ProductShow= ({product}) =>{
@@ -33,7 +34,7 @@ export const ProductShow= ({product}) =>{
 
     const handleAddtoCart = (product) => {
         for (let i=0;i<cartItems.length;i++){
-            if (cartItems[i]._id === product._id){
+            if (cartItems[i]?.productID === product?.productID){
                 updateQuantity(cartItems[i].id, cartItems[i].quantity+1)
                 return;
             }
@@ -90,7 +91,12 @@ export const ProductShow= ({product}) =>{
     <NavLink onClick={handleClickedData} to={`/productdetail/${product.productID || product._id}`}>
         <div className="product-cart-component cursor-pointer border-solid relative border-[1px] border-grey-100 group h-[483px] bg-white w-[256px] rounded-xl hover:shadow-lg">
             <div className="h-[254px] w-full rounded-t-xl overflow-hidden bg-black">
-                <img className="object-cover w-[100%] h-[100%] transition-all group-hover:scale-[107%] duration-180 " src={product.images[0]} />
+                <img
+                    decoding="async"
+                    loading="lazy"
+                    className="object-cover w-[100%] h-[100%] transition-all group-hover:scale-[107%] duration-180 " 
+                    src={optimizeImage(product.images[0], 260, 260)}
+                />
             </div>
             <div className="grid gap-[10px] mt-6 p-[14px]">
                 <div className="text-[20px] truncate">{product.name} </div>

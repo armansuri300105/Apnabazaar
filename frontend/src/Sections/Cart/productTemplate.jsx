@@ -16,7 +16,7 @@ export const ProductTemplate = ({item}) => {
     };
 
     const onDelete = (product) => {
-        const updated_cart = cartItems.filter(p => p._id!==product._id)
+        const updated_cart = cartItems.filter(p => p.productID!==product.productID)
         setCartItems(updated_cart);
     }
     const onIncrease = (product) => {

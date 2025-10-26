@@ -27,7 +27,7 @@ const Overview = ({user}) => {
                 </h3>
 
                 <div className="space-y-4">
-                    {
+                    {orders?.length!==0 ?
                         orders?.slice(0,min(5,orders.length)).map((order, index) => (
                             <div key={index} className="profile-overview-orders flex justify-between items-center p-4 bg-[#ececf0] rounded-lg">
                                 <div>
@@ -36,11 +36,13 @@ const Overview = ({user}) => {
                                 </div>
                                 <span className="px-3 py-1 border text-sm rounded-md border-gray-500 bg-green-100 text-blue-600 font-medium">{order?.orderStatus}</span>
                             </div>
-                        ))
+                        )) : <div>
+                         You Have No Orders
+                        </div>
                     }
                 </div>
 
-                <button onClick={() => navigate('/orders')} className="w-full mt-4 py-2 border rounded-lg hover:bg-gray-100 transition">View All Orders</button>
+                {orders?.length > 0 ? <button onClick={() => navigate('/orders')} className="w-full mt-4 py-2 border rounded-lg hover:bg-gray-100 transition">View All Orders</button> : ""}
             </div>
         </div>
     </>

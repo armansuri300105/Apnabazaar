@@ -285,7 +285,7 @@ export const getOrders = async (req, res) => {
     });
 
     if (!orders || orders.length === 0) {
-      return res.status(404).json({ message: "No orders found for this user" });
+      return res.json({ success: true, orders: [], message: "No orders found for this user" });
     }
 
     res.status(200).json({ orders });
