@@ -59,16 +59,18 @@ export const CreateOrder =  async (req, res) => {
 
     if (paymentMethod==='COD'){
         const finalItems = OrderData?.items?.map(item => ({
-          product: item._id,
+          product: item?.productID,
           quantity: item.quantity,
           price: item.price
         }));
+
         OrderData = {
           ...OrderData,
           paymentStatus: 'Pending',
           orderStatus: 'Processing',
           totalAmount,
         }
+
         const newOrderData = {
           orderId: generateOrderId(),
           user: OrderData.user._id,
@@ -82,6 +84,7 @@ export const CreateOrder =  async (req, res) => {
         }
         const newOrder = new ORDER(newOrderData);
         await newOrder.save();
+        
         if (newOrderData?.shippingAddress?.remember) {
           await USER.findByIdAndUpdate(
             newOrderData.user,
