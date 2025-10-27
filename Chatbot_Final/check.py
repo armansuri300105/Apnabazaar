@@ -15,6 +15,12 @@ from pymongo import MongoClient
 import numpy as np
 from functools import lru_cache
 from dotenv import load_dotenv
+from pydantic import BaseModel
+
+class ChatRequest(BaseModel):
+    user_id: str
+    question: str
+
 
 app = FastAPI()
 
@@ -155,7 +161,7 @@ async def chat_ai_async(user_id: str, question: str):
             1. If the user requests a product recommendation, recommend up to 3 products that best match the user's preferences and needs, using only product fields present in the context along with the product data and link to the product.
             Product link should be in this format:
             https://apnabzaar.netlify.app/productdetail/product_id
-            Replace `product_id` with the product's `id` value from the Product Data.
+            Replace product_id with the product's id value from the Product Data.
             Example:
             Context:
             Product: Product Name: Product Description: Product Price: Product Link:
@@ -169,7 +175,7 @@ async def chat_ai_async(user_id: str, question: str):
             3. If the user asks for order details, return only order information present in the order data (e.g., order id, items, status, delivery ETA). Do NOT invent or assume missing fields.
             4. If the user asks for a product's price or its details, reply with the price, Name of product and the product link in this exact format:
             https://apnabzaar.netlify.app/productdetail/product_id
-            Replace `product_id` with the product's `id` value from the Product Data.
+            Replace product_id with the product's id value from the Product Data.
             5. Do not provide any information that is not present in the context. Do not add technical notes, disclaimers, or extra sentences—keep it to 1–2 lines.
             "
 
@@ -241,7 +247,10 @@ async def chat(user_id: str, option: str):
 
 
 
-@app.get("/chat/ai")
-async def chat_ai_endpoint(user_id: str, question: str):
+@app.post("/chat/ai")
+async def chat_ai_endpoint(req: ChatRequest):
+    user_id = req.user_id
+    question = req.question
+    print(f"Received question from user {user_id}: {question}")
     resp = await chat_ai_async(user_id, question)
     return JSONResponse(resp)

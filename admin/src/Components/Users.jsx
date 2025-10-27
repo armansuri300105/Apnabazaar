@@ -133,7 +133,7 @@ export default function UsersManagement() {
                     <p className="text-gray-500">{u.phone}</p>
                   </td>
                   <td className="p-2 sm:p-3">{u?.orders?.length}</td>
-                  <td className="p-2 sm:p-3">{parseFloat(u?.totalSpent.toFixed(2))!==0 ? `₹${Math.floor(u?.totalSpent)}` : "NA"}</td>
+                  <td className="p-2 sm:p-3">{parseFloat(u?.totalSpent)!==0 ? `₹${Math.floor(u?.totalSpent)}` : "NA"}</td>
                 </tr>
               ))
             )}

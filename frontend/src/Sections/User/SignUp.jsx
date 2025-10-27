@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { FiMail, FiPhone, FiUser, FiLock } from "react-icons/fi";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -10,7 +10,8 @@ import { CartProductContext } from "../../services/context";
 export default function SignupForm() {
   const { refetch } = useContext(CartProductContext);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false)
+
+  const [loading, setLoading] = useState(false);
   const [eye1, setEye1] = useState(false);
   const [eye2, setEye2] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -35,9 +36,7 @@ export default function SignupForm() {
 
   // Password strength validation
   const isValidPassword = (password) =>
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/.test(
-      password
-    );
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/.test(password);
 
   // Handle input change
   const handleChange = (e) => {
@@ -51,31 +50,21 @@ export default function SignupForm() {
   // Form validation
   const validateForm = () => {
     const errors = {};
-
     if (!formData.firstName.trim()) errors.firstName = "First name is required";
     if (!formData.lastName.trim()) errors.lastName = "Last name is required";
-
     if (!formData.email.trim()) errors.email = "Email is required";
-    else if (!isValidEmail(formData.email))
-      errors.email = "Enter a valid email";
-
+    else if (!isValidEmail(formData.email)) errors.email = "Enter a valid email";
     if (!formData.phone.trim()) errors.phone = "Phone number is required";
-    else if (!isValidPhone(formData.phone))
-      errors.phone = "Enter a valid 10-digit phone number";
-
+    else if (!isValidPhone(formData.phone)) errors.phone = "Enter a valid 10-digit phone number";
     if (!formData.password) errors.password = "Password is required";
     else if (!isValidPassword(formData.password))
-      errors.password =
-        "Must be 8+ chars with uppercase, lowercase, number & symbol";
-
+      errors.password = "Must be 8+ chars with uppercase, lowercase, number & symbol";
     if (!formData.confirmPassword)
       errors.confirmPassword = "Confirm your password";
     else if (formData.password !== formData.confirmPassword)
       errors.confirmPassword = "Passwords do not match";
-
     if (!formData.agree)
       errors.agree = "You must agree to the Terms and Privacy Policy";
-
     return errors;
   };
 
@@ -83,18 +72,18 @@ export default function SignupForm() {
     try {
       return await signup(userData);
     } catch (error) {
-      console.log(error);
+      console.error("Signup API Error:", error);
     }
   };
 
-  // Submit
+  // Handle Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
     const errors = validateForm();
     setFormErrors(errors);
-
     if (Object.keys(errors).length > 0) return;
+
+    setLoading(true); // ✅ Start loading
 
     const { email, phone, password, subscribe } = formData;
     const sendData = {
@@ -105,31 +94,36 @@ export default function SignupForm() {
       subscribe,
     };
 
-    const res = await sendUserData(sendData);
-    if (res?.data?.success) {
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        password: "",
-        confirmPassword: "",
-        agree: false,
-        subscribe: true,
-      });
-      setLoading(false)
-      refetch();
-      navigate("/signin");
-    } else {
-      setErrorMessage(res?.data?.message)
+    try {
+      const res = await sendUserData(sendData);
+      if (res?.data?.success) {
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          password: "",
+          confirmPassword: "",
+          agree: false,
+          subscribe: true,
+        });
+        refetch();
+        navigate("/signin");
+      } else {
+        setErrorMessage(res?.data?.message || "Signup failed");
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("An unexpected error occurred");
+    } finally {
+      setLoading(false); // ✅ Stop loading
     }
-
-    setLoading(false)
   };
 
   // Google Login
   const responseGoogle = async (authResult) => {
     try {
+      setLoading(true); // ✅ Start loading
       if (authResult["code"]) {
         const res = await googleLogin(authResult["code"]);
         refetch();
@@ -138,6 +132,9 @@ export default function SignupForm() {
       }
     } catch (error) {
       console.error("Google Login Error:", error.message);
+      setErrorMessage("Google login failed");
+    } finally {
+      setLoading(false); // ✅ Stop loading
     }
   };
 
@@ -331,10 +328,12 @@ export default function SignupForm() {
             disabled={loading}
             type="submit"
             className={`w-full h-[35px] text-[13px] text-white rounded-md ${
-              formData.agree && !loading ? "bg-gray-800 hover:bg-black" : "bg-gray-400"
+              formData.agree && !loading
+                ? "bg-gray-800 hover:bg-black"
+                : "bg-gray-400 cursor-not-allowed"
             }`}
           >
-            {!loading ? "Create Account" : "Loading..."}
+            {loading ? "Loading..." : "Create Account"}
           </button>
 
           {/* OR Google */}
@@ -347,14 +346,17 @@ export default function SignupForm() {
           <button
             onClick={handleGoogleLogin}
             type="button"
-            className="flex items-center justify-center gap-2 border rounded-md h-[35px] w-full hover:bg-gray-50 text-sm"
+            disabled={loading}
+            className={`flex items-center justify-center gap-2 border rounded-md h-[35px] w-full text-sm ${
+              loading ? "opacity-60 cursor-not-allowed" : "hover:bg-gray-50"
+            }`}
           >
             <img
               src="https://www.svgrepo.com/show/355037/google.svg"
               alt="Google"
               className="w-5 h-5"
             />
-            Google
+            {loading ? "Signing in..." : "Google"}
           </button>
 
           <div className="flex justify-center text-[12px] mt-4">

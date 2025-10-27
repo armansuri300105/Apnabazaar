@@ -10,7 +10,7 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([
     {
       from: "bot",
-      text: "👋 Hello Betwa! Welcome to ApnaBazzar! How may I help you today?",
+      text: "👋 Hello! Welcome to ApnaBazzar! How may I help you today?",
       options: ["Order Related", "Product Related", "Chat with AI Assistant", "Others"],
     },
   ]);
