@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Settings, LogOut, Plus, Eye, Edit, Trash, Menu, X, Cross } from "lucide-react";
+import { LogOut, Plus, Eye, Edit, Trash } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getVendorProducts, removeVendorProduct } from "../../../../API/api";
 import AddProductForm from "./AddProduct";
@@ -7,10 +7,14 @@ import Swal from "sweetalert2";
 import "./product.css";
 import Loading from "../../Loading/loading";
 import NotificationPanel from "./notificationPannel";
+import { ProductDetailModal } from "./productDetailModel";
 
 export default function Products({setSelectedField, handleLogout}) {
   const [addProduct, setAddProduct] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  // 1. NEW STATE FOR MODAL CONTROL
+  const [viewedProduct, setViewedProduct] = useState(null); 
+  
   const {data, isLoading, refetch} = useQuery({
     queryKey: ["product"],
     queryFn: getVendorProducts,
@@ -114,6 +118,12 @@ export default function Products({setSelectedField, handleLogout}) {
       images: product?.images,
     })
   }
+  
+  // 2. MODIFIED HANDLER TO OPEN MODAL
+  const handleView = (productData) => {
+    setViewedProduct(productData);
+  };
+  // ----------------------------------
 
   return (
     <div className="products-container min-h-screen bg-gray-50">
@@ -209,10 +219,12 @@ export default function Products({setSelectedField, handleLogout}) {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                  {/* Price */}
                   <div>
                     <p className="text-gray-500">Price</p>
                     <p className="font-bold">₹{p.price}{p.oldPrice && <span className="ml-2 line-through text-gray-400 text-xs">${p.oldPrice}</span>}</p>
                   </div>
+                  {/* Status */}
                   <div className="justify-self-end flex flex-col items-center">
                     <p className="text-gray-800 font-bold">Status</p>
                     <span className={`px-2 py-1 rounded-full text-xs ${
@@ -223,14 +235,24 @@ export default function Products({setSelectedField, handleLogout}) {
                       {parseInt(p.stock) > 0 ? `In Stock` : `Out Of Stock`}
                     </span>
                   </div>
+                  
+                  {/* Stock */}
+                  <div>
+                    <p className="text-gray-500">Stock</p>
+                    <p className={`font-bold ${parseInt(p.stock) <= 5 ? 'text-red-500' : 'text-gray-800'}`}>{p.stock}</p>
+                  </div>
+
+                  {/* Rating */}
                   <div>
                     <p className="text-gray-500">Rating</p>
                     <p>{p?.ratings?.average} <span className="text-gray-400 text-xs">({p.reviews.length})</span></p>
                   </div>
+                  
+                  {/* Admin Status */}
                   <div className="justify-self-end">
                     <p className="text-gray-500">Admin Status</p>
                     <p className={`px-2 py-1 rounded-full text-xs text-center ${
-                            p?.status === "Approved"
+                      p?.status === "Approved"
                           ? "bg-green-100 text-green-600" 
                           : "bg-red-100 text-red-600"
                       }`}>{p?.status}</p>
@@ -238,7 +260,10 @@ export default function Products({setSelectedField, handleLogout}) {
                 </div>
                 
                 <div className="flex justify-end gap-2 pt-2 border-t">
-                  <button className="p-2 hover:bg-gray-100 rounded">
+                  <button 
+                    onClick={() => handleView(p)} // <-- PASS THE FULL PRODUCT OBJECT
+                    className="p-2 hover:bg-gray-100 rounded"
+                  >
                     <Eye className="w-4 h-4" />
                   </button>
                   <button className="p-2 hover:bg-gray-100 rounded">
@@ -258,7 +283,7 @@ export default function Products({setSelectedField, handleLogout}) {
           <table className="w-full text-left">
             <thead className="bg-gray-100 w-full text-sm">
               <tr>
-                 <th className="p-3">
+                <th className="p-3">
                   <input
                     type="checkbox"
                     onChange={(e) =>
@@ -273,6 +298,7 @@ export default function Products({setSelectedField, handleLogout}) {
                 <th className="p-3">Category</th>
                 <th className="p-3">Admin Status</th>
                 <th className="p-3">Price</th>
+                <th className="p-3">Stock</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Rating</th>
                 <th className="p-3">Actions</th>
@@ -310,10 +336,10 @@ export default function Products({setSelectedField, handleLogout}) {
                   <td>
                     <span className={`px-2 py-1 rounded-full text-xs text-center ${
                           p?.status === "Approved"
-                        ? "bg-green-100 text-green-600" :
-                          p?.status === "Pending" ?
-                          "bg-yellow-500" 
-                        : "bg-red-100 text-red-600"
+                            ? "bg-green-100 text-green-600" :
+                            p?.status === "Pending" ?
+                            "bg-yellow-500" 
+                          : "bg-red-100 text-red-600"
                     }`}>{p?.status}</span>
                   </td>
                   <td className="p-3">
@@ -324,6 +350,10 @@ export default function Products({setSelectedField, handleLogout}) {
                       </span>
                     )}
                   </td>
+                  {/* Stock Data */}
+                  <td className="p-3"> 
+                    <span className={`font-bold ${parseInt(p.stock) <= 5 ? 'text-red-500' : 'text-gray-800'}`}>{p.stock}</span>
+                  </td>
                   <td className="p-3">
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       parseInt(p.stock) > 0
@@ -331,14 +361,17 @@ export default function Products({setSelectedField, handleLogout}) {
                         : "bg-red-100 text-red-600"
                     }`}>
                       {parseInt(p.stock) > 0 ? `In Stock` : `Out Of Stock`}
-                  </span>
+                    </span>
                   </td>
                   <td className="p-3">
                     {p.ratings?.average}{"⭐"}
                     <span className="text-gray-400 text-xs">({p.reviews.length})</span>
                   </td>
                   <td className="p-3 flex gap-2">
-                    <button className="p-2 hover:bg-gray-100 rounded">
+                    <button 
+                        onClick={() => handleView(p)} // <-- PASS THE FULL PRODUCT OBJECT
+                        className="p-2 hover:bg-gray-100 rounded"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded">
@@ -367,6 +400,12 @@ export default function Products({setSelectedField, handleLogout}) {
           {addProduct ? <Plus className="w-6 h-6 rotate-45 transition-transform duration-200" /> : <Plus className="w-6 h-6 transition-transform duration-200"/>}
         </button>
       </div>
+
+      {/* 3. MODAL RENDERED HERE */}
+      <ProductDetailModal
+        product={viewedProduct} 
+        onClose={() => setViewedProduct(null)} 
+      />
     </div>
   );
 }

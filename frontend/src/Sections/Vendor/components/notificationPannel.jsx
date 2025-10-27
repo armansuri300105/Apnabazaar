@@ -35,6 +35,8 @@ const NotificationPanel = ({setSelectedField}) => {
     if (!note.isRead) await readNotification(note._id)
     if (note.type==="product_status"){
       setSelectedField("products")
+    } else if (note.type==="new_order"){
+      setSelectedField("orders")
     } else {
       setSelectedField("dashboard")
     }

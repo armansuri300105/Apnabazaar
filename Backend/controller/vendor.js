@@ -71,7 +71,7 @@ export const editVendorProduct = async (req ,res) => {
 
     product.name = name
     product.price = price
-    product.stock = stock
+    product.stock = parseInt(stock)
     product.description = description
     product.category = category
     product.images = images
@@ -307,33 +307,45 @@ export const getVendorLast7DaysOrders = async (req, res) => {
 
 export const getVendorsOrdersByCategory = async (req, res) => {
   try {
-    const vendorId = req?.user?._id;
+    // Assuming req.user._id is already a MongoDB ObjectId type or converted later
+    const vendorId = req?.user?._id; 
 
     const result = await ORDER.aggregate([
       {
-        $match: { vendor: vendorId }
-      },
-      {
+        // Stage 1: Deconstruct the 'items' array to process each product individually
         $unwind: "$items"
       },
       {
+        // Stage 2: Look up the full product document from the 'products' collection
         $lookup: {
           from: "products",
           localField: "items.product",
           foreignField: "_id",
-          as: "product"
+          as: "productDetails" // Renamed 'product' to 'productDetails' to be more descriptive
         }
       },
       {
-        $unwind: "$product"
+        // Stage 3: Deconstruct the 'productDetails' array
+        $unwind: "$productDetails"
       },
       {
+        // ----------------------------------------------------------------
+        // Stage 4: THE CRITICAL FIX - Filter by the Vendor ID found inside the product document.
+        // Assuming the 'products' collection has a field named 'vendor' which holds the vendor's _id.
+        $match: {
+          "productDetails.vendor": vendorId
+        }
+        // ----------------------------------------------------------------
+      },
+      {
+        // Stage 5: Group by the product's category and sum the quantity
         $group: {
-          _id: "$product.category",
+          _id: "$productDetails.category",
           value: { $sum: "$items.quantity" }
         }
       },
       {
+        // Stage 6: Rename _id to name and keep value
         $project: {
           _id: 0,
           name: "$_id",
@@ -341,6 +353,7 @@ export const getVendorsOrdersByCategory = async (req, res) => {
         }
       }
     ]);
+    
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

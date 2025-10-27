@@ -13,7 +13,7 @@ export const CategoryBody = () => {
   const navigate = useNavigate();
 
   const [selected, setSelected] = useState("name");
-  const [items, setItems] = useState("");
+  // Removed redundant state: [items, setItems]
 
   const { data, isError, error, isLoading } = useQuery({
     queryKey: ["products"],
@@ -23,6 +23,7 @@ export const CategoryBody = () => {
 
   const category = catname ? decodeURIComponent(catname) : "All Products";
 
+  // Scrolling logic, primarily triggered by category change
   useEffect(() => {
     const isMobile = window.innerWidth <= 600;
 
@@ -34,8 +35,9 @@ export const CategoryBody = () => {
     } else {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [category, selected]);
+  }, [category]); // Removed 'selected' dependency to prevent scrolling on sort change
 
+  // Memoize unique categories list
   const categories = useMemo(() => {
     if (!data) return ["All Products"];
     const uniqueCategories = [
@@ -44,14 +46,39 @@ export const CategoryBody = () => {
     return ["All Products", ...uniqueCategories];
   }, [data]);
 
-  let products = useMemo(() => {
-    if (!data) return [];
-    if (category === "All Products") return data;
-    return data.filter(
-      (p) => p.category?.toLowerCase() === category.toLowerCase()
-    );
-  }, [category, data]);
+  // Memoize the filtered and sorted product list in one step for efficiency
+  const filteredAndSortedProducts = useMemo(() => {
+    let filtered = data || [];
+    
+    // 1. Filtering
+    if (category !== "All Products") {
+      filtered = filtered.filter(
+        (p) => p.category?.toLowerCase() === category.toLowerCase()
+      );
+    }
 
+    // 2. Sorting (operate on a copy)
+    let sorted = [...filtered];
+
+    if (selected === "name") {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (selected === "date") {
+      sorted.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+    } else if (selected === "rating") {
+      // Use fallback (|| 0) for safe comparison
+      sorted.sort(
+        (a, b) => (b.ratings?.average || 0) - (a.ratings?.average || 0)
+      );
+    } else if (selected === "price") {
+      sorted.sort((a, b) => a.price - b.price);
+    }
+
+    return sorted;
+  }, [category, data, selected]); // Recalculates only when these dependencies change
+
+  // Memoize categories with their counts
   const categoriesWithCount = useMemo(() => {
     if (!data) return categories.map((c) => ({ name: c, quantity: 0 }));
     return categories.map((c) => ({
@@ -65,28 +92,10 @@ export const CategoryBody = () => {
     }));
   }, [categories, data]);
 
-  useMemo(() => {
-    setItems(products?.length || 0);
-  }, [products]);
+  // Removed old useMemo that set 'items' state
 
   if (isError) return <p>Error: {error.message}</p>;
-  if (isLoading) return <CategorySkeleton />;
-  if (loadinguser) return <CategorySkeleton />;
-
-  // Sorting logic
-  if (selected === "name") {
-    products = [...products].sort((a, b) => a.name.localeCompare(b.name));
-  } else if (selected === "date") {
-    products = [...products].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-  } else if (selected === "rating") {
-    products = [...products].sort(
-      (a, b) => b.ratings?.average - a.ratings?.average
-    );
-  } else if (selected === "price") {
-    products = [...products].sort((a, b) => a.price - b.price);
-  }
+  if (isLoading || loadinguser) return <CategorySkeleton />;
 
   return (
     <div className="category-section-top w-[90vw] grid grid-cols-1 gap-[40px] mb-[50px]">
@@ -138,7 +147,7 @@ export const CategoryBody = () => {
               } px-3 text-[16px] flex justify-between items-center w-[250px] h-[41px] rounded-lg mb-2 cursor-pointer`}
             >
               {item.name}
-              <div className="text-black h-5 w-5 rounded-lg bg-neutral-200 border-solid border-[1px] border-grey-100 flex items-center justify-center">
+              <div className="text-black w-[25px] h-[25px] rounded-lg p-2 bg-neutral-200 border-solid border-[1px] border-grey-100 flex items-center justify-center">
                 {item.quantity}
               </div>
             </div>
@@ -147,14 +156,15 @@ export const CategoryBody = () => {
 
         {/* Products Section */}
         <div className="flex-1">
-          <div>{items !== 0 ? `Showing ${items} products` : ""}</div>
+          {/* Display length directly from memoized array */}
+          <div>{filteredAndSortedProducts.length !== 0 ? `Showing ${filteredAndSortedProducts.length} products` : ""}</div>
           <div className="category-product-section flex gap-6 mt-2 flex-wrap relative">
-            {products?.length === 0 ? (
+            {filteredAndSortedProducts?.length === 0 ? (
               <p className="w-[100%] h-[100%] text-center text-2xl font-bold">
                 Product Not Available
               </p>
             ) : (
-              products?.map((product, index) => (
+              filteredAndSortedProducts.map((product, index) => (
                 <ProductShow key={index} product={product} />
               ))
             )}
