@@ -11,10 +11,9 @@ export const getallproducts = async (req,res) => {
     const products = await PRODUCT.find({isActive: true}).lean();
     if (products.length==0) return res.json({message: `Products not found`})
     const formattedProducts = products.map(p => {
-        const {stock, ...rest} = p;
+        const {...rest} = p;
         return {
           productID: p._id,
-          inStock: stock>0,
           ...rest
         }
     });
@@ -24,10 +23,9 @@ export const getallproducts = async (req,res) => {
 export const getproductsbyid = async (req, res) => {
     const {id} = req.query;
     const product = await PRODUCT.findOne({_id: id}).lean().populate("vendor");
-    const {stock, ...rest} = product
+    const {...rest} = product
     const formattedProduct = {
         productID: product._id,
-        inStock: stock > 0,
         ...rest
     }
     res.json({success: true, product: formattedProduct})

@@ -204,7 +204,7 @@ export const authCheck = async (req,res) => {
             return res.send({isAuthenticate: false, message: "UnAutharized Access"})
         }
         const email = decodeUser?.email
-        const user = await USER.findOne({email});
+        const user = await USER.findOne({email}).select("-history");
         if (!user){
             return res.send({isAuthenticate: false, message: "UnAutharized Access"})
         }

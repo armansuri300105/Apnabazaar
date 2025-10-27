@@ -25,10 +25,10 @@ const VendorOrders = () => {
   const orders = data.orders
 
   const stats = {
-    total: orders.length,
-    pending: orders.filter((o) => o.orderStatus === "Processing").length,
-    processing: orders.filter((o) => o.orderStatus === "Shipped").length,
-    completed: orders.filter((o) => o.orderStatus === "Delivered").length,
+    total: orders?.length,
+    pending: orders?.filter((o) => o.orderStatus === "Processing").length,
+    processing: orders?.filter((o) => o.orderStatus === "Shipped").length,
+    completed: orders?.filter((o) => o.orderStatus === "Delivered").length,
   };
 
   const filteredOrders = orders.filter((o) => {
@@ -169,7 +169,7 @@ const VendorOrders = () => {
                     {o?.orderStatus}
                   </span>
                 </td>
-                <td className="p-3 font-semibold">₹{o?.totalAmount?.toFixed(2)}</td>
+                <td className="p-3 font-semibold">₹{o?.vendorTotal?.toFixed(2)}</td>
                 <td onClick={() => {setIsOpenDetail(true); setSelectedOrder(o)}} className="p-3 text-blue-600 cursor-pointer">👁 View</td>
               </tr>
             ))}

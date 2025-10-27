@@ -1,276 +1,353 @@
 import Razorpay from 'razorpay';
 import PRODUCT from "../models/product.js";
 import ORDER from "../models/order.js"
-import crypto from 'crypto'
+import crypto, { createECDH } from 'crypto'
 import 'dotenv/config'
 import USER from '../models/user.js';
 import { generateOrderId } from '../services/generateOrderId.js';
 import { sendOrderConfirmation, sendOrderToVendor } from '../emails/sendMail.js';
 import notification from '../models/notification.js';
+import mongoose from 'mongoose';
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
   key_secret: process.env.RAZORPAY_SECRET_KEY
 });
 
-export const CreateOrder =  async (req, res) => {
-    const {user, items, shippingAddress, paymentMethod, deliveryMethod} = req.body;
-    let OrderData = {
-      user,
-      items,
-      shippingAddress,
-      paymentMethod,
-      deliveryMethod
-    }
-    let totalAmount = 0;
-    let vendors = []
-    for (const item of items) {
-      const product = await PRODUCT.findById(item.productID);
-      if (!product) return res.status(400).json({ message: `Product not found for ID ${item.productID}` });
-      const vendor_id = product?.vendor
-      const populate_prd = await product.populate("vendor");
-      const vendorEmail = populate_prd?.vendor?.email;
-
-      let vendor = vendors.find(v => v.email === vendorEmail);
-      if (!vendor) {
-        vendor = {
-          vendor_id,
-          email: vendorEmail,
-          products: []
-        };
-        vendors.push(vendor);
-      }
-
-      vendor.products.push({
-        productID: product._id,
-        name: product.name,
-        price: product.price,
-        quantity: item.quantity
-      });
-
-      product.stock -= item.quantity;
-      totalAmount += product.price * item.quantity;
-    }
-    let delivery = totalAmount >= 499 ? 0 : 40;
-    totalAmount += totalAmount*2/100;
-    if (OrderData?.deliveryMethod === 'Express') delivery = 60;
-    totalAmount += delivery;
-    totalAmount = parseFloat(totalAmount.toFixed(2));
-
-    if (paymentMethod==='COD'){
-        const finalItems = OrderData?.items?.map(item => ({
-          product: item?.productID,
-          quantity: item.quantity,
-          price: item.price
-        }));
-
-        OrderData = {
-          ...OrderData,
-          paymentStatus: 'Pending',
-          orderStatus: 'Processing',
-          totalAmount,
-        }
-
-        const newOrderData = {
-          orderId: generateOrderId(),
-          user: OrderData.user._id,
-          items: finalItems,
-          shippingAddress: OrderData.shippingAddress,
-          deliveryMethod: OrderData.deliveryMethod,
-          paymentMethod: OrderData.paymentMethod,
-          paymentStatus: OrderData.paymentStatus,
-          orderStatus: OrderData.orderStatus,
-          totalAmount: OrderData.totalAmount
-        }
-        const newOrder = new ORDER(newOrderData);
-        await newOrder.save();
-        
-        if (newOrderData?.shippingAddress?.remember) {
-          await USER.findByIdAndUpdate(
-            newOrderData.user,
-            {
-              $push: {
-                orders: newOrder._id,
-                addresses: newOrderData.shippingAddress
-              }
-            },
-            { new: true }
-          );
-        } else {
-          await USER.findByIdAndUpdate(
-            newOrderData.user,
-            { $push: { orders: newOrder._id } },
-            { new: true }
-          );
-        }
-        for (const v of vendors) {
-          await sendOrderToVendor(
-            v?.email,
-            v?.name || "Vendor",
-            newOrder.orderId,
-            v.products,
-            newOrderData.shippingAddress,
-            newOrderData?.user?.name
-          );
-        }
-        for (const v of vendors) {
-          await notification.create({
-            receiver: v.vendor_id,
-            title: `New Order`,
-            message: `You have received a new Order ${newOrderData?.orderId}`,
-            type: "new_order",
-            isRead: false,
-          })
-        }
-
-        const user = await USER.findById(newOrderData.user)
-        user.totalSpent += totalAmount
-        await user.save()
-        await sendOrderConfirmation(OrderData?.user?.email, OrderData.user?.name, newOrderData?.orderId, OrderData?.items, newOrderData?.totalAmount)
-        return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder._id });
-    }
-    const orderId = generateOrderId()
-    const orderOptions = {
-        amount: Math.round(totalAmount * 100),
-        currency: 'INR',
-        receipt: orderId
-    };
-
+export const CreateOrder = async (req, res) => {
+    const { user, items, shippingAddress, paymentMethod, deliveryMethod } = req.body;
+    let session; // Declare session outside try-catch
     try {
+        session = await mongoose.startSession();
+        session.startTransaction();
+
+        let totalAmount = 0;
+        let vendors = [];
+        const stockUpdates = []; // To hold product IDs and quantities for atomic update
+
+        // 1. Pre-check for stock and gather product/vendor info
+        for (const item of items) {
+            const product = await PRODUCT.findById(item.productID).session(session);
+
+            if (!product) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: `Product not found for ID ${item.productID}` });
+            }
+
+            if (product.stock < item.quantity) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: `Insufficient stock for ${product.name}. Available: ${product.stock}` });
+            }
+
+            const vendor_id = product?.vendor;
+            const populate_prd = await product.populate("vendor");
+            const vendorEmail = populate_prd?.vendor?.email;
+
+            let vendor = vendors.find(v => v.email === vendorEmail);
+            if (!vendor) {
+                vendor = {
+                    vendor_id,
+                    email: vendorEmail,
+                    products: []
+                };
+                vendors.push(vendor);
+            }
+
+            vendor.products.push({
+                productID: product._id,
+                name: product.name,
+                price: product.price,
+                quantity: item.quantity
+            });
+
+            // Prepare for atomic stock update
+            stockUpdates.push({
+                productId: product._id,
+                quantity: item.quantity
+            });
+
+            totalAmount += product.price * item.quantity;
+        }
+
+        // 2. Calculate final amount
+        let delivery = totalAmount >= 499 ? 0 : 40;
+        totalAmount += totalAmount * 2 / 100; // Assuming 2% fee
+        if (deliveryMethod === 'Express') delivery = 60;
+        totalAmount += delivery;
+        totalAmount = parseFloat(totalAmount.toFixed(2));
+
+        let OrderData = {
+            user,
+            items,
+            shippingAddress,
+            paymentMethod,
+            deliveryMethod
+        };
+
+        // 3. Handle COD logic (stock update and order creation are inside the transaction)
+        if (paymentMethod === 'COD') {
+            // Atomically decrement stock for all products
+            for (const update of stockUpdates) {
+                const updatedProduct = await PRODUCT.findOneAndUpdate(
+                    { _id: update.productId, stock: { $gte: update.quantity } }, // Only update if stock is sufficient
+                    { $inc: { stock: -update.quantity } }, // Atomic decrement
+                    { new: true, session: session }
+                );
+
+                if (!updatedProduct) {
+                    await session.abortTransaction();
+                    session.endSession();
+                    return res.status(400).json({ message: `Stock sold out for product ID ${update.productId} during final check.` });
+                }
+            }
+
+            // Prepare and save Order
+            const finalItems = OrderData.items.map(item => ({
+                product: item.productID,
+                quantity: item.quantity,
+                price: item.price
+            }));
+
+            const newOrderData = {
+                orderId: generateOrderId(),
+                user: OrderData.user._id,
+                items: finalItems,
+                shippingAddress: OrderData.shippingAddress,
+                deliveryMethod: OrderData.deliveryMethod,
+                paymentMethod: OrderData.paymentMethod,
+                paymentStatus: 'Pending',
+                orderStatus: 'Processing',
+                totalAmount: totalAmount
+            };
+
+            const newOrder = new ORDER(newOrderData);
+            await newOrder.save({ session }); // Save order within transaction
+
+            // Update user details
+            const userUpdate = { $push: { orders: newOrder._id } };
+            if (newOrderData?.shippingAddress?.remember) {
+                userUpdate.$push.addresses = newOrderData.shippingAddress;
+            }
+            await USER.findByIdAndUpdate(newOrderData.user, userUpdate, { new: true, session });
+
+            // Commit the transaction after all DB operations are successful
+            await session.commitTransaction();
+            session.endSession();
+
+            // 4. Post-transaction operations (emails/notifications)
+            for (const v of vendors) {
+                await sendOrderToVendor(v?.email, v?.name || "Vendor", newOrder.orderId, v.products, newOrderData.shippingAddress, newOrderData?.user?.name);
+            }
+            for (const v of vendors) {
+                await notification.create({
+                    receiver: v.vendor_id,
+                    title: `New Order`,
+                    message: `You have received a new Order ${newOrderData?.orderId}`,
+                    type: "new_order",
+                    isRead: false,
+                });
+            }
+
+            const userDoc = await USER.findById(newOrderData.user);
+            userDoc.totalSpent += totalAmount;
+            await userDoc.save();
+            await sendOrderConfirmation(OrderData?.user?.email, OrderData.user?.name, newOrderData?.orderId, OrderData?.items, newOrderData?.totalAmount);
+
+            return res.status(200).json({ success: true, message: "Order saved successfully", orderid: newOrder._id });
+        }
+
+        // 5. Handle Online Payment (Razorpay order creation)
+        // No stock update here yet, as payment is pending. It happens in verifyPayment.
+        await session.commitTransaction(); // Commit pre-check only
+        session.endSession();
+
+        const orderId = generateOrderId();
+        const orderOptions = {
+            amount: Math.round(totalAmount * 100),
+            currency: 'INR',
+            receipt: orderId
+        };
+
         const order = await instance.orders.create(orderOptions);
         res.json({
-          success: true,
-          key_id: process.env.RAZORPAY_ID_KEY,
-          amount: order.amount,
-          order_id: order.id,
-          product_name: OrderData.items[0].name,
-          description: "Sample Product Description",
-          contact: user.phone,
-          name: user.name,
-          email: user.email
+            success: true,
+            key_id: process.env.RAZORPAY_ID_KEY,
+            amount: order.amount,
+            order_id: order.id,
+            product_name: user.name, // Changed from OrderData.items[0].name (which is not available on OrderData yet) to user.name, or find a better product name
+            description: "E-commerce Order Payment",
+            contact: user.phone,
+            name: user.name,
+            email: user.email,
+            // You might need to send totalAmount back to client for Razorpay display
+            totalAmount: totalAmount // Sending final calculated amount
         });
     } catch (error) {
-      console.log(error)
-        res.json({ success: false, msg: "Order creation failed", error: error.message });
+        console.error('CreateOrder error:', error);
+        if (session) {
+            await session.abortTransaction();
+            session.endSession();
+        }
+        res.status(500).json({ success: false, msg: "Order processing failed", error: error.message });
     }
 };
 
-export const verifyPayment =  async (req, res) => {
-  const { payment_id, order_id, signature } = req.body;
-  let {orderData} = req.body;
+export const verifyPayment = async (req, res) => {
+    const { payment_id, order_id, signature } = req.body;
+    let { orderData } = req.body;
+    let session; // Declare session outside try-catch
 
-  let totalAmount = 0;
-  let vendors = []
-  for (const item of orderData.items) {
-    const product = await PRODUCT.findById(item.productID);
-    if (!product) return res.status(400).json({ message: `Product not found for ID ${item.ProductID}` });
-    const vendor_id = product?.vendor
-    const populate_prd = await product.populate("vendor");
-    const vendorEmail = populate_prd?.vendor?.email;
+    // 1. Verify Razorpay Signature
+    const shasum = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET_KEY);
+    shasum.update(order_id + "|" + payment_id);
+    const generated_signature = shasum.digest('hex');
 
-    let vendor = vendors.find(v => v.email === vendorEmail);
-    if (!vendor) {
-      vendor = {
-        vendor_id,
-        email: vendorEmail,
-        products: []
-      };
-      vendors.push(vendor);
+    if (generated_signature !== signature) {
+        return res.json({ success: false, message: "Payment verification failed" });
     }
 
-    vendor.products.push({
-      productID: product._id,
-      name: product.name,
-      price: product.price,
-      quantity: item.quantity
-    });
-    totalAmount += product.price * item.quantity;
-  }
-  totalAmount += totalAmount*2/100;
-  let delivery = totalAmount >= 499 ? 0 : 40;
-  if (orderData?.deliveryMethod === 'Express') delivery = 60;
-  totalAmount += delivery;
-  totalAmount = parseFloat(totalAmount.toFixed(2));
-
-  const finalItems = orderData.items.map(item => ({
-    product: item._id,
-    quantity: item.quantity,
-    price: item.price
-  }));
-  orderData = {
-    ...orderData,
-    paymentStatus: 'Paid',
-    orderStatus: 'Processing',
-    totalAmount,
-  }
-  const newOrderData = {
-    orderId: generateOrderId(),
-    user: orderData.user._id,
-    items: finalItems,
-    shippingAddress: orderData.shippingAddress,
-    deliveryMethod: orderData.deliveryMethod,
-    paymentMethod: orderData.paymentMethod,
-    paymentStatus: orderData.paymentStatus,
-    orderStatus: orderData.orderStatus,
-    totalAmount: orderData.totalAmount
-  }
-  const shasum = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET_KEY);
-  shasum.update(order_id + "|" + payment_id);
-  const generated_signature = shasum.digest('hex');
-  if (generated_signature === signature) {
+    // Payment signature is valid, proceed with atomic stock update and order saving
     try {
+        session = await mongoose.startSession();
+        session.startTransaction();
+
+        let totalAmount = 0;
+        let vendors = [];
+        const stockUpdates = []; // To hold product IDs and quantities for atomic update
+
+        // 2. Recalculate and perform atomic stock update
+        for (const item of orderData.items) {
+            const product = await PRODUCT.findById(item.productID).session(session); // Use productID from original item structure
+
+            if (!product) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: `Product not found for ID ${item.productID}` });
+            }
+
+            if (product.stock < item.quantity) {
+                 await session.abortTransaction();
+                 session.endSession();
+                 // Note: Ideally, this should trigger a refund or an order review process
+                 return res.status(400).json({ message: `Stock sold out for ${product.name} after payment.` });
+            }
+
+            // Atomic stock decrement preparation
+            stockUpdates.push({
+                productId: product._id,
+                quantity: item.quantity
+            });
+
+            // Vendor information gathering
+            const vendor_id = product?.vendor;
+            const populate_prd = await product.populate("vendor");
+            const vendorEmail = populate_prd?.vendor?.email;
+
+            let vendor = vendors.find(v => v.email === vendorEmail);
+            if (!vendor) {
+                vendor = {
+                    vendor_id,
+                    email: vendorEmail,
+                    products: []
+                };
+                vendors.push(vendor);
+            }
+
+            vendor.products.push({
+                productID: product._id,
+                name: product.name,
+                price: product.price,
+                quantity: item.quantity
+            });
+            totalAmount += product.price * item.quantity;
+        }
+
+        // Recalculate amount (Ensure this logic is identical to CreateOrder)
+        totalAmount += totalAmount * 2 / 100;
+        let delivery = totalAmount >= 499 ? 0 : 40;
+        if (orderData?.deliveryMethod === 'Express') delivery = 60;
+        totalAmount += delivery;
+        totalAmount = parseFloat(totalAmount.toFixed(2));
+
+
+        // **Atomic Stock Decrement**
+        for (const update of stockUpdates) {
+            const updatedProduct = await PRODUCT.findOneAndUpdate(
+                { _id: update.productId, stock: { $gte: update.quantity } }, // Only update if stock is sufficient
+                { $inc: { stock: -update.quantity } }, // Atomic decrement
+                { new: true, session: session }
+            );
+
+            if (!updatedProduct) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: `Stock sold out for product ID ${update.productId} during final check.` });
+            }
+        }
+
+        // 3. Save Order (must happen inside transaction)
+        const finalItems = orderData.items.map(item => ({
+            product: item.productID, // Use productID from original item structure
+            quantity: item.quantity,
+            price: item.price
+        }));
+
+        const newOrderData = {
+            orderId: generateOrderId(),
+            user: orderData.user._id,
+            items: finalItems,
+            shippingAddress: orderData.shippingAddress,
+            deliveryMethod: orderData.deliveryMethod,
+            paymentMethod: orderData.paymentMethod,
+            paymentStatus: 'Paid',
+            orderStatus: 'Processing',
+            totalAmount: totalAmount
+        };
+
         const newOrder = new ORDER(newOrderData);
-        await newOrder.save();
+        await newOrder.save({ session }); // Save order within transaction
+
+        // Update user details
+        const userUpdate = { $push: { orders: newOrder._id } };
         if (newOrderData?.shippingAddress?.remember) {
-          await USER.findByIdAndUpdate(
-            newOrderData.user,
-            {
-              $push: {
-                orders: newOrder._id,
-                addresses: newOrderData.shippingAddress
-              }
-            },
-            { new: true }
-          );
+            userUpdate.$push.addresses = newOrderData.shippingAddress;
         }
-        else {
-          await USER.findByIdAndUpdate(
-            newOrderData.user,
-            { $push: { orders: newOrder._id } },
-            { new: true }
-          );
+        await USER.findByIdAndUpdate(newOrderData.user, userUpdate, { new: true, session });
+
+        // Commit the transaction after all DB operations are successful
+        await session.commitTransaction();
+        session.endSession();
+
+        // 4. Post-transaction operations (emails/notifications)
+        for (const v of vendors) {
+            await sendOrderToVendor(v?.email, v?.name || "Vendor", newOrder.orderId, v.products, orderData.shippingAddress, orderData?.user?.name);
         }
         for (const v of vendors) {
-          await sendOrderToVendor(
-            v?.email,
-            v?.name || "Vendor",
-            newOrder.orderId,
-            v.products,
-            orderData.shippingAddress,
-            newOrderData?.user?.name
-          );
+            await notification.create({
+                receiver: v.vendor_id,
+                title: `New Order`,
+                message: `You have received a new Order ${newOrderData?.orderId}`,
+                type: "new_order",
+                isRead: false,
+            });
         }
-        for (const v of vendors) {
-          await notification.create({
-            receiver: v.vendor_id,
-            title: `New Order`,
-            message: `You have received a new Order ${newOrderData?.orderId}`,
-            type: "new_order",
-            isRead: false,
-          })
-        }
-        const user = await USER.findById(newOrderData.user)
-        user.totalSpent += totalAmount
-        await user.save()
-        await sendOrderConfirmation(orderData?.user?.email, orderData.user?.name, newOrderData?.orderId, orderData.items, newOrderData?.totalAmount)
-        return res.status(200).json({ success: true,  message: "Order saved successfully", orderid: newOrder._id });
+        const userDoc = await USER.findById(newOrderData.user);
+        userDoc.totalSpent += totalAmount;
+        await userDoc.save();
+        await sendOrderConfirmation(orderData?.user?.email, orderData.user?.name, newOrderData?.orderId, orderData.items, newOrderData?.totalAmount);
+
+        return res.status(200).json({ success: true, message: "Order saved successfully", orderid: newOrder._id });
+
     } catch (error) {
-        console.error('Error saving order:', error);
-        return res.status(500).json({ message: 'Error saving order', error });
+        console.error('verifyPayment error:', error);
+        if (session) {
+            await session.abortTransaction();
+            session.endSession();
+        }
+        return res.status(500).json({ message: 'Error saving order after payment verification', error });
     }
-  } else {
-    return res.json({ success: false });
-  }
 };
 
 export const getOrders = async (req, res) => {
