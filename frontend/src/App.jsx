@@ -1,52 +1,70 @@
+// Main App component - Controls the overall structure and flow of the website
+
+// Import page sections and components
+// About page sections
 import { Mission } from "./Sections/About/Parts/Mission";
 import { Stats } from "./Sections/About/Parts/stats";
 import { Story } from "./Sections/About/Parts/Story";
 import { MeetTeam } from "./Sections/About/Parts/MeetTeam";
+
+// Main content sections
 import { CategoryBody } from "./Sections/Category/Parts/Body";
 import { HomeBody } from "./Sections/Home/HomeBody";
 import { NavBar } from "./Sections/Navbar/navbar";
-import { Routes, Route, useLocation } from "react-router-dom";
-import { CartProductContext } from "./services/context";
 import { FooterSection } from "./Sections/footer-section/Footer";
 import ContactUs from "./Sections/Contact/Parts/contact";
-import { useState } from "react";
+
+// Navigation and state management
+import { Routes, Route, useLocation } from "react-router-dom";
+import { CartProductContext } from "./services/context";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+// User account related components
 import SignupForm from "./Sections/User/SignUp";
 import SigninForm from "./Sections/User/Signin";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import { useQuery } from "@tanstack/react-query";
-import { authCheck } from "../API/api";
 import Profile from "./Sections/User/Profile/profile";
-import Checkout from "./Sections/Order/checkout";
-import ProductDetails from "./Sections/Product/ProductDetails";
-import ScrollToTop from "./scrolltotop";
-import Orders from "./Sections/Order/orders";
-import VendorForm from "./Sections/Vendor/vendorForm";
-import { VendorDashboard } from "./Sections/Vendor/vendorDashboard";
-import TrackOrder from "./Sections/Order/trackOrder";
-import { useEffect } from "react";
-import { userInteresctionDataServer } from "../API/api";
-import Search from "./Sections/Product/search";
 import SendVerification from "./Sections/User/sendVerification";
 import VerifyAccount from "./Sections/User/verifyAccount";
 import ForgotPassword from "./Sections/User/forgotPassword";
-import OrderPage from "./Sections/Order/orderPage";
 import ResetPassword from "./Sections/User/resetPassword";
 
+// Shopping related components
+import Checkout from "./Sections/Order/checkout";
+import ProductDetails from "./Sections/Product/ProductDetails";
+import Orders from "./Sections/Order/orders";
+import OrderPage from "./Sections/Order/orderPage";
+import TrackOrder from "./Sections/Order/trackOrder";
+import Search from "./Sections/Product/search";
+
+// Vendor (seller) related components
+import VendorForm from "./Sections/Vendor/vendorForm";
+import { VendorDashboard } from "./Sections/Vendor/vendorDashboard";
+
+// Utility components and functions
+import ScrollToTop from "./scrolltotop";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { authCheck, userInteresctionDataServer } from "../API/api";
+
+// Google sign-in configuration
 const GOOGLE_CLIENT_ID = "316084868865-6cm9ag49f38mgqp25ttja2i61cbjbl6l.apps.googleusercontent.com";
 
+// Wrapper component for Google authentication
 const GoogleAuthWrapper = ({ children }) => (
   <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     {children}
   </GoogleOAuthProvider>
 );
 
+// Main application component
 const App = () => {
+  // Initialize shopping cart from local storage (persists after page refresh)
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem("Cart");
-    return saved ? JSON.parse(saved) : [];
+    return saved ? JSON.parse(saved) : [];  // Empty cart if nothing saved
   });
 
-
+  // Check if user is logged in
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["authcheck"],
     queryFn: authCheck,

@@ -1,47 +1,72 @@
-import { FaArrowLeft } from "react-icons/fa6";
+// This file handles the checkout process where users enter shipping details and make payment
+
+// Import necessary icons and styles
+import { FaArrowLeft } from "react-icons/fa6";  // Back button icon
 import "./checkout.css"
+
+// Import React tools and cart data
 import { useContext, useEffect, useState } from "react";
 import { CartProductContext } from "../../services/context";
 import { useNavigate } from "react-router-dom";
-import OrderDetail from "./orderDetail";
-import PaymentOptions from "./paymentOptions";
-import DeliveryOption from "./deliveryOption";
-import AddressForm from "./addressForm";
-import { createOrder, verifyPayment } from "../../../API/api"; // Note: getOrder is not used in this function
-import Addresses from "./addresses";
-import Loading from "../Loading/loading"
-import axios from 'axios'; // Import axios if your `createOrder` and `verifyPayment` use it.
 
+// Import checkout process components
+import OrderDetail from "./orderDetail";           // Order summary
+import PaymentOptions from "./paymentOptions";     // Payment method selection
+import DeliveryOption from "./deliveryOption";     // Shipping method selection
+import AddressForm from "./addressForm";           // Shipping address form
+import Addresses from "./addresses";               // Saved addresses
+import Loading from "../Loading/loading"           // Loading animation
+
+// Import payment processing functions
+import { createOrder, verifyPayment } from "../../../API/api";
+import axios from 'axios';
+
+// Main checkout component
 const Checkout = () => {
+    // Get cart data and user info from global state
     const {cartItems , user, setCartItems, setCmenu } = useContext(CartProductContext)
-    const [priceDetail, setPriceDetail] = useState({subtotal: "", platform_fees: "", delivery: "", total: ""});
+    
+    // Track order details and process
+    const [priceDetail, setPriceDetail] = useState({
+        subtotal: "",           // Items total
+        platform_fees: "",      // Service charges
+        delivery: "",           // Shipping cost
+        total: ""              // Final amount
+    });
     const [count, setCount] = useState(1);
-    const [selected, setSelected] = useState(0);
-    const [paymentSelected, setPaymentSelected] = useState(0);
-    const [addNew, setaddNew] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [selected, setSelected] = useState(0);              // Selected address
+    const [paymentSelected, setPaymentSelected] = useState(0); // Payment method
+    const [addNew, setaddNew] = useState(false);              // New address form
+    const [loading, setLoading] = useState(false);            // Loading state
     const navigate = useNavigate();
+
+    // Address form data structure
     const [addressForm, setAddressForm] = useState({
         id: "",
         email: "",
-        name: "",
-        street: "",
-        city: "",
+        name: "",          // Full name
+        street: "",        // Street address
+        city: "",         
         state: "",
-        phone: "",
-        zipcode: "",
-        remember: false
+        phone: "",        // Contact number
+        zipcode: "",      // PIN code
+        remember: false   // Save for future
     })
 
+    // Load Razorpay payment gateway when component loads
     useEffect(() => {
+        // Add Razorpay script to page
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.async = true;
         document.body.appendChild(script);
+        
+        // Redirect to home if cart is empty
         if (cartItems.length===0){
             navigate("/")
         }
 
+        // Clean up: remove script when component unmounts
         return () => {
             document.body.removeChild(script);
         };
@@ -212,7 +237,6 @@ const Checkout = () => {
         return <Loading/>
     }
     
-    // ... rest of the component remains the same
     return (
     <>
       <section className="min-h-screen flex justify-center bg-[#f3f3f5]"> 

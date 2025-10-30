@@ -1,26 +1,39 @@
-import { getuser, setuserandcookies } from "../services/auth.js";
-import USER from "../models/user.js"
-import axios from "axios"
-import bcrypt from "bcrypt"
-import {oauth2Client} from "../services/googleAuth.js"
-import { sendCancelledOrderMail, sendCustomerQueryMail, sendVendorApplicationMail, sendVerificationMail, sendForgotPasswordEmail, sendPasswordResetSuccessMail } from "../emails/sendMail.js";
-import PRODUCT from "../models/product.js";
-import ORDER from "../models/order.js"
-import jwt from "jsonwebtoken";
+// This file handles all user-related operations like signup, login, verification, and profile management
 
+// Import necessary tools and services
+import { getuser, setuserandcookies } from "../services/auth.js";  // Authentication helpers
+import USER from "../models/user.js"                               // User database model
+import axios from "axios"                                          // For making HTTP requests
+import bcrypt from "bcrypt"                                        // For password security
+import {oauth2Client} from "../services/googleAuth.js"             // Google login support
+// Email sending functions for different scenarios
+import { sendCancelledOrderMail, sendCustomerQueryMail, sendVendorApplicationMail, sendVerificationMail, sendForgotPasswordEmail, sendPasswordResetSuccessMail } from "../emails/sendMail.js";
+import PRODUCT from "../models/product.js";                        // Product database model
+import ORDER from "../models/order.js"                            // Order database model
+import jwt from "jsonwebtoken";                                   // For creating secure tokens
+
+// Handle new user registration
 export const signup = async (req,res) => {
   try {
+    // Get user information from the registration form
     const {name, email, phone, password} = req.body;
+    
+    // Check if email is already registered
     const user = await USER.findOne({email});
     if (user){
         return res.json({success: false, message: "This Email already registered"})
     }
 
+    // Secure the password and create verification token
     const saltround = 11;
-    const hashedpass = await bcrypt.hash(password, saltround);
-    const verificationToken =  Math.floor(100000 + Math.random() * 900000)
-    const verificationTokenExpiry = Date.now() + 15*60*60*1000
+    const hashedpass = await bcrypt.hash(password, saltround);  // Encrypt password
+    const verificationToken =  Math.floor(100000 + Math.random() * 900000)  // Create 6-digit verification code
+    const verificationTokenExpiry = Date.now() + 15*60*60*1000  // Token expires in 15 hours
+    
+    // Create login token and set in browser cookies
     const token = setuserandcookies(res, {name, email})
+    
+    // Create new user account in database
     await USER.create({
         name,
         email,
@@ -28,8 +41,10 @@ export const signup = async (req,res) => {
         password: hashedpass,
         verificationToken,
         verificationTokenExpiry,
-        authProvider: "local"
+        authProvider: "local"  // Shows this is a regular signup (not Google)
     })
+    
+    // Send verification email to user
     await sendVerificationMail(email, verificationToken);
     return res.json({success: true, message: "user registered successfully", user: {name, email, phone}, token});
   } catch (error) {
@@ -37,16 +52,22 @@ export const signup = async (req,res) => {
   }
 }
 
+// Send or resend email verification code
 export const sendVerification = async (req,res) => {
   try {
+    // Get current user's ID from their login session
     const user_id = req?.user?._id
     const user = await USER.findById(user_id);
+    
+    // Check if user exists and needs verification
     if (!user){
         return res.status(404).json({success:false, message: "User Not Found"})
     }
     if (user.isVerified){
       return res.json({success: false, message: "Already verified"})
     }
+    
+    // Generate new verification code
     const verificationToken =  Math.floor(100000 + Math.random() * 900000)
     const verificationTokenExpiry = Date.now() + 15*60*60*1000
     user.verificationToken = verificationToken
