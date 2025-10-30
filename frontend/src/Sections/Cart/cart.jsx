@@ -1,43 +1,62 @@
-import { useContext, useEffect, useState } from "react";
-import { FiShoppingBag } from "react-icons/fi";
-import { IoMdClose } from "react-icons/io";
-import {CartProductContext} from "../../services/context"
-import {NavLink, useNavigate} from "react-router-dom"
-import ProductTemplate from "./productTemplate";
+// This file manages the shopping cart sidebar/panel that shows selected items and total
 
+// Import necessary tools and components
+import { useContext, useEffect, useState } from "react";
+import { FiShoppingBag } from "react-icons/fi";              // Shopping bag icon
+import { IoMdClose } from "react-icons/io";                  // Close button icon
+import {CartProductContext} from "../../services/context"     // Shopping cart data
+import {NavLink, useNavigate} from "react-router-dom"        // Page navigation
+import ProductTemplate from "./productTemplate";             // Individual cart item display
+
+// Shopping cart panel component
 const Cart = ({setCmenu}) => {
+    // Get cart data and user information from global state
     const {cartItems , items, checkAuth, user} = useContext(CartProductContext)
+    // Track price calculations
     const [priceDetail, setPriceDetail] = useState({subtototal: "", tax: "", delivery: "", total: ""});
     const navigate = useNavigate();
 
+    // Calculate total price whenever cart items change
     useEffect(() => {
+        // Save cart to browser storage (persists after refresh)
         localStorage.setItem("Cart", JSON.stringify(cartItems));
+        
+        // Calculate subtotal of all items
         let subtotal = 0;
         for (let i=0;i<cartItems.length;i++){
             subtotal += (cartItems[i].price)*(cartItems[i].quantity)
         }
-        const platform_fees = subtotal*2/100
-        const delivery = subtotal>499 ? 0 : 40
+        
+        // Calculate additional costs
+        const platform_fees = subtotal*2/100                  // 2% platform fee
+        const delivery = subtotal>499 ? 0 : 40               // Free delivery above ₹499
         const total = subtotal + platform_fees + delivery
+        
+        // Update price details
         setPriceDetail({subtototal: subtotal, platform_fess: platform_fees.toFixed(2), delivery: subtotal>=499 ? "Free Delivery" : "₹40", total: total})
     },[cartItems])
 
+    // Close cart panel
     const handleMenuClose = () => {
         setCmenu(false);
     }
+    
+    // Continue shopping - redirects to categories page
     const handleContinue = () => {
         setCmenu(false)
         navigate('/categories')
     }
+    
+    // Handle checkout button click
     const handleCheckout = () => {
         if (checkAuth && user){
             if (!user.isVerified){
-                alert('Verify you account first');
+                alert('Verify you account first');            // Must verify email before checkout
             } else {
-                navigate('/checkout')
+                navigate('/checkout')                         // Go to checkout page
             }
         } else {
-            navigate('/signin')
+            navigate('/signin')                              // Must sign in first
         }
     }
   return (

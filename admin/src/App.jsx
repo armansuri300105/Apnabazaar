@@ -1,19 +1,30 @@
+// Main Admin Panel Application
+// This file sets up the admin dashboard with routing and authentication
+
+// Import necessary routing components
 import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
-import Sidebar from "./Components/SideBar";
-import Dashboard from "./Components/Dashbord";
-import Products from "./Components/Products";
-import Orders from "./Components/Orders";
-import Vendors from "./Components/Vendors";
-import Users from "./Components/Users";
+
+// Import admin panel sections
+import Sidebar from "./Components/SideBar";        // Navigation sidebar
+import Dashboard from "./Components/Dashbord";      // Main dashboard view
+import Products from "./Components/Products";       // Product management
+import Orders from "./Components/Orders";          // Order tracking
+import Vendors from "./Components/Vendors";        // Vendor management
+import Users from "./Components/Users";            // User management
+
+// Authentication components
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import SigninForm from "./Components/Signin";
 import SignupForm from "./Components/SignUp";
+
+// Data management and routing protection
 import { useQuery } from "@tanstack/react-query";
 import { authCheck } from "../API/product";
 import { CartProductContext } from "./services/context";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "./services/protectedRoute";
 
+// Google OAuth configuration for admin authentication
 const GOOGLE_CLIENT_ID = "316084868865-6cm9ag49f38mgqp25ttja2i61cbjbl6l.apps.googleusercontent.com";
 
 const GoogleAuthWrapper = ({ children }) => (
@@ -37,6 +48,7 @@ export const App = () => {
   const location = useLocation();
   const isSignupPage = ["/signup", "/signin"].includes(location.pathname);
 
+  // Update authentication state when the API check completes
   useEffect(() => {
     if (!isLoading) {
       // Set auth state based on API response
@@ -46,7 +58,7 @@ export const App = () => {
   }, [data, isLoading]);
 
   // Show loading spinner during initial authentication check
-  // But only if we haven't completed the initial load yet
+  // Displays only during the first load to prevent flashing on subsequent checks
   if (isLoading && !initialLoadComplete) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -58,7 +70,8 @@ export const App = () => {
     );
   }
 
-  // If there's an error with auth check and we're not on public pages, redirect to signin
+  // Security: Redirect to signin if authentication fails
+  // Only redirects if not already on signup/signin pages
   if (error && !isSignupPage && initialLoadComplete) {
     return <Navigate to="/signin" replace />;
   }

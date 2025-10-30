@@ -1,17 +1,26 @@
-import { useContext, useEffect, useState } from "react"
-import { SearchBar } from "./components/SearchBar"
-import { NavLink } from 'react-router-dom'
-import { BsCart3 } from "react-icons/bs";
-import { IoMdClose } from "react-icons/io";
-import { IoMdMenu } from "react-icons/io";
-import "./navbar.css"
-import Cart from "../Cart/cart";
-import { CartProductContext } from "../../services/context";
-import NavbarSkeleton from "./NavbarSkeleton.jsx"
+// This file creates the navigation bar that appears at the top of every page
 
+// Import necessary tools and components
+import { useContext, useEffect, useState } from "react"
+import { SearchBar } from "./components/SearchBar"         // Search input field
+import { NavLink } from 'react-router-dom'                // Page navigation links
+import { BsCart3 } from "react-icons/bs";                 // Shopping cart icon
+import { IoMdClose } from "react-icons/io";               // Close menu icon
+import { IoMdMenu } from "react-icons/io";                // Open menu icon
+import "./navbar.css"
+import Cart from "../Cart/cart";                          // Shopping cart panel
+import { CartProductContext } from "../../services/context";  // Shopping cart data
+import NavbarSkeleton from "./NavbarSkeleton.jsx"         // Loading animation
+
+// Main navigation bar component
 export const NavBar = () =>{
+    // Track mobile menu state (open/closed)
     const [menu, setMenu] = useState(false);
+    
+    // Get cart data and user info from global state
     const {cartItems, items, setItems, checkAuth, cmenu, setCmenu, loadinguser, user} = useContext(CartProductContext)
+    
+    // Calculate total items in cart whenever cart changes
     useEffect(() => {
         let total = 0;
         for (let i=0;i<cartItems.length;i++){
@@ -19,33 +28,42 @@ export const NavBar = () =>{
         }
         setItems(total);
     },[cartItems])
+
+    // Close all menus (mobile and cart)
     const handleMenu = () => {
         setMenu(false);
         setCmenu(false);
     }
 
+    // Toggle between menu and close icons
     const Icon = menu ? IoMdClose : IoMdMenu
+    
+    // Open shopping cart panel
     const handleCartMenu = () => {
         setCmenu(true);
     }
 
     return (
+        // Main navigation bar - stays at top of screen
         <div  className="navbar z-[1] fixed top-0 items-center right-0 left-0 flex justify-center shadow-sm backdrop-blur-md p-[20px]" style={{backgroundColor: "color-mix(in oklab, #fff 60%, transparent)"}}>
             {loadinguser ? (
-                <NavbarSkeleton/>
+                <NavbarSkeleton/>  // Show loading animation while user data loads
             ) : 
             (<nav className="navbar-section flex justify-around items-center w-[1200px]">
+                {/* Website logo */}
                 <div className="logo flex items-center">
                     <div>
                         <NavLink to="/"><div className="font-semibold"><img className="w-[150px]" src="/logo.webp" alt="ApnaBazaar" /></div></NavLink>
                     </div>
                 </div>
+                {/* Desktop navigation menu */}
                 <ul className={`options flex gap-8 justify-between cursor-pointer text-[20px]`}>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/"><li>Home</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/categories"><li>Categories</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/about"><li>About</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/contact"><li>Contact</li></NavLink>
                 </ul>
+                {/* Mobile navigation menu - shows on small screens */}
                 <ul className={`mobile-options hidden flex-col items-center text-[20px] gap-[14px] justify-between cursor-pointer overflow-hidden duration-300 ease-linear tarnsition-all ${(menu) ? "h-[155px]" : "h-0"}`}>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/"><li>Home</li></NavLink>
                     <NavLink className="link [&.active>li]:font-bold" onClick={handleMenu} to="/categories"><li>Categories</li></NavLink>

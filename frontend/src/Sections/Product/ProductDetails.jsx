@@ -1,35 +1,53 @@
+// This file creates the detailed product page showing all information about a single product
+
+// Import necessary tools and icons
 import { useContext, useEffect, useState } from "react";
-import { HiOutlineTruck } from "react-icons/hi";
-import { Star } from "lucide-react";
-import { Heart } from "lucide-react";
-import { FaArrowLeft } from "react-icons/fa6";
+import { HiOutlineTruck } from "react-icons/hi";           // Delivery truck icon
+import { Star } from "lucide-react";                       // Rating star icon
+import { Heart } from "lucide-react";                      // Wishlist heart icon
+import { FaArrowLeft } from "react-icons/fa6";            // Back navigation arrow
+import { MdOutlineShare } from "react-icons/md";          // Share button icon
+
+// Navigation and API functions
 import { useNavigate, useParams } from "react-router-dom";
 import { deleteWishlist, getProductsById, updateWishlist } from "../../../API/api";
-import { MdOutlineShare } from "react-icons/md";
 import { CartProductContext } from "../../services/context";
+
+// Import sub-components for different sections
 import "./productDetail.css"
-import Detail from "./detail";
-import Vendor from "./vendor";
-import Reviews from "./reviews";
-import {useQuery} from "@tanstack/react-query"
+import Detail from "./detail";              // Product specifications
+import Vendor from "./vendor";              // Seller information
+import Reviews from "./reviews";            // Customer reviews
+import CartPopup from "./cartPopUp";        // Added to cart notification
+import { ProductShow } from "../Home/Components/productshow";  // Similar products
+
+// Loading state components
 import ProductDetailSkeleton from "./productDetailSkeleton";
-import CartPopup from "./cartPopUp";
-import { userSearchMl } from "../../../API/ml";
-import { ProductShow } from "../Home/Components/productshow";
 import FavoritesSkeleton from "../User/Profile/Skeletons/favoritesSkeleton"
 
+// Data fetching tools
+import {useQuery} from "@tanstack/react-query"
+import { userSearchMl } from "../../../API/ml";  // Machine learning product recommendations
+
+// Main product details page component
 const ProductDetails = () => {
+  // Get cart and user data from global state
   const {user, cartItems, setCartItems, setCmenu, dataForMl, setDataForMl} = useContext(CartProductContext)
-  const [wishlist, setWishlist] = useState(false);
-  const [quantity, setQuantity] = useState(1);
-  const [btn, setBtn] = useState("Add to Cart")
-  const [select, setSelect] = useState(0)
+  
+  // Local state for product interaction
+  const [wishlist, setWishlist] = useState(false);         // Wishlist status
+  const [quantity, setQuantity] = useState(1);             // Quantity to buy
+  const [btn, setBtn] = useState("Add to Cart")            // Cart button text
+  const [select, setSelect] = useState(0)                  // Selected tab (details/reviews)
+  const [selectedImage, setSelectedImage] = useState(null); // Current product image
+  const [popUp, setPopUp] = useState(false);               // Cart notification
+  
+  // Navigation setup
   const navigate = useNavigate();
   const param = useParams();
   const Productid = param?.Productid
-  const [selectedImage, setSelectedImage] = useState(null);
-   const [popUp, setPopUp] = useState(false);
   
+  // Fetch product details from server
   const {data: product, isLoading, refetch} = useQuery({
     queryKey : ["showproduct", Productid],
     queryFn: () => getProductsById(Productid),
@@ -37,6 +55,7 @@ const ProductDetails = () => {
     enabled: !!Productid,
   })
 
+  // Get product recommendations based on machine learning
   const {data: mlprd, mlLoading} = useQuery({
     queryKey: [`mlprd`, Productid],
     queryFn: () => userSearchMl(product?.name),
@@ -44,6 +63,7 @@ const ProductDetails = () => {
     enabled: !!product?.name
   })
 
+  // Set first product image as default when data loads
   useEffect(() => {
     if (product?.images?.length > 0) {
       setSelectedImage(product.images[0]);

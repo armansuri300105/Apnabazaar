@@ -1,50 +1,63 @@
-import Razorpay from 'razorpay';
-import PRODUCT from "../models/product.js";
-import ORDER from "../models/order.js"
-import crypto, { createECDH } from 'crypto'
-import 'dotenv/config'
-import USER from '../models/user.js';
-import { generateOrderId } from '../services/generateOrderId.js';
-import { sendOrderConfirmation, sendOrderToVendor } from '../emails/sendMail.js';
-import notification from '../models/notification.js';
-import mongoose from 'mongoose';
+// This file handles all order-related operations including creating orders, processing payments, and managing order status
 
+// Import necessary tools and services
+import Razorpay from 'razorpay';                                      // Payment gateway integration
+import PRODUCT from "../models/product.js";                           // Product database model
+import ORDER from "../models/order.js"                                // Order database model
+import crypto, { createECDH } from 'crypto'                          // For security operations
+import 'dotenv/config'                                               // Environment configuration
+import USER from '../models/user.js';                                // User database model
+import { generateOrderId } from '../services/generateOrderId.js';     // Custom order ID generator
+import { sendOrderConfirmation, sendOrderToVendor } from '../emails/sendMail.js';  // Email notifications
+import notification from '../models/notification.js';                 // In-app notifications
+import mongoose from 'mongoose';                                      // Database operations
+
+// Set up payment gateway with security credentials
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
   key_secret: process.env.RAZORPAY_SECRET_KEY
 });
 
+// Handle creation of new orders
 export const CreateOrder = async (req, res) => {
+    // Get order details from checkout form
     const { user, items, shippingAddress, paymentMethod, deliveryMethod } = req.body;
-    let session; // Declare session outside try-catch
+    let session; // For managing database changes safely
     try {
+        // Start a safe transaction - ensures all changes happen together or none happen
         session = await mongoose.startSession();
         session.startTransaction();
 
+        // Initialize tracking variables
         let totalAmount = 0;
-        let vendors = [];
-        const stockUpdates = []; // To hold product IDs and quantities for atomic update
+        let vendors = [];  // Track different sellers in the order
+        const stockUpdates = []; // Track inventory changes needed
 
-        // 1. Pre-check for stock and gather product/vendor info
+        // First check: Make sure all products are available
         for (const item of items) {
+            // Find the product in database
             const product = await PRODUCT.findById(item.productID).session(session);
 
+            // Stop if product doesn't exist
             if (!product) {
                 await session.abortTransaction();
                 session.endSession();
                 return res.status(400).json({ message: `Product not found for ID ${item.productID}` });
             }
 
+            // Stop if not enough stock available
             if (product.stock < item.quantity) {
                 await session.abortTransaction();
                 session.endSession();
                 return res.status(400).json({ message: `Insufficient stock for ${product.name}. Available: ${product.stock}` });
             }
 
+            // Get seller information
             const vendor_id = product?.vendor;
             const populate_prd = await product.populate("vendor");
             const vendorEmail = populate_prd?.vendor?.email;
 
+            // Group items by seller
             let vendor = vendors.find(v => v.email === vendorEmail);
             if (!vendor) {
                 vendor = {

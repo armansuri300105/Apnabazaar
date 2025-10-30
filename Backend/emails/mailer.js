@@ -1,6 +1,10 @@
+// This file handles sending emails to users (verification, order confirmations, etc.)
+
+// Previously used Gmail for sending emails (kept for reference)
 // import nodemailer from "nodemailer";
 // import { google } from "googleapis";
 
+// Gmail OAuth2 setup for secure email sending
 // const oAuth2Client = new google.auth.OAuth2(
 //   process.env.GMAIL_CLIENT_ID,
 //   process.env.GMAIL_CLIENT_SECRET,
@@ -8,10 +12,12 @@
 // );
 // oAuth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
 
+// Gmail email sending function
 // export const sendMail = async ({ to, subject, html }) => {
 //   try {
 //     const accessToken = await oAuth2Client.getAccessToken();
 
+//     // Set up Gmail connection
 //     const transporter = nodemailer.createTransport({
 //       service: "gmail",
 //       auth: {
@@ -32,18 +38,25 @@
 //   }
 // };
 
-
+// Now using SendGrid for more reliable email delivery
 import sgMail from "@sendgrid/mail";
 
+// Set up SendGrid with API key from environment variables
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+// Function to send emails using SendGrid
+// Parameters:
+// - to: Recipient's email address
+// - subject: Email subject line
+// - html: Email content in HTML format
 export const sendMail = async ({ to, subject, html }) => {
   try {
+    // Prepare email message
     const msg = {
-      to,
-      from: process.env.SENDGRID_FROM,
-      subject,
-      html,
+      to,                              // Recipient
+      from: process.env.SENDGRID_FROM, // Verified sender address
+      subject,                         // Email subject
+      html,                           // Email content (HTML)
     };
     const result = await sgMail.send(msg);
     return result;

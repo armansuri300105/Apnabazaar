@@ -86,7 +86,7 @@ const userSchema = new mongoose.Schema(
       }
     ],
     vendor: vendorSchema,
-    totalSpent: {type: Number}
+    totalSpent: {type: Number, default: 0, min: 0}
   },
   { timestamps: true }
 );

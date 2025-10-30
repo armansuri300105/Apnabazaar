@@ -44,6 +44,7 @@ export const ProductShow= ({product}) =>{
             // Assuming productID and _id are interchangeable for product identification based on your existing logic
             if (cartItems[i]?.productID === (product?.productID || product?._id)){
                 updateQuantity(cartItems[i].productID, cartItems[i].quantity+1)
+                setPopUp(true);
                 return;
             }
         }
