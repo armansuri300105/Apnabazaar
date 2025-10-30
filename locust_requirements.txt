@@ -1,0 +1,4 @@
+# Locust Load Testing Requirements
+# Install these dependencies to run load tests on ApnaBazaar
+
+locust>=2.20.0
