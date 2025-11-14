@@ -87,6 +87,7 @@ const App = () => {
   const [items, setItems] = useState(0);
   const [cmenu, setCmenu] = useState(false);
   const location = useLocation();
+  const [userLocation, setUserLocation] = useState("")
   const isSignupPage = ["/signup", "/signin", "/checkout" ,"/vendor/dashboard", "/user/verify", "/user/forgotpassword"].includes(location.pathname) || location.pathname.startsWith("/user/verify/") || location.pathname.startsWith("/checkout/order/") || location.pathname.startsWith("/reset-password/");;
 
   useEffect(() => {
@@ -139,7 +140,9 @@ const App = () => {
         loadinguser: isLoading,
         dataForMl,
         setDataForMl,
-        refetch
+        refetch, 
+        userLocation,
+        setUserLocation
       }}
     >
       {!isSignupPage && <NavBar />}
@@ -147,7 +150,6 @@ const App = () => {
 
       {isLoading && <p className="text-center py-5">Loading...</p>}
       {error && <p className="text-center text-red-500 py-5">Failed to fetch user</p>}
-
       <Routes>
         <Route path="/" element={<HomeBody />} />
         <Route path="/categories" element={<CategoryPage />} />
@@ -184,7 +186,6 @@ const App = () => {
         <Route path="/checkout/order/:orderId" element={<OrderPage/>} />
         <Route path="/reset-password/:verificationToken" element={<ResetPassword/>} />
       </Routes>
-
       {!isSignupPage && <FooterSection loadinguser={isLoading} />}
     </CartProductContext.Provider>
   );

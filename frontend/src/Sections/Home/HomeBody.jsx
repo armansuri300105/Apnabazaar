@@ -8,6 +8,7 @@ import { Hbody1 } from "./Parts/Hbody1"                          // Main hero/ba
 import { ShopbyCategory } from "./Parts/ShopBycategory"          // Category navigation
 // Import shopping cart information
 import { CartProductContext } from "../../services/context"
+import { NearByProducts } from "./Parts/NearByProducts"
 
 // Main homepage component
 export const HomeBody = () =>{

@@ -11,6 +11,7 @@ import "./navbar.css"
 import Cart from "../Cart/cart";                          // Shopping cart panel
 import { CartProductContext } from "../../services/context";  // Shopping cart data
 import NavbarSkeleton from "./NavbarSkeleton.jsx"         // Loading animation
+import LocationFetcher from "../location/locationFetcher.jsx";
 
 // Main navigation bar component
 export const NavBar = () =>{
@@ -18,7 +19,7 @@ export const NavBar = () =>{
     const [menu, setMenu] = useState(false);
     
     // Get cart data and user info from global state
-    const {cartItems, items, setItems, checkAuth, cmenu, setCmenu, loadinguser, user} = useContext(CartProductContext)
+    const {cartItems, items, setItems, checkAuth, cmenu, setCmenu, loadinguser, user, setUserLocation} = useContext(CartProductContext)
     
     // Calculate total items in cart whenever cart changes
     useEffect(() => {
@@ -51,6 +52,7 @@ export const NavBar = () =>{
             ) : 
             (<nav className="navbar-section flex justify-around items-center w-[1200px]">
                 {/* Website logo */}
+                <div className="absolute bottom-0 left-[calc(50% - 70px)]"><LocationFetcher/></div>
                 <div className="logo flex items-center">
                     <div>
                         <NavLink to="/"><div className="font-semibold"><img className="w-[150px]" src="/logo.webp" alt="ApnaBazaar" /></div></NavLink>

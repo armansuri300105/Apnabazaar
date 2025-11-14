@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { CategoryItem } from "../Components/Categoryitem";
 import CategorySectionSkeleton from "../Skeleton/category";
 import { getCategories } from "../../../../API/api";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export const ShopbyCategory = ({ loadinguser }) => {
     const { data, isLoading } = useQuery({
