@@ -42,8 +42,13 @@ app.use('/api/order', order);     // Order features (cart, checkout, etc.)
 app.use('/api/admin', admin);     // Admin features (management tools)
 app.use('/api/vendor', vendor);   // Vendor features (selling tools)
 
+app.get('/', (req, res) => {
+    res.send("E-Commerce Website Backend is Running");
+});
+
 // Start the server and connect to the database
 app.listen(PORT, () => {
     connect(url)
     console.log(`Server run on port ${PORT}`);
+
 })
