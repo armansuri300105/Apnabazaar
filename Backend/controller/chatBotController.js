@@ -144,6 +144,27 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 const toCurrency = (value) => `Rs. ${Number(value || 0).toFixed(2)}`;
 
+const parseToolArguments = (args) => {
+  if (!args) return {};
+  if (typeof args === "object") return args;
+  return JSON.parse(args);
+};
+
+const normalizeAssistantMessage = (message) => {
+  if (!message) return null;
+
+  const normalized = {
+    role: "assistant",
+    content: message.content || "",
+  };
+
+  if (message.tool_calls?.length) {
+    normalized.tool_calls = message.tool_calls;
+  }
+
+  return normalized;
+};
+
 const serializeProduct = (product) => ({
   product_id: product?._id?.toString(),
   name: product?.name,
@@ -328,7 +349,7 @@ const runTool = async (toolCall, currentUserId) => {
   }
 
   try {
-    const args = JSON.parse(toolCall.function.arguments || "{}");
+    const args = parseToolArguments(toolCall.function.arguments);
     if (
       currentUserId &&
       ["get_recent_orders", "get_total_orders", "get_order_details", "get_user_profile"].includes(toolCall.function.name)
@@ -348,16 +369,16 @@ export const chatBot = async (req, res) => {
     if (!question?.trim()) {
       return res.status(400).json({ success: false, message: "Question is required" });
     }
-
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
         success: false,
-        message: "AI assistant is not configured. Please add OPENAI_API_KEY on the backend.",
+        message: "AI assistant is not configured. Please add GEMINI_API_KEY on the backend.",
       });
     }
 
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.GEMINI_API_KEY,
+      baseURL: process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai/",
     });
 
     const user = await getRequestUser(req, req.body?.user_id);
@@ -373,7 +394,7 @@ export const chatBot = async (req, res) => {
     ];
 
     const firstResponse = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+      model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
       messages,
       tools,
       tool_choice: "auto",
@@ -381,7 +402,16 @@ export const chatBot = async (req, res) => {
     });
 
     const assistantMessage = firstResponse.choices?.[0]?.message;
-    messages.push(assistantMessage);
+    const normalizedAssistantMessage = normalizeAssistantMessage(assistantMessage);
+
+    if (!normalizedAssistantMessage) {
+      return res.status(502).json({
+        success: false,
+        message: "AI assistant did not return a valid response. Please try again.",
+      });
+    }
+
+    messages.push(normalizedAssistantMessage);
 
     if (assistantMessage?.tool_calls?.length) {
       for (const toolCall of assistantMessage.tool_calls) {
@@ -394,7 +424,7 @@ export const chatBot = async (req, res) => {
       }
 
       const finalResponse = await openai.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+        model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
         messages,
         temperature: 0.3,
       });

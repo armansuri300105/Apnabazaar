@@ -1,0 +1,26 @@
+{
+  "name": "ApnaBazaar - Local Online Marketplace",
+  "short_name": "ApnaBazaar",
+  "description": "Shop local products, daily essentials, fashion, electronics, fresh produce and handmade goods from trusted nearby sellers.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "business", "lifestyle"],
+  "icons": [
+    {
+      "src": "/apnabazaar.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}

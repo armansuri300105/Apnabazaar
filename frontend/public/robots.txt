@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /checkout/
+Disallow: /orders
+Disallow: /orders/
+Disallow: /profile
+Disallow: /vendor/dashboard
+Disallow: /reset-password/
+Disallow: /user/verify/
+
+Sitemap: https://apnabzaar.netlify.app/sitemap.xml

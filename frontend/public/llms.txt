@@ -1,0 +1,15 @@
+# ApnaBazaar
+
+ApnaBazaar is an online marketplace for local products, daily essentials, fresh produce, fashion, electronics, handmade goods and nearby sellers.
+
+## Important URLs
+
+- Home: https://apnabzaar.netlify.app/
+- Categories: https://apnabzaar.netlify.app/categories
+- About: https://apnabzaar.netlify.app/about
+- Contact: https://apnabzaar.netlify.app/contact
+- Sitemap: https://apnabzaar.netlify.app/sitemap.xml
+
+## Search Keywords
+
+ApnaBazaar, Apna Bazaar, online marketplace India, local products, local shopping, nearby sellers, daily essentials online, fresh produce online, handmade products, electronics online, fashion online, ecommerce marketplace.

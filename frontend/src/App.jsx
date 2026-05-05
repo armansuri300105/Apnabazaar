@@ -43,6 +43,7 @@ import { VendorDashboard } from "./Sections/Vendor/vendorDashboard";
 
 // Utility components and functions
 import ScrollToTop from "./scrolltotop";
+import SeoManager from "./seo/SeoManager";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { authCheck, userInteresctionDataServer } from "../API/api";
 
@@ -146,6 +147,7 @@ const App = () => {
       }}
     >
       {!isSignupPage && <NavBar />}
+      <SeoManager />
       <ScrollToTop />
 
       {isLoading && <p className="text-center py-5">Loading...</p>}
