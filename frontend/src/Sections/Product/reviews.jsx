@@ -127,6 +127,7 @@ const Reviews = ({ product, refetch }) => {
               <p className="text-gray-500 text-sm">{new Date(r?.createdAt).toLocaleDateString()}</p>
             </div>
             <p className="text-gray-600 mt-1">{r?.comment}</p>
+            {/* <p className="text-gray-600 mt-1" dangerouslySetInnerHTML={{ __html: r?.comment }}></p> */}
           </div>
           {r?.user===user?._id && mode!=='edit' ? <div className='flex gap-[20px]'>
             <button onClick={() => handleEditComment(r)}><Edit className='w-[17px]'/></button>

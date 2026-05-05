@@ -1,10 +1,12 @@
 import axios from "axios"
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://apnabazaar-backend-3iwt.onrender.com";
+
 const api = axios.create({
-    baseURL: "http://172.0.0.1:8000",
+    baseURL: API_BASE_URL,
     withCredentials: true
 })
 
 export const send = (data) => {
-    return api.post('/chat/ai', data)
+    return api.post('/api/chat/ai', data)
 }

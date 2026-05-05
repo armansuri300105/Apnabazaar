@@ -47,7 +47,7 @@ export const FeaturedLocalProducts = () => {
                     </div>
                 </div>
                 <div className="w-full mt-8 flex gap-4 flex-wrap justify-center">
-                    {productsToShow?.map((product, index) => (
+                    {allProducts?.splice(0,6).map((product, index) => (
                         <ProductShow key={index} product={product} />
                     ))}
                 </div>

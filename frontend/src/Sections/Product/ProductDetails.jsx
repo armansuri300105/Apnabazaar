@@ -17,8 +17,7 @@ import { CartProductContext } from "../../services/context";
 import "./productDetail.css"
 import Detail from "./detail";              // Product specifications
 import Vendor from "./vendor";              // Seller information
-import Reviews from "./reviews";            // Customer reviews
-import CartPopup from "./cartPopUp";        // Added to cart notification
+import Reviews from "./reviews";            // Added to cart notification
 import { ProductShow } from "../Home/Components/productshow";  // Similar products
 
 // Loading state components
@@ -28,6 +27,7 @@ import FavoritesSkeleton from "../User/Profile/Skeletons/favoritesSkeleton"
 // Data fetching tools
 import {useQuery} from "@tanstack/react-query"
 import { userSearchMl } from "../../../API/ml";  // Machine learning product recommendations
+import CartPopup from "./cartPopUp";
 
 // Main product details page component
 const ProductDetails = () => {

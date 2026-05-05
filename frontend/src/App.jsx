@@ -88,7 +88,7 @@ const App = () => {
   const [cmenu, setCmenu] = useState(false);
   const location = useLocation();
   const [userLocation, setUserLocation] = useState("")
-  const isSignupPage = ["/signup", "/signin", "/checkout" ,"/vendor/dashboard", "/user/verify", "/user/forgotpassword"].includes(location.pathname) || location.pathname.startsWith("/user/verify/") || location.pathname.startsWith("/checkout/order/") || location.pathname.startsWith("/reset-password/");;
+  const isSignupPage = ["/signup", "/signin", "/checkout" ,"/vendor/dashboard", "/user/verify", "/user/forgotpassword"].includes(location.pathname) || location.pathname.startsWith("/user/verify/") || location.pathname.startsWith("/checkout/order/") || location.pathname.startsWith("/reset-password/");
 
   useEffect(() => {
     const sendInteractionData = async () => {

@@ -13,7 +13,7 @@ import { NearByProducts } from "./Parts/NearByProducts"
 // Main homepage component
 export const HomeBody = () =>{
     // Get loading state to show loading animations while data loads
-    const { loadinguser } = useContext(CartProductContext)
+    const { loadinguser, userLocation } = useContext(CartProductContext)
     
     return (
     <div>
@@ -25,5 +25,7 @@ export const HomeBody = () =>{
         
         {/* Display featured products from local sellers */}
         <FeaturedLocalProducts loadinguser={loadinguser}/>
+
+        {userLocation && <NearByProducts/>}
     </div>
 )} 
